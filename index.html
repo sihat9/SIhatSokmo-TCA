@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistem Appointment Klinik SIHATSOKMO</title>
+  <title>Sistem Appointment Klinik Sihatsokmo</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,14 +12,13 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <!-- SheetJS untuk export Excel -->
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #e0f2fe 0, #f8fafc 45%, #eef2ff 100%);
       min-height: 100vh;
-      font-size: 14px;
     }
     .tab-hidden { display: none; }
     .service-tag {
@@ -28,90 +27,92 @@
       border-radius: 12px;
       font-size: 11px;
       font-weight: 500;
-      margin-right: 5px;
-      margin-bottom: 5px;
+      margin-right: 4px;
+      margin-bottom: 4px;
     }
     .scrollbar-thin::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+      width: 6px;
+      height: 6px;
     }
     .scrollbar-thin::-webkit-scrollbar-track {
       background: #f1f5f9;
-      border-radius: 5px;
+      border-radius: 6px;
     }
     .scrollbar-thin::-webkit-scrollbar-thumb {
       background: #cbd5e1;
-      border-radius: 5px;
+      border-radius: 6px;
     }
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
+    .card-hover {
+      transition: all 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .tab-btn-premium {
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .delete-btn {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .appointment-card:hover .delete-btn {
+      opacity: 1;
     }
   </style>
 </head>
 <body class="text-slate-900">
-  <div class="min-h-screen flex flex-col items-center px-3 py-4 md:px-4 md:py-6">
+  <div class="min-h-screen flex flex-col items-center px-4 py-6 md:px-8 md:py-8">
     <!-- Shell -->
-    <div class="w-full max-w-7xl bg-white/90 border border-slate-200 rounded-2xl shadow-xl shadow-sky-100 p-4 md:p-6 backdrop-blur">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-        <div class="space-y-1">
+    <div class="w-full max-w-7xl bg-white/90 border border-slate-200 rounded-2xl shadow-xl shadow-sky-100 p-5 md:p-8 backdrop-blur">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div class="space-y-2">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm border border-emerald-100">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Live Appointment Dashboard</span>
           </div>
-          <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight mt-1">
-            Sistem Appointment Klinik SIHATSOKMO
+          <h1 class="text-2xl md:text-4xl font-bold text-slate-900 tracking-tight mt-1">
+            Sistem Appointment Klinik Sihatsokmo
           </h1>
           <p class="text-sm md:text-base text-slate-500">
             Panel temujanji untuk staff klinik &amp; doktor pakar dengan WhatsApp automatik.
           </p>
         </div>
-        <div id="userHeader" class="flex flex-col items-end gap-1 text-sm md:text-base">
+        <div id="userHeader" class="flex flex-col items-end gap-2 text-sm md:text-base">
           <span id="userInfo" class="text-slate-500">Belum log masuk</span>
           <button id="logoutBtn"
-                  class="hidden text-sm px-4 py-2 rounded-full border border-slate-300 hover:border-rose-400 hover:text-rose-500 transition bg-white">
+                  class="hidden text-sm px-4 py-2 rounded-full border border-slate-300 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 transition bg-white shadow-sm">
             Log keluar
           </button>
         </div>
       </div>
 
       <!-- Nav Tabs (selepas login) -->
-      <div id="navTabs" class="hidden border-b border-slate-200 mb-4">
+      <div id="navTabs" class="hidden border-b border-slate-200 mb-6">
         <nav class="-mb-px flex flex-wrap gap-2 text-sm md:text-base">
           <button data-tab="tab-staff"
-                  class="tab-btn border-b-2 border-transparent px-4 py-3 text-slate-500 hover:text-sky-600"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
                   id="btnStaff">
             Staff Klinik
           </button>
+          <button data-tab="tab-export"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
+                  id="btnExport">
+            Export Data
+          </button>
           <button data-tab="tab-doctor"
-                  class="tab-btn border-b-2 border-transparent px-4 py-3 text-slate-500 hover:text-sky-600"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
                   id="btnDoctor">
             Doktor
           </button>
-          <button data-tab="tab-export"
-                  class="tab-btn border-b-2 border-transparent px-4 py-3 text-slate-500 hover:text-sky-600"
-                  id="btnExport">
-            Export
-          </button>
           <button data-tab="tab-settings"
-                  class="tab-btn border-b-2 border-transparent px-4 py-3 text-slate-500 hover:text-sky-600"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
                   id="btnSettings">
             Settings
           </button>
@@ -119,50 +120,49 @@
       </div>
 
       <!-- CONTENT -->
-      <div class="mt-2 space-y-6">
+      <div class="mt-4 space-y-8">
 
         <!-- LOGIN -->
         <section id="tab-login">
-          <div class="grid md:grid-cols-2 gap-6">
+          <div class="grid md:grid-cols-2 gap-8">
             <!-- Log masuk -->
-            <div class="space-y-4 bg-slate-50 border border-slate-200 rounded-2xl p-5 md:p-6">
-              <h2 class="text-xl font-semibold text-slate-900">Log masuk</h2>
+            <div class="space-y-6 bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Log masuk</h2>
               <p class="text-sm md:text-base text-slate-500">
                 Guna akaun yang telah didaftarkan di Supabase (staff atau doktor).
               </p>
 
-              <form id="loginForm" class="space-y-4 mt-2">
+              <form id="loginForm" class="space-y-4 mt-4">
                 <div>
-                  <label class="block text-sm mb-2 text-slate-600">Email</label>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Email</label>
                   <input id="loginEmail" type="email" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                 </div>
                 <div>
-                  <label class="block text-sm mb-2 text-slate-600">Password</label>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Password</label>
                   <input id="loginPassword" type="password" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                 </div>
                 <button type="submit"
-                        class="w-full inline-flex justify-center items-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-base font-medium text-white px-4 py-3 transition shadow-sm">
+                        class="w-full inline-flex justify-center items-center gap-3 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-base md:text-lg font-semibold text-white px-6 py-3 transition shadow-lg hover:shadow-xl">
                   Log masuk
                 </button>
               </form>
 
-              <p id="loginError" class="text-sm text-rose-500 mt-1 hidden"></p>
+              <p id="loginError" class="text-sm md:text-base text-rose-500 mt-2 hidden"></p>
             </div>
 
             <!-- Info sistem -->
-            <div class="space-y-4 bg-slate-50 border border-slate-200 rounded-2xl p-5 md:p-6 text-sm md:text-base text-slate-600">
-              <h3 class="text-lg font-semibold text-slate-900">Maklumat sistem</h3>
-              <ul class="list-disc list-inside space-y-2">
-                <li>Staff klinik daftar pesakit dan tarikh yang dicadangkan.</li>
-                <li>Doktor approve atau cadangkan tarikh baharu.</li>
-                <li>Status temujanji dipantau dalam 3 kategori: Pending, Approved dan Rejected.</li>
-                <li>WhatsApp automatik membantu staff &amp; doktor berhubung dengan lebih pantas.</li>
-                <li>Export data ke Excel untuk rekod bulanan.</li>
+            <div class="space-y-4 bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 text-sm md:text-base text-slate-600">
+              <h3 class="text-lg md:text-xl font-bold text-slate-900">Maklumat sistem</h3>
+              <ul class="list-disc list-inside space-y-3">
+                <li class="text-sm md:text-base">Staff klinik daftar pesakit dan tarikh yang dicadangkan.</li>
+                <li class="text-sm md:text-base">Doktor approve atau cadangkan tarikh baharu.</li>
+                <li class="text-sm md:text-base">Status temujanji dipantau dalam 3 kategori: Pending, Approved dan Rejected.</li>
+                <li class="text-sm md:text-base">WhatsApp automatik membantu staff &amp; doktor berhubung dengan lebih pantas.</li>
               </ul>
-              <div class="mt-3 p-4 rounded-xl bg-sky-50 border border-sky-100 text-sm md:text-base text-sky-800">
-                Tip: Untuk kali pertama, login sebagai <span class="font-semibold">staff</span>, tambah servis &amp; kolom tambahan di tab <span class="font-semibold">Settings</span>.
+              <div class="mt-4 p-4 rounded-xl bg-sky-50 border border-sky-100 text-sm md:text-base text-sky-800">
+                Tip: Untuk kali pertama, login sebagai <span class="font-bold">staff</span>, tambah servis &amp; kolom tambahan di tab <span class="font-bold">Settings</span>.
               </div>
             </div>
           </div>
@@ -170,63 +170,63 @@
 
         <!-- STAFF PANEL -->
         <section id="tab-staff" class="tab-hidden">
-          <div class="space-y-4">
+          <div class="space-y-6">
             <!-- Tindakan Hari Ini -->
-            <div class="bg-sky-50 border border-sky-100 rounded-2xl p-5 md:p-6">
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="bg-sky-50 border border-sky-100 rounded-2xl p-6 md:p-8">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h2 class="text-lg md:text-xl font-semibold text-slate-900">
+                  <h2 class="text-xl md:text-2xl font-bold text-slate-900">
                     Tindakan Hari Ini
                   </h2>
-                  <p class="text-sm md:text-base text-slate-500 mt-1">
+                  <p class="text-sm md:text-base text-slate-500 mt-2">
                     Ringkasan temujanji yang perlu diberi perhatian hari ini, diasingkan mengikut servis.
                   </p>
                 </div>
                 <div class="flex flex-wrap gap-3 text-sm md:text-base">
-                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
                     <span>Pending</span>
-                    <span class="font-semibold text-slate-900" id="todayPendingCount">0</span>
+                    <span class="font-bold text-slate-900" id="todayPendingCount">0</span>
                   </div>
-                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
                     <span>Approved (hari ini)</span>
-                    <span class="font-semibold text-slate-900" id="todayApprovedCount">0</span>
+                    <span class="font-bold text-slate-900" id="todayApprovedCount">0</span>
                   </div>
-                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-rose-400"></span>
                     <span>Perlu follow-up</span>
-                    <span class="font-semibold text-slate-900" id="todayRejectedCount">0</span>
+                    <span class="font-bold text-slate-900" id="todayRejectedCount">0</span>
                   </div>
                 </div>
               </div>
-              <div id="todayActionsList" class="mt-4 space-y-4 text-sm md:text-base text-slate-700">
+              <div id="todayActionsList" class="mt-6 space-y-4 text-sm md:text-base text-slate-700">
                 <!-- auto render -->
               </div>
             </div>
 
             <!-- Borang & Senarai -->
-            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.3fr),minmax(0,1fr)]">
+            <div class="grid gap-8 lg:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)]">
               <!-- Create Appointment -->
-              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-                <h2 class="text-lg md:text-xl font-semibold text-slate-900 flex items-center justify-between">
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+                <h2 class="text-xl md:text-2xl font-bold text-slate-900 flex items-center justify-between">
                   Daftar Temujanji Baru
-                  <span class="text-sm md:text-base text-slate-400">Staff klinik</span>
+                  <span class="text-sm text-slate-500">Staff klinik</span>
                 </h2>
 
                 <form id="appointmentForm" class="space-y-4 text-sm md:text-base">
                   <div class="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-sm mb-2 text-slate-600">Servis</label>
+                      <label class="block text-sm md:text-base mb-2 text-slate-700">Servis</label>
                       <select id="serviceSelect"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
                         <option value="">Pilih servis...</option>
                       </select>
                     </div>
                     <div>
-                      <label class="block text-sm mb-2 text-slate-600">Doktor</label>
+                      <label class="block text-sm md:text-base mb-2 text-slate-700">Doktor</label>
                       <select id="doctorSelect"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
                     </div>
@@ -234,55 +234,55 @@
 
                   <div class="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-sm mb-2 text-slate-600">Nama penuh pesakit</label>
+                      <label class="block text-sm md:text-base mb-2 text-slate-700">Nama penuh pesakit</label>
                       <input id="patientName" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                     </div>
                     <div>
-                      <label class="block text-sm mb-2 text-slate-600">No. IC / Passport</label>
+                      <label class="block text-sm md:text-base mb-2 text-slate-700">No. IC / Passport</label>
                       <input id="patientIC" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                     </div>
                   </div>
 
                   <div class="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-sm mb-2 text-slate-600">No. Telefon Pesakit</label>
+                      <label class="block text-sm md:text-base mb-2 text-slate-700">No. Telefon Pesakit</label>
                       <input id="patientPhone" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                     </div>
                     <div>
-                      <label class="block text-sm mb-2 text-slate-600">Tarikh yang pesakit available</label>
+                      <label class="block text-sm md:text-base mb-2 text-slate-700">Tarikh yang pesakit available</label>
                       <input id="requestedDate" type="date" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                     </div>
                   </div>
 
                   <div>
-                    <label class="block text-sm mb-2 text-slate-600">Ringkasan masalah / complaint</label>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Ringkasan masalah / complaint</label>
                     <textarea id="complaint" rows="3"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400"></textarea>
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm"></textarea>
                   </div>
 
                   <!-- Dynamic custom fields -->
-                  <div id="customFieldsContainer" class="space-y-3">
+                  <div id="customFieldsContainer" class="space-y-4">
                     <!-- auto inject -->
                   </div>
 
                   <button type="submit"
-                          class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-base font-medium text-white px-5 py-3 mt-2 shadow-sm">
+                          class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-base md:text-lg font-semibold text-white px-6 py-3 mt-4 shadow-lg hover:shadow-xl">
                     Simpan temujanji
                   </button>
 
-                  <p id="appointmentMessage" class="text-sm mt-1 text-sky-700 hidden"></p>
-                  <p id="appointmentError" class="text-sm mt-1 text-rose-500 hidden"></p>
+                  <p id="appointmentMessage" class="text-sm md:text-base mt-2 text-sky-700 hidden"></p>
+                  <p id="appointmentError" class="text-sm md:text-base mt-2 text-rose-500 hidden"></p>
                 </form>
 
                 <!-- WhatsApp link ke doktor selepas create -->
-                <div id="staffWhatsappBox" class="mt-4 hidden text-sm md:text-base">
-                  <p class="text-slate-700 mb-2">Hantar butiran kepada doktor melalui WhatsApp:</p>
+                <div id="staffWhatsappBox" class="mt-6 hidden text-sm md:text-base">
+                  <p class="text-slate-700 mb-3">Hantar butiran kepada doktor melalui WhatsApp:</p>
                   <a id="staffWhatsappLink"
-                     class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-green-500 hover:bg-green-600 text-base font-medium text-white shadow-sm"
+                     class="inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-green-500 hover:bg-green-600 text-base md:text-lg font-semibold text-white shadow-lg hover:shadow-xl"
                      href="#"
                      target="_blank">
                     Hantar Notifikasi kepada Doktor
@@ -291,25 +291,25 @@
               </div>
 
               <!-- Appointment List -->
-              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 class="text-lg md:text-xl font-semibold text-slate-900">Senarai Temujanji (Disusun Mengikut Servis)</h2>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-900">Senarai Temujanji (Disusun Mengikut Servis)</h2>
                     <p class="text-sm md:text-base text-slate-500">
                       30 rekod terkini, diasingkan mengikut servis untuk pantauan mudah.
                     </p>
                   </div>
                   <div class="flex items-center gap-3">
                     <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
-                      <button class="staff-filter-btn px-4 py-2 rounded-full font-medium text-slate-500"
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                               data-status="pending">
                         Pending
                       </button>
-                      <button class="staff-filter-btn px-4 py-2 rounded-full font-medium text-slate-500"
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                               data-status="approved">
                         Approved
                       </button>
-                      <button class="staff-filter-btn px-4 py-2 rounded-full font-medium text-slate-500"
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                               data-status="rejected">
                         Rejected
                       </button>
@@ -320,7 +320,7 @@
                     </button>
                   </div>
                 </div>
-                <div id="staffAppointmentsList" class="space-y-4 text-sm md:text-base max-h-[500px] overflow-auto scrollbar-thin">
+                <div id="staffAppointmentsList" class="space-y-6 text-sm md:text-base max-h-[500px] overflow-auto scrollbar-thin">
                   <!-- render -->
                 </div>
               </div>
@@ -328,22 +328,116 @@
           </div>
         </section>
 
+        <!-- EXPORT PANEL -->
+        <section id="tab-export" class="tab-hidden">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
+            <div>
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Export Data Temujanji ke Excel</h2>
+              <p class="text-sm md:text-base text-slate-500 mt-2">
+                Pilih doktor dan tempoh masa untuk export data temujanji ke format Excel.
+              </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="space-y-3">
+                <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Doktor</label>
+                <select id="exportDoctor" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                  <option value="all">Semua Doktor</option>
+                </select>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Bulan</label>
+                <select id="exportMonth" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                  <option value="all">Semua Bulan</option>
+                  <option value="01">Januari</option>
+                  <option value="02">Februari</option>
+                  <option value="03">Mac</option>
+                  <option value="04">April</option>
+                  <option value="05">Mei</option>
+                  <option value="06">Jun</option>
+                  <option value="07">Julai</option>
+                  <option value="08">Ogos</option>
+                  <option value="09">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Disember</option>
+                </select>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Tahun</label>
+                <select id="exportYear" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                  <option value="all">Semua Tahun</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Status</label>
+              <div class="flex flex-wrap gap-4">
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportPending" type="checkbox" checked
+                         class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5">
+                  Pending
+                </label>
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportApproved" type="checkbox" checked
+                         class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5">
+                  Approved
+                </label>
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportRejected" type="checkbox" checked
+                         class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5">
+                  Rejected
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+              <button id="exportPreviewBtn"
+                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-sky-500 hover:bg-sky-600 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                Preview Data
+              </button>
+              <button id="exportExcelBtn"
+                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                Export ke Excel
+              </button>
+            </div>
+
+            <div id="exportPreview" class="mt-6 space-y-4 hidden">
+              <h3 class="text-lg md:text-xl font-semibold text-slate-900">Preview Data</h3>
+              <div class="bg-white border border-slate-200 rounded-xl p-4">
+                <div id="exportStats" class="text-sm md:text-base text-slate-600 mb-4"></div>
+                <div id="exportPreviewTable" class="overflow-auto max-h-80 scrollbar-thin">
+                  <!-- Preview table akan diisi di sini -->
+                </div>
+              </div>
+            </div>
+
+            <div id="exportLoading" class="hidden text-center py-8">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+              <p class="mt-4 text-sm md:text-base text-slate-600">Sedang memuatkan data...</p>
+            </div>
+          </div>
+        </section>
+
         <!-- DOCTOR PANEL -->
         <section id="tab-doctor" class="tab-hidden">
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-            <div class="flex items-center justify-between">
-              <h2 class="text-lg md:text-xl font-semibold text-slate-900">Panel Doktor</h2>
-              <div class="flex items-center gap-3">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Panel Doktor</h2>
+              <div class="flex flex-wrap items-center gap-3">
                 <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
-                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-medium text-slate-500"
+                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                           data-tab="pending">
                     Status (Pending Approval)
                   </button>
-                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-medium text-slate-500"
+                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                           data-tab="approved">
                     Approved
                   </button>
-                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-medium text-slate-500"
+                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                           data-tab="rejected">
                     Rejected
                   </button>
@@ -354,270 +448,121 @@
                 </button>
               </div>
             </div>
-            <p id="doctorTabDescription" class="text-sm md:text-base text-slate-500 mb-3">
+            <p id="doctorTabDescription" class="text-sm md:text-base text-slate-500 mb-4">
               Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-semibold text-emerald-600">Approve</span> atau
               <span class="font-semibold text-rose-500">Reject</span>. Jika pilih Reject, sistem akan minta dua tarikh cadangan.
             </p>
 
-            <div id="doctorAppointmentsList" class="space-y-4 text-sm md:text-base max-h-[600px] overflow-auto scrollbar-thin">
+            <div id="doctorAppointmentsList" class="space-y-6 text-sm md:text-base max-h-[600px] overflow-auto scrollbar-thin">
               <!-- render -->
-            </div>
-          </div>
-        </section>
-
-        <!-- EXPORT PANEL -->
-        <section id="tab-export" class="tab-hidden">
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-            <h2 class="text-lg md:text-xl font-semibold text-slate-900">Export Data ke Excel</h2>
-            <p class="text-sm md:text-base text-slate-500 mb-3">
-              Export data temujanji ke format Excel untuk rekod bulanan atau analisis.
-            </p>
-
-            <div class="grid md:grid-cols-2 gap-6">
-              <!-- Filter Export -->
-              <div class="space-y-4">
-                <h3 class="text-base md:text-lg font-semibold text-slate-900">Filter Data</h3>
-                
-                <div class="space-y-4">
-                  <div>
-                    <label class="block text-sm mb-2 text-slate-600">Pilih Doktor</label>
-                    <select id="exportDoctorSelect"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
-                      <option value="">Semua Doktor</option>
-                    </select>
-                  </div>
-
-                  <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm mb-2 text-slate-600">Bulan</label>
-                      <select id="exportMonth"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
-                        <option value="">Semua Bulan</option>
-                        <option value="1">Januari</option>
-                        <option value="2">Februari</option>
-                        <option value="3">Mac</option>
-                        <option value="4">April</option>
-                        <option value="5">Mei</option>
-                        <option value="6">Jun</option>
-                        <option value="7">Julai</option>
-                        <option value="8">Ogos</option>
-                        <option value="9">September</option>
-                        <option value="10">Oktober</option>
-                        <option value="11">November</option>
-                        <option value="12">Disember</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-sm mb-2 text-slate-600">Tahun</label>
-                      <select id="exportYear"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
-                        <option value="">Semua Tahun</option>
-                        <!-- Dinamik tahun -->
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm mb-2 text-slate-600">Status</label>
-                    <select id="exportStatus"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
-                      <option value="">Semua Status</option>
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm mb-2 text-slate-600">Servis</label>
-                    <select id="exportService"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
-                      <option value="">Semua Servis</option>
-                    </select>
-                  </div>
-
-                  <button id="exportButton"
-                          class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-base font-medium text-white px-5 py-3 mt-2 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Export ke Excel
-                  </button>
-
-                  <div id="exportMessage" class="text-sm text-sky-700 hidden"></div>
-                  <div id="exportError" class="text-sm text-rose-500 hidden"></div>
-                </div>
-              </div>
-
-              <!-- Preview & Info -->
-              <div class="space-y-4">
-                <h3 class="text-base md:text-lg font-semibold text-slate-900">Maklumat Export</h3>
-                <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
-                  <div class="flex justify-between items-center">
-                    <span class="text-slate-600">Jumlah rekod:</span>
-                    <span id="exportCount" class="font-semibold">0</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-slate-600">Doktor terpilih:</span>
-                    <span id="exportDoctorName" class="font-semibold">Semua</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-slate-600">Tempoh:</span>
-                    <span id="exportPeriod" class="font-semibold">Semua masa</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-slate-600">Status:</span>
-                    <span id="exportStatusName" class="font-semibold">Semua</span>
-                  </div>
-                </div>
-
-                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                  <h4 class="font-semibold text-blue-900 mb-2">Arahan Export:</h4>
-                  <ul class="list-disc list-inside space-y-1 text-sm text-blue-800">
-                    <li>Pilih filter yang diperlukan</li>
-                    <li>Klik "Export ke Excel" untuk muat turun</li>
-                    <li>Fail akan mengandungi semua data temujanji</li>
-                    <li>Data termasuk tarikh, pesakit, servis, status, dll</li>
-                    <li>Format fail: .xlsx (Excel)</li>
-                  </ul>
-                </div>
-
-                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
-                  <h4 class="font-semibold text-amber-900 mb-2">Nota:</h4>
-                  <p class="text-sm text-amber-800">
-                    Data akan diexport berdasarkan filter yang dipilih. Jika tiada filter, semua data akan diambil.
-                    Proses mungkin mengambil masa beberapa saat bergantung pada jumlah data.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </section>
 
         <!-- SETTINGS PANEL -->
         <section id="tab-settings" class="tab-hidden">
-          <div class="grid lg:grid-cols-2 gap-6 text-sm md:text-base">
+          <div class="grid lg:grid-cols-2 gap-8 text-sm md:text-base">
             <!-- Services -->
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-              <h2 class="text-lg md:text-xl font-semibold text-slate-900">Servis Klinik</h2>
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Servis Klinik</h2>
 
-              <form id="serviceForm" class="space-y-3">
+              <form id="serviceForm" class="space-y-4">
                 <div>
-                  <label class="block text-sm mb-2 text-slate-600">Nama servis</label>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Nama servis</label>
                   <input id="serviceName" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                 </div>
                 <div>
-                  <label class="block text-sm mb-2 text-slate-600">Keterangan (optional)</label>
-                  <textarea id="serviceDescription" rows="2"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400"></textarea>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Keterangan (optional)</label>
+                  <textarea id="serviceDescription" rows="3"
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm mb-2 text-slate-600">Status</label>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Status</label>
                     <select id="serviceStatus"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
                     </select>
                   </div>
                   <div>
-                    <label class="block text-sm mb-2 text-slate-600">Doktor default (optional)</label>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Doktor default (optional)</label>
                     <select id="serviceDoctor"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
                       <option value="">Tiada (pilih manual masa daftar)</option>
                     </select>
                   </div>
                 </div>
                 <button type="submit"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-base font-medium text-white px-5 py-3 mt-1 shadow-sm">
+                        class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 mt-2 shadow-lg hover:shadow-xl">
                   Simpan Servis
                 </button>
-                <p id="serviceMessage" class="text-sm mt-1 text-sky-700 hidden"></p>
+                <p id="serviceMessage" class="text-sm md:text-base mt-2 text-sky-700 hidden"></p>
               </form>
 
-              <div class="mt-4">
-                <h3 class="text-sm font-semibold text-slate-700 mb-2">Senarai Servis</h3>
-                <div id="serviceList" class="space-y-2 max-h-64 overflow-auto scrollbar-thin">
+              <div class="mt-6">
+                <h3 class="text-sm md:text-base font-bold text-slate-800 mb-3">Senarai Servis</h3>
+                <div id="serviceList" class="space-y-3 max-h-72 overflow-auto scrollbar-thin">
                   <!-- senarai servis -->
                 </div>
               </div>
             </div>
 
             <!-- Custom Fields -->
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-              <h2 class="text-lg md:text-xl font-semibold text-slate-900">Kolom Tambahan (Custom Fields)</h2>
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Kolom Tambahan (Custom Fields)</h2>
 
-              <form id="fieldForm" class="space-y-3">
+              <form id="fieldForm" class="space-y-4">
                 <div>
-                  <label class="block text-sm mb-2 text-slate-600">Label / Tajuk Pertanyaan</label>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Label / Tajuk Pertanyaan</label>
                   <input id="fieldLabel" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm mb-2 text-slate-600">Jenis Input</label>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Jenis Input</label>
                     <select id="fieldType"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
                       <option value="text">Text</option>
                       <option value="phone">Phone</option>
                       <option value="date">Date</option>
                     </select>
                   </div>
                   <div>
-                    <label class="block text-sm mb-2 text-slate-600">Servis</label>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Servis</label>
                     <select id="fieldService"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
                       <option value="">Global (semua servis)</option>
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label class="inline-flex items-center gap-2 text-sm text-slate-600">
+                  <label class="inline-flex items-center gap-3 text-sm md:text-base text-slate-700">
                     <input id="fieldRequired" type="checkbox"
-                           class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500" />
+                           class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5" />
                     Wajib diisi
                   </label>
                 </div>
                 <button type="submit"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-base font-medium text-white px-5 py-3 mt-1 shadow-sm">
+                        class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 mt-2 shadow-lg hover:shadow-xl">
                   Tambah Kolom
                 </button>
-                <p id="fieldMessage" class="text-sm mt-1 text-sky-700 hidden"></p>
+                <p id="fieldMessage" class="text-sm md:text-base mt-2 text-sky-700 hidden"></p>
               </form>
 
-              <div class="mt-4">
-                <div class="flex justify-between items-center mb-2">
-                  <h3 class="text-sm font-semibold text-slate-700">Senarai Kolom Aktif</h3>
+              <div class="mt-6">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="text-sm md:text-base font-bold text-slate-800">Senarai Kolom Aktif</h3>
                   <span class="text-sm text-slate-500">Klik untuk padam</span>
                 </div>
-                <div id="fieldList" class="space-y-2 max-h-64 overflow-auto scrollbar-thin">
+                <div id="fieldList" class="space-y-3 max-h-72 overflow-auto scrollbar-thin">
                   <!-- senarai fields -->
                 </div>
               </div>
             </div>
           </div>
         </section>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Padam Appointment -->
-  <div id="deleteAppointmentModal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <h3 class="text-lg font-semibold text-slate-900 mb-3">Padam Temujanji</h3>
-      <p id="deleteAppointmentText" class="text-slate-600 mb-4">
-        Adakah anda pasti mahu memadam temujanji ini?
-      </p>
-      <div class="flex justify-end gap-3">
-        <button id="cancelDeleteBtn"
-                class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">
-          Batal
-        </button>
-        <button id="confirmDeleteBtn"
-                class="px-4 py-2 rounded-lg bg-rose-500 hover:bg-rose-600 text-white">
-          Padam
-        </button>
       </div>
     </div>
   </div>
@@ -629,8 +574,7 @@
     const SUPABASE_URL = "https://rzcrbseoiqbgkhprdbbz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y3Jic2VvaXFiZ2tocHJkYmJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NTk5MDksImV4cCI6MjA4MTAzNTkwOX0.C5AHYqGKywrfOf2uEwZZUSYGByuLE_PKfImS7nuFKrs";
 
-    // 👉 Tukar kepada URL sebenar bila dah host (GitHub / Netlify / dll)
-    const APP_URL = "https://contoh-domain-anda.com/clinic_appointment_index.html";
+    const APP_URL = window.location.origin + window.location.pathname;
 
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -645,13 +589,12 @@
     let staffAppointmentsCache = [];
     let activeStaffFilter = "pending";
     let activeDoctorTab = "pending";
-    let appointmentToDelete = null;
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
     const tabStaff = document.getElementById("tab-staff");
-    const tabDoctor = document.getElementById("tab-doctor");
     const tabExport = document.getElementById("tab-export");
+    const tabDoctor = document.getElementById("tab-doctor");
     const tabSettings = document.getElementById("tab-settings");
     const navTabs = document.getElementById("navTabs");
 
@@ -660,8 +603,8 @@
 
     const tabButtons = document.querySelectorAll(".tab-btn");
     const btnStaff = document.getElementById("btnStaff");
-    const btnDoctor = document.getElementById("btnDoctor");
     const btnExport = document.getElementById("btnExport");
+    const btnDoctor = document.getElementById("btnDoctor");
     const btnSettings = document.getElementById("btnSettings");
 
     // Login form
@@ -694,25 +637,25 @@
     const todayRejectedCountEl = document.getElementById("todayRejectedCount");
     const todayActionsListEl = document.getElementById("todayActionsList");
 
+    // Export elements
+    const exportDoctor = document.getElementById("exportDoctor");
+    const exportMonth = document.getElementById("exportMonth");
+    const exportYear = document.getElementById("exportYear");
+    const exportPending = document.getElementById("exportPending");
+    const exportApproved = document.getElementById("exportApproved");
+    const exportRejected = document.getElementById("exportRejected");
+    const exportPreviewBtn = document.getElementById("exportPreviewBtn");
+    const exportExcelBtn = document.getElementById("exportExcelBtn");
+    const exportPreview = document.getElementById("exportPreview");
+    const exportStats = document.getElementById("exportStats");
+    const exportPreviewTable = document.getElementById("exportPreviewTable");
+    const exportLoading = document.getElementById("exportLoading");
+
     // Doctor panel
     const doctorAppointmentsList = document.getElementById("doctorAppointmentsList");
     const refreshDoctorAppointments = document.getElementById("refreshDoctorAppointments");
     const doctorTabButtons = document.querySelectorAll(".doctor-tab-btn");
     const doctorTabDescription = document.getElementById("doctorTabDescription");
-
-    // Export panel
-    const exportDoctorSelect = document.getElementById("exportDoctorSelect");
-    const exportMonth = document.getElementById("exportMonth");
-    const exportYear = document.getElementById("exportYear");
-    const exportStatus = document.getElementById("exportStatus");
-    const exportService = document.getElementById("exportService");
-    const exportButton = document.getElementById("exportButton");
-    const exportMessage = document.getElementById("exportMessage");
-    const exportError = document.getElementById("exportError");
-    const exportCount = document.getElementById("exportCount");
-    const exportDoctorName = document.getElementById("exportDoctorName");
-    const exportPeriod = document.getElementById("exportPeriod");
-    const exportStatusName = document.getElementById("exportStatusName");
 
     // Settings
     const serviceForm = document.getElementById("serviceForm");
@@ -731,17 +674,11 @@
     const fieldMessage = document.getElementById("fieldMessage");
     const fieldList = document.getElementById("fieldList");
 
-    // Delete modal
-    const deleteAppointmentModal = document.getElementById("deleteAppointmentModal");
-    const deleteAppointmentText = document.getElementById("deleteAppointmentText");
-    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
-    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-
     // ==============================
     // UTILITI UI
     // ==============================
     function setActiveTab(tabId) {
-      [tabLogin, tabStaff, tabDoctor, tabExport, tabSettings].forEach(sec => {
+      [tabLogin, tabStaff, tabExport, tabDoctor, tabSettings].forEach(sec => {
         if (!sec) return;
         if (sec.id === tabId) {
           sec.classList.remove("tab-hidden");
@@ -752,9 +689,9 @@
 
       tabButtons.forEach(btn => {
         if (btn.dataset.tab === tabId) {
-          btn.classList.add("border-sky-500", "text-sky-600", "font-semibold");
+          btn.classList.add("border-sky-500", "text-sky-600", "font-bold", "bg-sky-50");
         } else {
-          btn.classList.remove("border-sky-500", "text-sky-600", "font-semibold");
+          btn.classList.remove("border-sky-500", "text-sky-600", "font-bold", "bg-sky-50");
         }
       });
     }
@@ -779,6 +716,23 @@
       }
     }
 
+    function formatDateTime(dateStr) {
+      if (!dateStr) return "-";
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleDateString('ms-MY', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch {
+        return dateStr;
+      }
+    }
+
     function buildWhatsAppLink(phone, message) {
       const cleanPhone = (phone || "").replace(/[^0-9]/g, "");
       const encoded = encodeURIComponent(message || "");
@@ -798,12 +752,6 @@
       ];
       const index = serviceId ? parseInt(serviceId, 36) % colors.length : 0;
       return colors[index];
-    }
-
-    function openDeleteModal(appointment) {
-      appointmentToDelete = appointment;
-      deleteAppointmentText.textContent = `Adakah anda pasti mahu memadam temujanji untuk ${appointment.patient_name} (${formatDate(appointment.requested_date)})?`;
-      deleteAppointmentModal.classList.remove("hidden");
     }
 
     // ==============================
@@ -850,7 +798,6 @@
       btnDoctor.classList.toggle("hidden", profile.role !== "doctor");
 
       await Promise.all([loadDoctors(), loadServices(), loadCustomFields()]);
-      await loadExportYears();
 
       if (profile.role === "staff") {
         setActiveTab("tab-staff");
@@ -896,48 +843,6 @@
       });
     });
 
-    // Modal handlers
-    cancelDeleteBtn?.addEventListener("click", () => {
-      deleteAppointmentModal.classList.add("hidden");
-      appointmentToDelete = null;
-    });
-
-    confirmDeleteBtn?.addEventListener("click", async () => {
-      if (!appointmentToDelete) return;
-
-      try {
-        // Delete appointment field values first
-        const { error: fieldError } = await db
-          .from("appointment_field_values")
-          .delete()
-          .eq("appointment_id", appointmentToDelete.id);
-
-        if (fieldError) {
-          console.error("Error deleting field values:", fieldError);
-        }
-
-        // Delete appointment
-        const { error } = await db
-          .from("appointments")
-          .delete()
-          .eq("id", appointmentToDelete.id);
-
-        if (error) {
-          alert("Gagal memadam temujanji: " + error.message);
-          return;
-        }
-
-        alert("Temujanji berjaya dipadam.");
-        deleteAppointmentModal.classList.add("hidden");
-        appointmentToDelete = null;
-
-        await refreshStaffAppointmentsList();
-      } catch (err) {
-        console.error("Error deleting appointment:", err);
-        alert("Gagal memadam temujanji.");
-      }
-    });
-
     // ==============================
     // LOAD DOCTORS, SERVICES, FIELDS
     // ==============================
@@ -945,7 +850,8 @@
       const { data, error } = await db
         .from("profiles")
         .select("id, full_name")
-        .eq("role", "doctor");
+        .eq("role", "doctor")
+        .order("full_name", { ascending: true });
 
       if (error) {
         console.error("Error load doctors", error);
@@ -975,14 +881,14 @@
         });
       }
 
-      // dropdown doctor (export)
-      if (exportDoctorSelect) {
-        exportDoctorSelect.innerHTML = '<option value="">Semua Doktor</option>';
+      // dropdown export doctor
+      if (exportDoctor) {
+        exportDoctor.innerHTML = '<option value="all">Semua Doktor</option>';
         doctorsCache.forEach(d => {
           const opt = document.createElement("option");
           opt.value = d.id;
           opt.textContent = d.full_name;
-          exportDoctorSelect.appendChild(opt);
+          exportDoctor.appendChild(opt);
         });
       }
     }
@@ -1023,28 +929,17 @@
         });
       }
 
-      // Export service dropdown
-      if (exportService) {
-        exportService.innerHTML = '<option value="">Semua Servis</option>';
-        servicesCache.forEach(s => {
-          const opt = document.createElement("option");
-          opt.value = s.id;
-          opt.textContent = s.name;
-          exportService.appendChild(opt);
-        });
-      }
-
       // List services
       if (serviceList) {
         serviceList.innerHTML = "";
         servicesCache.forEach(s => {
           const line = document.createElement("div");
           const statusColor = s.status === "active" ? "text-emerald-600" : "text-slate-400";
-          line.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-3 py-2";
+          line.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-4 py-3 card-hover";
           const docName = doctorsCache.find(d => d.id === s.default_doctor_id)?.full_name || "-";
           line.innerHTML = `
             <div>
-              <div class="font-medium text-slate-900 text-sm">${s.name}</div>
+              <div class="font-bold text-slate-900 text-base">${s.name}</div>
               <div class="text-sm text-slate-500">${s.description || ""}</div>
             </div>
             <div class="text-right text-sm">
@@ -1087,19 +982,19 @@
             ? (servicesCache.find(s => s.id === f.service_id)?.name || "Unknown")
             : "Global";
           const item = document.createElement("div");
-          item.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-3 py-2 hover:bg-slate-50 cursor-pointer group";
+          item.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-4 py-3 hover:bg-slate-50 cursor-pointer card-hover";
           item.innerHTML = `
             <div class="flex-1">
-              <div class="font-medium text-slate-900 text-sm">${f.label}</div>
+              <div class="font-bold text-slate-900 text-base">${f.label}</div>
               <div class="text-sm text-slate-500">
                 Type: ${f.input_type} • Servis: ${serviceName}
               </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3">
               <span class="text-sm ${f.is_required ? "text-amber-500" : "text-slate-400"}">
                 ${f.is_required ? "Wajib" : "Optional"}
               </span>
-              <button class="delete-field-btn text-sm px-3 py-1 rounded-md text-rose-600 hover:bg-rose-50 hover:text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity"
+              <button class="delete-field-btn text-sm px-3 py-1.5 rounded-md text-rose-600 hover:bg-rose-50 hover:text-rose-700 delete-btn"
                       data-field-id="${f.id}">
                 Padam
               </button>
@@ -1113,33 +1008,29 @@
           btn.addEventListener("click", async (e) => {
             e.stopPropagation();
             const fieldId = btn.dataset.fieldId;
-            if (confirm("Adakah anda pasti mahu memadam kolom ini? Data yang berkaitan juga akan dipadam.")) {
+            if (confirm("Adakah anda pasti mahu memadam kolom ini? Data yang berkaitan juga akan dipadam dari Supabase.")) {
               try {
-                // Delete field values first
-                const { error: vErr } = await db
+                // Padam field values dahulu
+                const { error: vError } = await db
                   .from("appointment_field_values")
                   .delete()
                   .eq("field_id", fieldId);
+                
+                if (vError) throw vError;
 
-                if (vErr) {
-                  console.error("Error deleting field values:", vErr);
-                }
-
-                // Delete the field
+                // Padam field
                 const { error } = await db
                   .from("appointment_fields")
                   .delete()
                   .eq("id", fieldId);
                 
-                if (error) {
-                  console.error("Error delete field", error);
-                  alert("Gagal memadam kolom.");
-                } else {
-                  await loadCustomFields();
-                  renderCustomFieldsForm();
-                }
-              } catch (err) {
-                console.error("Error deleting field:", err);
+                if (error) throw error;
+
+                await loadCustomFields();
+                renderCustomFieldsForm();
+                alert("Kolom berjaya dipadam.");
+              } catch (error) {
+                console.error("Error delete field", error);
                 alert("Gagal memadam kolom.");
               }
             }
@@ -1166,7 +1057,7 @@
         wrapper.className = "grid md:grid-cols-2 gap-4";
 
         const label = document.createElement("label");
-        label.className = "block text-sm mb-2 text-slate-600";
+        label.className = "block text-sm md:text-base mb-2 text-slate-700";
         label.textContent = f.label + (f.is_required ? " *" : "");
 
         let input;
@@ -1181,7 +1072,7 @@
           }
         }
         input.dataset.fieldId = f.id;
-        input.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400";
+        input.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm";
 
         wrapper.appendChild(label);
         const divInput = document.createElement("div");
@@ -1190,273 +1081,6 @@
         customFieldsContainer.appendChild(wrapper);
       });
     }
-
-    // ==============================
-    // EXPORT FUNCTIONS
-    // ==============================
-    async function loadExportYears() {
-      if (!exportYear) return;
-      
-      const currentYear = new Date().getFullYear();
-      const startYear = 2023; // Tahun mula sistem
-      
-      exportYear.innerHTML = '<option value="">Semua Tahun</option>';
-      for (let year = currentYear; year >= startYear; year--) {
-        const option = document.createElement("option");
-        option.value = year;
-        option.textContent = year;
-        exportYear.appendChild(option);
-      }
-    }
-
-    async function fetchExportData() {
-      let query = db
-        .from("appointments")
-        .select(`
-          id,
-          patient_name,
-          patient_ic,
-          patient_phone,
-          complaint,
-          requested_date,
-          doctor_selected_date,
-          doctor_alt_date1,
-          doctor_alt_date2,
-          status,
-          created_at,
-          service_id,
-          doctor_id,
-          services(name),
-          profiles!appointments_doctor_id_fkey(full_name)
-        `)
-        .order("created_at", { ascending: false });
-
-      // Apply filters
-      const doctorId = exportDoctorSelect.value;
-      const month = exportMonth.value;
-      const year = exportYear.value;
-      const status = exportStatus.value;
-      const serviceId = exportService.value;
-
-      if (doctorId) {
-        query = query.eq("doctor_id", doctorId);
-      }
-
-      if (status) {
-        query = query.eq("status", status);
-      }
-
-      if (serviceId) {
-        query = query.eq("service_id", serviceId);
-      }
-
-      if (month || year) {
-        let dateFilter = "";
-        if (month && year) {
-          dateFilter = `${year}-${month.padStart(2, '0')}`;
-          query = query.gte('created_at', `${dateFilter}-01`)
-                      .lt('created_at', `${dateFilter}-32`);
-        } else if (year) {
-          dateFilter = year;
-          query = query.gte('created_at', `${dateFilter}-01-01`)
-                      .lt('created_at', `${parseInt(year)+1}-01-01`);
-        } else if (month) {
-          const currentYear = new Date().getFullYear();
-          dateFilter = `${currentYear}-${month.padStart(2, '0')}`;
-          query = query.gte('created_at', `${dateFilter}-01`)
-                      .lt('created_at', `${dateFilter}-32`);
-        }
-      }
-
-      const { data, error, count } = await query;
-      
-      if (error) {
-        console.error("Error fetching export data:", error);
-        throw error;
-      }
-
-      return data || [];
-    }
-
-    function updateExportInfo(data) {
-      if (!exportCount || !exportDoctorName || !exportPeriod || !exportStatusName) return;
-      
-      exportCount.textContent = data.length;
-      
-      const doctorId = exportDoctorSelect.value;
-      const doctor = doctorsCache.find(d => d.id === doctorId);
-      exportDoctorName.textContent = doctor ? doctor.full_name : "Semua";
-      
-      const month = exportMonth.value;
-      const year = exportYear.value;
-      if (month && year) {
-        const monthNames = [
-          "Januari", "Februari", "Mac", "April", "Mei", "Jun",
-          "Julai", "Ogos", "September", "Oktober", "November", "Disember"
-        ];
-        exportPeriod.textContent = `${monthNames[parseInt(month)-1]} ${year}`;
-      } else if (year) {
-        exportPeriod.textContent = `Tahun ${year}`;
-      } else if (month) {
-        const monthNames = [
-          "Januari", "Februari", "Mac", "April", "Mei", "Jun",
-          "Julai", "Ogos", "September", "Oktober", "November", "Disember"
-        ];
-        exportPeriod.textContent = monthNames[parseInt(month)-1];
-      } else {
-        exportPeriod.textContent = "Semua masa";
-      }
-      
-      const status = exportStatus.value;
-      exportStatusName.textContent = status ? 
-        (status === "pending" ? "Pending" : 
-         status === "approved" ? "Approved" : "Rejected") : 
-        "Semua";
-    }
-
-    function exportToExcel(data) {
-      if (data.length === 0) {
-        alert("Tiada data untuk diexport.");
-        return;
-      }
-
-      // Prepare worksheet data
-      const worksheetData = [
-        [
-          "ID",
-          "Nama Pesakit",
-          "No. IC/Passport",
-          "No. Telefon",
-          "Servis",
-          "Doktor",
-          "Tarikh Diminta",
-          "Tarikh Dipilih",
-          "Tarikh Cadangan 1",
-          "Tarikh Cadangan 2",
-          "Status",
-          "Complaint",
-          "Tarikh Didaftar"
-        ]
-      ];
-
-      data.forEach(item => {
-        const serviceName = item.services?.name || "Tidak Dikenali";
-        const doctorName = item.profiles?.full_name || "Tidak Dikenali";
-        
-        worksheetData.push([
-          item.id,
-          item.patient_name || "",
-          item.patient_ic || "",
-          item.patient_phone || "",
-          serviceName,
-          doctorName,
-          formatDate(item.requested_date),
-          formatDate(item.doctor_selected_date),
-          formatDate(item.doctor_alt_date1),
-          formatDate(item.doctor_alt_date2),
-          item.status || "",
-          item.complaint || "",
-          formatDate(item.created_at)
-        ]);
-      });
-
-      // Create workbook
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-      
-      // Set column widths
-      const colWidths = [
-        { wch: 10 }, // ID
-        { wch: 25 }, // Nama Pesakit
-        { wch: 20 }, // No. IC/Passport
-        { wch: 15 }, // No. Telefon
-        { wch: 20 }, // Servis
-        { wch: 20 }, // Doktor
-        { wch: 15 }, // Tarikh Diminta
-        { wch: 15 }, // Tarikh Dipilih
-        { wch: 15 }, // Tarikh Cadangan 1
-        { wch: 15 }, // Tarikh Cadangan 2
-        { wch: 12 }, // Status
-        { wch: 30 }, // Complaint
-        { wch: 15 }  // Tarikh Didaftar
-      ];
-      ws['!cols'] = colWidths;
-
-      XLSX.utils.book_append_sheet(wb, ws, "Temujanji");
-
-      // Generate filename
-      const doctorId = exportDoctorSelect.value;
-      const month = exportMonth.value;
-      const year = exportYear.value;
-      const status = exportStatus.value;
-      
-      let filename = "Temujanji";
-      if (doctorId) {
-        const doctor = doctorsCache.find(d => d.id === doctorId);
-        filename += `_${doctor?.full_name || 'Doktor'}`;
-      }
-      if (month && year) {
-        filename += `_${year}-${month.padStart(2, '0')}`;
-      } else if (year) {
-        filename += `_${year}`;
-      }
-      if (status) {
-        filename += `_${status}`;
-      }
-      filename += `.xlsx`;
-
-      // Save file
-      XLSX.writeFile(wb, filename);
-    }
-
-    exportButton?.addEventListener("click", async () => {
-      showMessage(exportError, "", false);
-      showMessage(exportMessage, "", false);
-      
-      try {
-        exportButton.disabled = true;
-        exportButton.innerHTML = `
-          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          Sedang memproses...
-        `;
-
-        const data = await fetchExportData();
-        updateExportInfo(data);
-        
-        if (data.length > 0) {
-          exportToExcel(data);
-          showMessage(exportMessage, `Berjaya export ${data.length} rekod ke Excel.`, false);
-        } else {
-          showMessage(exportError, "Tiada data yang sepadan dengan filter yang dipilih.", true);
-        }
-      } catch (error) {
-        console.error("Export error:", error);
-        showMessage(exportError, "Gagal export data. Sila cuba lagi.", true);
-      } finally {
-        exportButton.disabled = false;
-        exportButton.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Export ke Excel
-        `;
-      }
-    });
-
-    // Update export info when filters change
-    [exportDoctorSelect, exportMonth, exportYear, exportStatus, exportService].forEach(select => {
-      select?.addEventListener("change", async () => {
-        try {
-          const data = await fetchExportData();
-          updateExportInfo(data);
-        } catch (error) {
-          console.error("Error updating export info:", error);
-        }
-      });
-    });
 
     // ==============================
     // SETTINGS HANDLERS
@@ -1609,6 +1233,7 @@
       if (!appointment || !staffWhatsappLink || !staffWhatsappBox) return;
       const serviceName =
         servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
+      const doctorName = doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
 
       const message = [
         "Assalamualaikum / Salam sejahtera Dr,",
@@ -1619,9 +1244,8 @@
         `IC: ${appointment.patient_ic}`,
         `No. Telefon: ${appointment.patient_phone}`,
         `Tarikh dicadangkan pesakit: ${formatDate(appointment.requested_date)}`,
-        appointment.complaint ? `Complaint: ${appointment.complaint}` : "",
         "",
-        `Sila buka sistem untuk approve / reject: ${APP_URL}`
+        "Sila buka sistem untuk approve / reject."
       ]
         .filter(Boolean)
         .join("\n");
@@ -1640,14 +1264,14 @@
       if (!currentProfile || currentProfile.role !== "staff") return;
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, requested_date, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone")
+        .select("id, patient_name, requested_date, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at")
         .order("created_at", { ascending: false })
         .limit(30);
 
       if (error) {
         console.error("Error load staff appointments", error);
         staffAppointmentsList.innerHTML =
-          '<p class="text-sm text-rose-500">Gagal load temujanji.</p>';
+          '<p class="text-base text-rose-500">Gagal load temujanji.</p>';
         return;
       }
 
@@ -1668,6 +1292,36 @@
       });
     }
 
+    async function deleteAppointment(appointmentId) {
+      if (!confirm("Adakah anda pasti mahu memadam temujanji ini? Data akan dipadam dari sistem secara kekal.")) {
+        return;
+      }
+
+      try {
+        // Padam field values dahulu
+        const { error: vError } = await db
+          .from("appointment_field_values")
+          .delete()
+          .eq("appointment_id", appointmentId);
+        
+        if (vError) throw vError;
+
+        // Padam appointment
+        const { error } = await db
+          .from("appointments")
+          .delete()
+          .eq("id", appointmentId);
+        
+        if (error) throw error;
+
+        alert("Temujanji berjaya dipadam.");
+        await refreshStaffAppointmentsList();
+      } catch (error) {
+        console.error("Error delete appointment", error);
+        alert("Gagal memadam temujanji.");
+      }
+    }
+
     function renderStaffAppointmentsList() {
       const listEl = staffAppointmentsList;
       if (!listEl) return;
@@ -1676,7 +1330,7 @@
 
       if (!filtered.length) {
         listEl.innerHTML =
-          '<p class="text-sm text-slate-500">Tiada temujanji untuk status ini.</p>';
+          '<p class="text-base text-slate-500">Tiada temujanji untuk status ini.</p>';
         return;
       }
 
@@ -1713,18 +1367,16 @@
         // Appointments for this service
         serviceAppointments.forEach(a => {
           const card = document.createElement("div");
-          card.className =
-            "border border-slate-200 bg-white rounded-lg px-4 py-3 flex flex-col gap-2 mb-3";
+          card.className = "border border-slate-200 bg-white rounded-xl px-4 py-3 flex flex-col gap-3 mb-4 appointment-card card-hover";
 
           const topRow = document.createElement("div");
-          topRow.className = "flex items-center justify-between gap-3";
+          topRow.className = "flex items-center justify-between gap-4";
 
           const left = document.createElement("div");
           left.innerHTML = `
-            <div class="text-base font-medium text-slate-900">${a.patient_name}</div>
-            <div class="text-sm text-slate-400">Tarikh: ${formatDate(
-              a.requested_date
-            )}</div>
+            <div class="text-base md:text-lg font-bold text-slate-900">${a.patient_name}</div>
+            <div class="text-sm text-slate-400">Tarikh: ${formatDate(a.requested_date)}</div>
+            <div class="text-xs text-slate-500">Didaftar: ${formatDateTime(a.created_at)}</div>
           `;
 
           const badge = document.createElement("span");
@@ -1732,9 +1384,7 @@
           if (a.status === "pending") statusColor = "bg-amber-50 text-amber-700";
           if (a.status === "approved") statusColor = "bg-emerald-50 text-emerald-700";
           if (a.status === "rejected") statusColor = "bg-rose-50 text-rose-700";
-          badge.className =
-            "text-sm px-3 py-1 rounded-full border " +
-            statusColor.replace("bg", "border");
+          badge.className = `text-sm px-3 py-1.5 rounded-full border ${statusColor.replace("bg", "border")}`;
           badge.textContent = a.status;
 
           topRow.appendChild(left);
@@ -1743,10 +1393,14 @@
 
           // Delete button
           const deleteBtn = document.createElement("button");
-          deleteBtn.textContent = "Padam";
-          deleteBtn.className = "absolute top-2 right-2 text-xs px-2 py-1 rounded-md text-rose-600 hover:bg-rose-50";
+          deleteBtn.className = "delete-btn absolute top-3 right-3 text-rose-500 hover:text-rose-700";
+          deleteBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          `;
           deleteBtn.addEventListener("click", () => {
-            openDeleteModal(a);
+            deleteAppointment(a.id);
           });
           card.appendChild(deleteBtn);
 
@@ -1754,8 +1408,7 @@
           if (activeStaffFilter === "approved") {
             const btn = document.createElement("button");
             btn.textContent = "WhatsApp Pesakit (temujanji disahkan)";
-            btn.className =
-              "mt-2 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-sm text-white font-medium shadow-sm";
+            btn.className = "mt-3 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-green-500 hover:bg-green-600 text-base font-semibold text-white shadow-lg hover:shadow-xl";
             btn.addEventListener("click", () => {
               sendWhatsAppToPatientApproved(a);
             });
@@ -1764,27 +1417,24 @@
 
           if (activeStaffFilter === "rejected") {
             const info = document.createElement("div");
-            info.className = "mt-1 text-sm text-slate-600";
-            info.textContent =
-              "Cadangan tarikh doktor: " +
+            info.className = "mt-2 text-sm text-slate-600";
+            info.textContent = "Cadangan tarikh doktor: " +
               (a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : "-") +
               " dan " +
               (a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : "-");
             card.appendChild(info);
 
             const btnRow = document.createElement("div");
-            btnRow.className = "mt-2 flex flex-wrap gap-2";
+            btnRow.className = "mt-3 flex flex-wrap gap-3";
 
             const btn1 = document.createElement("button");
             btn1.textContent = "Pilih Tarikh 1 & WhatsApp Doktor";
-            btn1.className =
-              "px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-sm text-white font-medium shadow-sm";
+            btn1.className = "px-4 py-2.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-base font-semibold text-white shadow-lg hover:shadow-xl";
             btn1.disabled = !a.doctor_alt_date1;
 
             const btn2 = document.createElement("button");
             btn2.textContent = "Pilih Tarikh 2 & WhatsApp Doktor";
-            btn2.className =
-              "px-4 py-2 rounded-lg bg-sky-500/90 hover:bg-sky-600 text-sm text-white font-medium shadow-sm";
+            btn2.className = "px-4 py-2.5 rounded-lg bg-sky-500/90 hover:bg-sky-600 text-base font-semibold text-white shadow-lg hover:shadow-xl";
             btn2.disabled = !a.doctor_alt_date2;
 
             btn1.addEventListener("click", () => {
@@ -1799,9 +1449,8 @@
             card.appendChild(btnRow);
 
             const hint = document.createElement("p");
-            hint.className = "mt-1 text-sm text-slate-500";
-            hint.textContent =
-              "Gunakan butang di atas selepas pesakit setuju dengan tarikh baharu.";
+            hint.className = "mt-2 text-sm text-slate-500";
+            hint.textContent = "Gunakan butang di atas selepas pesakit setuju dengan tarikh baharu.";
             card.appendChild(hint);
           }
 
@@ -1811,10 +1460,8 @@
     }
 
     function sendWhatsAppToPatientApproved(appointment) {
-      const doctorName =
-        doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
-      const serviceName =
-        servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
+      const doctorName = doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
+      const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
       const date = appointment.doctor_selected_date || appointment.requested_date;
 
       const msg = [
@@ -1849,8 +1496,7 @@
         return;
       }
 
-      const serviceName =
-        servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
+      const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
       const doctorPhone = await fetchDoctorWhatsapp(appointment.doctor_id);
 
       const msg = [
@@ -1861,7 +1507,7 @@
         `Nama pesakit: ${appointment.patient_name}`,
         `Tarikh baharu dipilih pesakit: ${formatDate(chosenDate)}`,
         "",
-        `Sila semak & sahkan semula dalam sistem: ${APP_URL}`
+        "Sila semak & sahkan semula dalam sistem."
       ].join("\n");
 
       const waUrl = buildWhatsAppLink(doctorPhone || "", msg);
@@ -1916,19 +1562,19 @@
           const serviceColor = getServiceColor(serviceId);
 
           const block = document.createElement("div");
-          block.className = "space-y-2 mb-4 p-4 border border-slate-200 rounded-lg bg-white";
+          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
           
           const serviceHeader = document.createElement("div");
-          serviceHeader.className = "flex items-center gap-2 mb-3";
+          serviceHeader.className = "flex items-center gap-3 mb-3";
           serviceHeader.innerHTML = `
             <span class="service-tag ${serviceColor}">${serviceName}</span>
-            <span class="text-sm font-semibold text-emerald-600">TINDAKAN: Temujanji Berlangsung Hari Ini</span>
+            <span class="text-sm font-bold text-emerald-600">TINDAKAN: Temujanji Berlangsung Hari Ini</span>
           `;
           block.appendChild(serviceHeader);
 
           serviceAppointments.forEach(a => {
             const line = document.createElement("div");
-            line.className = "text-sm text-slate-700 ml-3";
+            line.className = "text-sm text-slate-700 ml-4";
             line.textContent = `• ${a.patient_name} - ${formatDate(
               a.doctor_selected_date || a.requested_date
             )}`;
@@ -1936,7 +1582,7 @@
           });
           
           const instruction = document.createElement("div");
-          instruction.className = "mt-2 text-sm text-slate-500 ml-3";
+          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
           instruction.textContent = "Pesakit perlu dihadiri di klinik mengikut tarikh di atas.";
           block.appendChild(instruction);
           
@@ -1962,32 +1608,32 @@
           const serviceColor = getServiceColor(serviceId);
 
           const block = document.createElement("div");
-          block.className = "space-y-2 mb-4 p-4 border border-slate-200 rounded-lg bg-white";
+          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
           
           const serviceHeader = document.createElement("div");
-          serviceHeader.className = "flex items-center gap-2 mb-3";
+          serviceHeader.className = "flex items-center gap-3 mb-3";
           serviceHeader.innerHTML = `
             <span class="service-tag ${serviceColor}">${serviceName}</span>
-            <span class="text-sm font-semibold text-amber-600">TINDAKAN: Perlu Follow-up Dengan Doktor</span>
+            <span class="text-sm font-bold text-amber-600">TINDAKAN: Perlu Follow-up Dengan Doktor</span>
           `;
           block.appendChild(serviceHeader);
 
           serviceAppointments.slice(0, 3).forEach(a => {
             const line = document.createElement("div");
-            line.className = "text-sm text-slate-700 ml-3";
+            line.className = "text-sm text-slate-700 ml-4";
             line.textContent = `• ${a.patient_name} - diminta untuk ${formatDate(a.requested_date)}`;
             block.appendChild(line);
           });
           
           if (serviceAppointments.length > 3) {
             const more = document.createElement("div");
-            more.className = "text-sm text-slate-500 ml-3";
+            more.className = "text-sm text-slate-500 ml-4";
             more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
             block.appendChild(more);
           }
           
           const instruction = document.createElement("div");
-          instruction.className = "mt-2 text-sm text-slate-500 ml-3";
+          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
           instruction.textContent = "Sila pastikan doktor approve/reject temujanji ini secepat mungkin.";
           block.appendChild(instruction);
           
@@ -2013,19 +1659,19 @@
           const serviceColor = getServiceColor(serviceId);
 
           const block = document.createElement("div");
-          block.className = "space-y-2 mb-4 p-4 border border-slate-200 rounded-lg bg-white";
+          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
           
           const serviceHeader = document.createElement("div");
-          serviceHeader.className = "flex items-center gap-2 mb-3";
+          serviceHeader.className = "flex items-center gap-3 mb-3";
           serviceHeader.innerHTML = `
             <span class="service-tag ${serviceColor}">${serviceName}</span>
-            <span class="text-sm font-semibold text-rose-600">TINDAKAN: Hubungi Pesakit Untuk Tarikh Baharu</span>
+            <span class="text-sm font-bold text-rose-600">TINDAKAN: Hubungi Pesakit Untuk Tarikh Baharu</span>
           `;
           block.appendChild(serviceHeader);
 
           serviceAppointments.slice(0, 3).forEach(a => {
             const line = document.createElement("div");
-            line.className = "text-sm text-slate-700 ml-3";
+            line.className = "text-sm text-slate-700 ml-4";
             const dates = [
               a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
               a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
@@ -2036,13 +1682,13 @@
           
           if (serviceAppointments.length > 3) {
             const more = document.createElement("div");
-            more.className = "text-sm text-slate-500 ml-3";
+            more.className = "text-sm text-slate-500 ml-4";
             more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
             block.appendChild(more);
           }
           
           const instruction = document.createElement("div");
-          instruction.className = "mt-2 text-sm text-slate-500 ml-3";
+          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
           instruction.textContent = "Sila hubungi pesakit untuk memilih salah satu tarikh cadangan doktor.";
           block.appendChild(instruction);
           
@@ -2062,6 +1708,229 @@
         renderStaffAppointmentsList();
       });
     });
+
+    // ==============================
+    // EXPORT HANDLERS
+    // ==============================
+    async function populateYearDropdown() {
+      // Dapatkan tahun dari data appointment
+      const { data, error } = await db
+        .from("appointments")
+        .select("created_at");
+      
+      if (error) return;
+      
+      const years = new Set();
+      data.forEach(item => {
+        if (item.created_at) {
+          const year = new Date(item.created_at).getFullYear();
+          years.add(year);
+        }
+      });
+      
+      // Tambah tahun semasa
+      const currentYear = new Date().getFullYear();
+      years.add(currentYear);
+      
+      // Sort tahun
+      const sortedYears = Array.from(years).sort((a, b) => b - a);
+      
+      exportYear.innerHTML = '<option value="all">Semua Tahun</option>';
+      sortedYears.forEach(year => {
+        const option = document.createElement("option");
+        option.value = year;
+        option.textContent = year;
+        exportYear.appendChild(option);
+      });
+    }
+
+    async function fetchExportData() {
+      exportLoading.classList.remove("hidden");
+      exportPreview.classList.add("hidden");
+      
+      const doctorId = exportDoctor.value;
+      const month = exportMonth.value;
+      const year = exportYear.value;
+      
+      let query = db
+        .from("appointments")
+        .select(`
+          id,
+          patient_name,
+          patient_ic,
+          patient_phone,
+          complaint,
+          requested_date,
+          status,
+          doctor_selected_date,
+          doctor_alt_date1,
+          doctor_alt_date2,
+          created_at,
+          service_id,
+          doctor_id,
+          services(name),
+          profiles!appointments_doctor_id_fkey(full_name)
+        `)
+        .order("created_at", { ascending: false });
+
+      // Filter doktor
+      if (doctorId !== "all") {
+        query = query.eq("doctor_id", doctorId);
+      }
+
+      // Filter status
+      const statusFilters = [];
+      if (exportPending.checked) statusFilters.push("pending");
+      if (exportApproved.checked) statusFilters.push("approved");
+      if (exportRejected.checked) statusFilters.push("rejected");
+      
+      if (statusFilters.length > 0) {
+        query = query.in("status", statusFilters);
+      }
+
+      const { data, error } = await query;
+      
+      exportLoading.classList.add("hidden");
+      
+      if (error) {
+        console.error("Error fetch export data", error);
+        alert("Gagal memuatkan data untuk export.");
+        return [];
+      }
+
+      // Filter bulan dan tahun jika dipilih
+      let filteredData = data || [];
+      
+      if (month !== "all") {
+        filteredData = filteredData.filter(item => {
+          if (!item.created_at) return false;
+          const itemMonth = new Date(item.created_at).getMonth() + 1;
+          return itemMonth.toString().padStart(2, '0') === month;
+        });
+      }
+      
+      if (year !== "all") {
+        filteredData = filteredData.filter(item => {
+          if (!item.created_at) return false;
+          const itemYear = new Date(item.created_at).getFullYear();
+          return itemYear.toString() === year;
+        });
+      }
+      
+      return filteredData;
+    }
+
+    async function previewExportData() {
+      const data = await fetchExportData();
+      
+      if (data.length === 0) {
+        exportStats.textContent = "Tiada data ditemui untuk parameter yang dipilih.";
+        exportPreviewTable.innerHTML = "";
+        exportPreview.classList.remove("hidden");
+        return;
+      }
+      
+      // Update stats
+      exportStats.textContent = `Ditemui ${data.length} rekod temujanji.`;
+      
+      // Create preview table
+      let tableHTML = `
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Bil</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Nama Pesakit</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">IC</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Telefon</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Servis</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Doktor</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Status</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Tarikh Diminta</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Tarikh Diluluskan</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+      `;
+      
+      data.forEach((item, index) => {
+        const statusColors = {
+          pending: 'text-amber-600',
+          approved: 'text-emerald-600',
+          rejected: 'text-rose-600'
+        };
+        
+        tableHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="px-3 py-2">${index + 1}</td>
+            <td class="px-3 py-2 font-medium">${item.patient_name}</td>
+            <td class="px-3 py-2">${item.patient_ic}</td>
+            <td class="px-3 py-2">${item.patient_phone}</td>
+            <td class="px-3 py-2">${item.services?.name || '-'}</td>
+            <td class="px-3 py-2">${item.profiles?.full_name || '-'}</td>
+            <td class="px-3 py-2"><span class="${statusColors[item.status] || 'text-slate-600'}">${item.status}</span></td>
+            <td class="px-3 py-2">${formatDate(item.requested_date)}</td>
+            <td class="px-3 py-2">${formatDate(item.doctor_selected_date)}</td>
+          </tr>
+        `;
+      });
+      
+      tableHTML += `
+          </tbody>
+        </table>
+      `;
+      
+      exportPreviewTable.innerHTML = tableHTML;
+      exportPreview.classList.remove("hidden");
+    }
+
+    async function exportToExcel() {
+      const data = await fetchExportData();
+      
+      if (data.length === 0) {
+        alert("Tiada data untuk diexport.");
+        return;
+      }
+      
+      // Prepare data for Excel
+      const excelData = data.map((item, index) => ({
+        'Bil': index + 1,
+        'Nama Pesakit': item.patient_name,
+        'No. IC': item.patient_ic,
+        'No. Telefon': item.patient_phone,
+        'Servis': item.services?.name || '-',
+        'Doktor': item.profiles?.full_name || '-',
+        'Status': item.status,
+        'Tarikh Diminta': formatDate(item.requested_date),
+        'Tarikh Diluluskan': formatDate(item.doctor_selected_date),
+        'Cadangan Tarikh 1': formatDate(item.doctor_alt_date1),
+        'Cadangan Tarikh 2': formatDate(item.doctor_alt_date2),
+        'Complaint': item.complaint || '-',
+        'Tarikh Didaftar': formatDateTime(item.created_at)
+      }));
+      
+      // Create worksheet
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Temujanji");
+      
+      // Generate filename
+      const doctorName = exportDoctor.value === 'all' ? 'Semua-Doktor' : 
+        doctorsCache.find(d => d.id === exportDoctor.value)?.full_name || 'Doktor';
+      const monthName = exportMonth.value === 'all' ? 'Semua-Bulan' : 
+        document.querySelector(`#exportMonth option[value="${exportMonth.value}"]`).textContent;
+      const yearName = exportYear.value === 'all' ? 'Semua-Tahun' : exportYear.value;
+      
+      const fileName = `Temujanji_${doctorName}_${monthName}_${yearName}.xlsx`;
+      
+      // Save file
+      XLSX.writeFile(wb, fileName);
+    }
+
+    // Event listeners untuk export
+    exportPreviewBtn?.addEventListener("click", previewExportData);
+    exportExcelBtn?.addEventListener("click", exportToExcel);
 
     // ==============================
     // DOCTOR PANEL HANDLERS
@@ -2088,8 +1957,8 @@
       if (activeDoctorTab === "pending") {
         query = query.in("status", ["pending", "reschedule_pending"]);
         doctorTabDescription.innerHTML = `
-          Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-semibold text-emerald-600">Approve</span> atau
-          <span class="font-semibold text-rose-500">Reject</span>. Jika pilih Reject, sistem akan minta dua tarikh cadangan.
+          Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-bold text-emerald-600">Approve</span> atau
+          <span class="font-bold text-rose-600">Reject</span>. Jika pilih Reject, anda boleh mencadangkan tarikh alternatif.
         `;
       } else if (activeDoctorTab === "approved") {
         query = query.eq("status", "approved");
@@ -2110,7 +1979,7 @@
       if (error) {
         console.error("Error load doctor appointments", error);
         doctorAppointmentsList.innerHTML =
-          '<p class="text-sm text-rose-500">Gagal load temujanji.</p>';
+          '<p class="text-base text-rose-500">Gagal load temujanji.</p>';
         return;
       }
 
@@ -2121,18 +1990,16 @@
         else if (activeDoctorTab === "rejected") message = "Belum ada temujanji yang ditolak.";
         
         doctorAppointmentsList.innerHTML =
-          `<p class="text-sm text-slate-500">${message}</p>`;
+          `<p class="text-base text-slate-500">${message}</p>`;
         return;
       }
 
       doctorAppointmentsList.innerHTML = "";
       data.forEach(a => {
         const card = document.createElement("div");
-        card.className =
-          "border border-slate-200 rounded-xl px-4 py-3 space-y-2 bg-white shadow-sm";
+        card.className = "border border-slate-200 rounded-xl px-4 py-3 space-y-3 bg-white shadow-sm card-hover";
 
-        const serviceName =
-          servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
+        const serviceName = servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
 
         const statusBadge = (() => {
           let cls = "bg-slate-100 text-slate-600";
@@ -2140,13 +2007,13 @@
           if (a.status === "reschedule_pending") cls = "bg-sky-50 text-sky-700";
           if (a.status === "approved") cls = "bg-emerald-50 text-emerald-700";
           if (a.status === "rejected") cls = "bg-rose-50 text-rose-700";
-          return `<span class="inline-flex px-3 py-1 rounded-full text-sm ${cls} border border-current">${a.status}</span>`;
+          return `<span class="inline-flex px-3 py-1.5 rounded-full text-sm ${cls} border border-current">${a.status}</span>`;
         })();
 
         card.innerHTML = `
           <div class="flex items-start justify-between gap-3">
             <div>
-              <div class="text-base font-medium text-slate-900">${a.patient_name}</div>
+              <div class="text-base md:text-lg font-bold text-slate-900">${a.patient_name}</div>
               <div class="text-sm text-slate-500">${serviceName}</div>
               <div class="text-sm text-slate-400">
                 IC: ${a.patient_ic} • Tel: ${a.patient_phone}
@@ -2160,7 +2027,7 @@
           </div>
           ${
             a.complaint
-              ? `<div class="text-sm text-slate-700 mt-1">Complaint: ${a.complaint}</div>`
+              ? `<div class="text-sm text-slate-700 mt-2">Complaint: ${a.complaint}</div>`
               : ""
           }
         `;
@@ -2168,68 +2035,81 @@
         // Action row hanya untuk pending
         if (activeDoctorTab === "pending") {
           const actionRow = document.createElement("div");
-          actionRow.className = "mt-3 grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] gap-4";
+          actionRow.className = "mt-4 grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] gap-4";
 
           // Approve section
           const approveDiv = document.createElement("div");
-          approveDiv.className = "space-y-2";
-          approveDiv.innerHTML = `
-            <label class="block text-sm text-slate-600">Tarikh dipersetujui</label>
-          `;
+          approveDiv.className = "space-y-3";
+          
           const approveInput = document.createElement("input");
           approveInput.type = "date";
           approveInput.value = a.doctor_selected_date || a.requested_date || "";
-          approveInput.className =
-            "w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500";
+          approveInput.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm";
 
           const approveBtn = document.createElement("button");
-          approveBtn.textContent = "Approve + WhatsApp Klinik";
-          approveBtn.className =
-            "w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 text-sm font-medium text-white px-3 py-2 shadow-sm";
+          approveBtn.textContent = "Approve";
+          approveBtn.className = "w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl";
+
+          const approveWhatsappBtn = document.createElement("button");
+          approveWhatsappBtn.textContent = "Approve & WhatsApp Klinik";
+          approveWhatsappBtn.className = "w-full rounded-lg bg-green-500 hover:bg-green-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
 
           approveDiv.appendChild(approveInput);
           approveDiv.appendChild(approveBtn);
+          approveDiv.appendChild(approveWhatsappBtn);
 
           // Reject section
           const rejectWrapper = document.createElement("div");
-          rejectWrapper.className = "space-y-2";
+          rejectWrapper.className = "space-y-3";
 
-          const rejectToggleBtn = document.createElement("button");
-          rejectToggleBtn.textContent = "Reject (cadang tarikh lain)";
-          rejectToggleBtn.className =
-            "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-sm font-medium text-white px-3 py-2 shadow-sm";
+          const rejectBtn = document.createElement("button");
+          rejectBtn.textContent = "Reject";
+          rejectBtn.className = "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl";
 
           const rejectPanel = document.createElement("div");
-          rejectPanel.className = "mt-2 space-y-2 hidden";
+          rejectPanel.className = "mt-3 space-y-3 hidden";
 
-          const rLabel1 = document.createElement("label");
-          rLabel1.className = "block text-sm text-slate-600";
-          rLabel1.textContent = "Tarikh cadangan 1";
-          const rInput1 = document.createElement("input");
-          rInput1.type = "date";
-          rInput1.className =
-            "w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-rose-500";
+          const altDatesContainer = document.createElement("div");
+          altDatesContainer.className = "space-y-3";
+          altDatesContainer.innerHTML = `
+            <div class="space-y-2">
+              <label class="block text-sm text-slate-700">Tarikh cadangan 1</label>
+              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm text-slate-700">Tarikh cadangan 2</label>
+              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
+            </div>
+          `;
 
-          const rLabel2 = document.createElement("label");
-          rLabel2.className = "block text-sm text-slate-600";
-          rLabel2.textContent = "Tarikh cadangan 2";
-          const rInput2 = document.createElement("input");
-          rInput2.type = "date";
-          rInput2.className =
-            "w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-rose-500";
+          const addDateBtn = document.createElement("button");
+          addDateBtn.textContent = "+ Tambah Tarikh Cadangan";
+          addDateBtn.type = "button";
+          addDateBtn.className = "text-sm text-sky-600 hover:text-sky-700";
+          addDateBtn.addEventListener("click", () => {
+            const newDateInput = document.createElement("div");
+            newDateInput.className = "space-y-2";
+            newDateInput.innerHTML = `
+              <label class="block text-sm text-slate-700">Tarikh cadangan tambahan</label>
+              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
+            `;
+            altDatesContainer.appendChild(newDateInput);
+          });
 
           const rejectConfirmBtn = document.createElement("button");
-          rejectConfirmBtn.textContent = "Hantar Cadangan Tarikh + WhatsApp Klinik";
-          rejectConfirmBtn.className =
-            "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-sm font-medium text-white px-3 py-2 mt-1 shadow-sm";
+          rejectConfirmBtn.textContent = "Reject dengan Cadangan Tarikh";
+          rejectConfirmBtn.className = "w-full rounded-lg bg-rose-600 hover:bg-rose-700 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
 
-          rejectPanel.appendChild(rLabel1);
-          rejectPanel.appendChild(rInput1);
-          rejectPanel.appendChild(rLabel2);
-          rejectPanel.appendChild(rInput2);
+          const rejectWhatsappBtn = document.createElement("button");
+          rejectWhatsappBtn.textContent = "Reject & WhatsApp Klinik";
+          rejectWhatsappBtn.className = "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
+
+          rejectPanel.appendChild(altDatesContainer);
+          rejectPanel.appendChild(addDateBtn);
           rejectPanel.appendChild(rejectConfirmBtn);
+          rejectPanel.appendChild(rejectWhatsappBtn);
 
-          rejectWrapper.appendChild(rejectToggleBtn);
+          rejectWrapper.appendChild(rejectBtn);
           rejectWrapper.appendChild(rejectPanel);
 
           actionRow.appendChild(approveDiv);
@@ -2237,14 +2117,7 @@
 
           card.appendChild(actionRow);
 
-          const infoText = document.createElement("p");
-          infoText.className =
-            "mt-2 text-sm text-slate-500";
-          infoText.textContent =
-            "Selepas update status, sistem akan buka WhatsApp ke nombor klinik di tab baharu.";
-          card.appendChild(infoText);
-
-          // Handlers
+          // Handlers untuk Approve
           approveBtn.addEventListener("click", async () => {
             const date = approveInput.value;
             if (!date) {
@@ -2260,6 +2133,27 @@
               alert("Gagal update status.");
               return;
             }
+            alert("Temujanji telah diluluskan.");
+            await refreshDoctorAppointmentsList();
+          });
+
+          approveWhatsappBtn.addEventListener("click", async () => {
+            const date = approveInput.value;
+            if (!date) {
+              alert("Sila pilih tarikh yang dipersetujui.");
+              return;
+            }
+            const { error } = await db
+              .from("appointments")
+              .update({ status: "approved", doctor_selected_date: date })
+              .eq("id", a.id);
+            if (error) {
+              console.error("Error approve", error);
+              alert("Gagal update status.");
+              return;
+            }
+            
+            // Generate WhatsApp message
             const clinicPhone = await fetchClinicWhatsapp();
             const msg = [
               "Assalamualaikum / Salam sejahtera,",
@@ -2267,39 +2161,76 @@
               "Saya setuju untuk temujanji pesakit berikut:",
               `Servis: ${serviceName}`,
               `Nama: ${a.patient_name}`,
-              `Tarikh temujanji: ${formatDate(date)}`,
-              "",
-              `Sistem: ${APP_URL}`
+              `Tarikh temujanji: ${formatDate(date)}`
             ].join("\n");
+            
             const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
             window.open(waUrl, "_blank");
             await refreshDoctorAppointmentsList();
           });
 
-          rejectToggleBtn.addEventListener("click", () => {
+          // Handlers untuk Reject
+          rejectBtn.addEventListener("click", () => {
             rejectPanel.classList.toggle("hidden");
           });
 
           rejectConfirmBtn.addEventListener("click", async () => {
-            const d1 = rInput1.value;
-            const d2 = rInput2.value;
-            if (!d1 || !d2) {
-              alert("Sila isi kedua-dua tarikh cadangan.");
+            const dateInputs = altDatesContainer.querySelectorAll("input[type='date']");
+            const dates = Array.from(dateInputs).map(input => input.value).filter(date => date);
+            
+            if (dates.length < 2) {
+              alert("Sila isi sekurang-kurangnya dua tarikh cadangan.");
               return;
             }
+            
             const { error } = await db
               .from("appointments")
               .update({
                 status: "rejected",
-                doctor_alt_date1: d1,
-                doctor_alt_date2: d2
+                doctor_alt_date1: dates[0],
+                doctor_alt_date2: dates[1],
+                ...(dates[2] && { doctor_alt_date3: dates[2] }),
+                ...(dates[3] && { doctor_alt_date4: dates[3] })
               })
               .eq("id", a.id);
+              
             if (error) {
               console.error("Error reject", error);
               alert("Gagal update status.");
               return;
             }
+            
+            alert("Temujanji telah ditolak dengan cadangan tarikh alternatif.");
+            await refreshDoctorAppointmentsList();
+          });
+
+          rejectWhatsappBtn.addEventListener("click", async () => {
+            const dateInputs = altDatesContainer.querySelectorAll("input[type='date']");
+            const dates = Array.from(dateInputs).map(input => input.value).filter(date => date);
+            
+            if (dates.length < 2) {
+              alert("Sila isi sekurang-kurangnya dua tarikh cadangan.");
+              return;
+            }
+            
+            const { error } = await db
+              .from("appointments")
+              .update({
+                status: "rejected",
+                doctor_alt_date1: dates[0],
+                doctor_alt_date2: dates[1],
+                ...(dates[2] && { doctor_alt_date3: dates[2] }),
+                ...(dates[3] && { doctor_alt_date4: dates[3] })
+              })
+              .eq("id", a.id);
+              
+            if (error) {
+              console.error("Error reject", error);
+              alert("Gagal update status.");
+              return;
+            }
+            
+            // Generate WhatsApp message
             const clinicPhone = await fetchClinicWhatsapp();
             const msg = [
               "Assalamualaikum / Salam sejahtera,",
@@ -2310,11 +2241,9 @@
               `Tarikh asal: ${formatDate(a.requested_date)}`,
               "",
               "Cadangan tarikh baharu:",
-              `1) ${formatDate(d1)}`,
-              `2) ${formatDate(d2)}`,
-              "",
-              `Sistem: ${APP_URL}`
+              ...dates.map((date, idx) => `${idx + 1}) ${formatDate(date)}`)
             ].join("\n");
+            
             const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
             window.open(waUrl, "_blank");
             await refreshDoctorAppointmentsList();
@@ -2323,14 +2252,16 @@
           // Untuk rejected tab, show suggested dates
           if (a.doctor_alt_date1 || a.doctor_alt_date2) {
             const datesDiv = document.createElement("div");
-            datesDiv.className = "mt-2 text-sm text-slate-600";
-            datesDiv.textContent = `Cadangan tarikh alternatif: ${
-              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : "-"
-            } atau ${a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : "-"}`;
+            datesDiv.className = "mt-3 text-sm text-slate-600";
+            const dates = [a.doctor_alt_date1, a.doctor_alt_date2, a.doctor_alt_date3, a.doctor_alt_date4]
+              .filter(Boolean)
+              .map(date => formatDate(date))
+              .join(', ');
+            datesDiv.textContent = `Cadangan tarikh alternatif: ${dates}`;
             card.appendChild(datesDiv);
             
             const note = document.createElement("div");
-            note.className = "mt-1 text-sm text-slate-500";
+            note.className = "mt-2 text-sm text-slate-500";
             note.textContent = "Menunggu staff klinik hubungi pesakit untuk pilih tarikh baharu.";
             card.appendChild(note);
           }
@@ -2338,7 +2269,7 @@
           // Untuk approved tab, show confirmed date
           if (a.doctor_selected_date) {
             const confirmedDiv = document.createElement("div");
-            confirmedDiv.className = "mt-2 text-sm text-emerald-600";
+            confirmedDiv.className = "mt-3 text-sm text-emerald-600";
             confirmedDiv.textContent = `Tarikh temujanji disahkan: ${formatDate(a.doctor_selected_date)}`;
             card.appendChild(confirmedDiv);
           }
@@ -2375,6 +2306,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       setActiveTab("tab-login");
       loadSession();
+      populateYearDropdown();
       renderStaffFilterTabs();
       
       // Set default active doctor tab button
