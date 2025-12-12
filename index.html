@@ -18,6 +18,27 @@
       min-height: 100vh;
     }
     .tab-hidden { display: none; }
+    .service-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 500;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body class="text-slate-900">
@@ -127,7 +148,7 @@
                     Tindakan Hari Ini
                   </h2>
                   <p class="text-xs md:text-sm text-slate-500 mt-1">
-                    Ringkasan temujanji yang perlu diberi perhatian hari ini.
+                    Ringkasan temujanji yang perlu diberi perhatian hari ini, diasingkan mengikut servis.
                   </p>
                 </div>
                 <div class="flex flex-wrap gap-2 text-[11px] md:text-xs">
@@ -148,7 +169,7 @@
                   </div>
                 </div>
               </div>
-              <div id="todayActionsList" class="mt-3 space-y-2 text-xs md:text-sm text-slate-700">
+              <div id="todayActionsList" class="mt-3 space-y-3 text-xs md:text-sm text-slate-700">
                 <!-- auto render -->
               </div>
             </div>
@@ -242,9 +263,9 @@
               <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 class="text-base md:text-lg font-semibold text-slate-900">Senarai Temujanji</h2>
+                    <h2 class="text-base md:text-lg font-semibold text-slate-900">Senarai Temujanji (Disusun Mengikut Servis)</h2>
                     <p class="text-[11px] md:text-xs text-slate-500">
-                      20 rekod terkini untuk pantauan cepat.
+                      30 rekod terkini, diasingkan mengikut servis untuk pantauan mudah.
                     </p>
                   </div>
                   <div class="flex items-center gap-2">
@@ -268,7 +289,7 @@
                     </button>
                   </div>
                 </div>
-                <div id="staffAppointmentsList" class="space-y-2 text-xs md:text-sm max-h-80 overflow-auto">
+                <div id="staffAppointmentsList" class="space-y-4 text-xs md:text-sm max-h-80 overflow-auto scrollbar-thin">
                   <!-- render -->
                 </div>
               </div>
@@ -280,18 +301,34 @@
         <section id="tab-doctor" class="tab-hidden">
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <h2 class="text-base md:text-lg font-semibold text-slate-900">Temujanji Untuk Doktor</h2>
-              <button id="refreshDoctorAppointments"
-                      class="text-[11px] md:text-xs px-3 py-1 rounded-full border border-slate-300 hover:border-sky-400 hover:text-sky-600 bg-white shadow-sm">
-                Refresh
-              </button>
+              <h2 class="text-base md:text-lg font-semibold text-slate-900">Panel Doktor</h2>
+              <div class="flex items-center gap-2">
+                <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-0.5 text-[11px] md:text-xs shadow-sm">
+                  <button class="doctor-tab-btn px-3 py-1 rounded-full font-medium text-slate-500"
+                          data-tab="pending">
+                    Status (Pending Approval)
+                  </button>
+                  <button class="doctor-tab-btn px-3 py-1 rounded-full font-medium text-slate-500"
+                          data-tab="approved">
+                    Approved
+                  </button>
+                  <button class="doctor-tab-btn px-3 py-1 rounded-full font-medium text-slate-500"
+                          data-tab="rejected">
+                    Rejected
+                  </button>
+                </div>
+                <button id="refreshDoctorAppointments"
+                        class="text-[11px] md:text-xs px-3 py-1 rounded-full border border-slate-300 hover:border-sky-400 hover:text-sky-600 bg-white shadow-sm">
+                  Refresh
+                </button>
+              </div>
             </div>
-            <p class="text-xs md:text-sm text-slate-500 mb-2">
+            <p id="doctorTabDescription" class="text-xs md:text-sm text-slate-500 mb-2">
               Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-semibold text-emerald-600">Approve</span> atau
               <span class="font-semibold text-rose-500">Reject</span>. Jika pilih Reject, sistem akan minta dua tarikh cadangan.
             </p>
 
-            <div id="doctorAppointmentsList" class="space-y-3 text-xs md:text-sm max-h-[520px] overflow-auto">
+            <div id="doctorAppointmentsList" class="space-y-3 text-xs md:text-sm max-h-[520px] overflow-auto scrollbar-thin">
               <!-- render -->
             </div>
           </div>
@@ -341,7 +378,7 @@
 
               <div class="mt-4">
                 <h3 class="text-xs font-semibold text-slate-700 mb-1">Senarai Servis</h3>
-                <div id="serviceList" class="space-y-1 max-h-56 overflow-auto">
+                <div id="serviceList" class="space-y-1 max-h-56 overflow-auto scrollbar-thin">
                   <!-- senarai servis -->
                 </div>
               </div>
@@ -390,8 +427,11 @@
               </form>
 
               <div class="mt-4">
-                <h3 class="text-xs font-semibold text-slate-700 mb-1">Senarai Kolom Aktif</h3>
-                <div id="fieldList" class="space-y-1 max-h-56 overflow-auto">
+                <div class="flex justify-between items-center mb-1">
+                  <h3 class="text-xs font-semibold text-slate-700">Senarai Kolom Aktif</h3>
+                  <span class="text-[10px] text-slate-500">Klik untuk padam</span>
+                </div>
+                <div id="fieldList" class="space-y-1 max-h-56 overflow-auto scrollbar-thin">
                   <!-- senarai fields -->
                 </div>
               </div>
@@ -424,6 +464,7 @@
     let lastCreatedAppointment = null;
     let staffAppointmentsCache = [];
     let activeStaffFilter = "pending";
+    let activeDoctorTab = "pending";
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -473,6 +514,8 @@
     // Doctor panel
     const doctorAppointmentsList = document.getElementById("doctorAppointmentsList");
     const refreshDoctorAppointments = document.getElementById("refreshDoctorAppointments");
+    const doctorTabButtons = document.querySelectorAll(".doctor-tab-btn");
+    const doctorTabDescription = document.getElementById("doctorTabDescription");
 
     // Settings
     const serviceForm = document.getElementById("serviceForm");
@@ -537,6 +580,21 @@
       const cleanPhone = (phone || "").replace(/[^0-9]/g, "");
       const encoded = encodeURIComponent(message || "");
       return `https://wa.me/${cleanPhone}?text=${encoded}`;
+    }
+
+    function getServiceColor(serviceId) {
+      const colors = [
+        'bg-blue-100 text-blue-800 border-blue-200',
+        'bg-emerald-100 text-emerald-800 border-emerald-200',
+        'bg-amber-100 text-amber-800 border-amber-200',
+        'bg-purple-100 text-purple-800 border-purple-200',
+        'bg-rose-100 text-rose-800 border-rose-200',
+        'bg-cyan-100 text-cyan-800 border-cyan-200',
+        'bg-lime-100 text-lime-800 border-lime-200',
+        'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200'
+      ];
+      const index = serviceId ? parseInt(serviceId, 36) % colors.length : 0;
+      return colors[index];
     }
 
     // ==============================
@@ -746,7 +804,7 @@
       }
       customFieldsCache = data || [];
 
-      // List di Settings
+      // List di Settings dengan delete button
       if (fieldList) {
         fieldList.innerHTML = "";
         customFieldsCache.forEach(f => {
@@ -754,19 +812,47 @@
             ? (servicesCache.find(s => s.id === f.service_id)?.name || "Unknown")
             : "Global";
           const item = document.createElement("div");
-          item.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-2 py-1";
+          item.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-2 py-1 hover:bg-slate-50 cursor-pointer group";
           item.innerHTML = `
-            <div>
+            <div class="flex-1">
               <div class="font-medium text-slate-900 text-xs md:text-sm">${f.label}</div>
               <div class="text-[10px] md:text-xs text-slate-500">
                 Type: ${f.input_type} • Servis: ${serviceName}
               </div>
             </div>
-            <span class="text-[10px] md:text-xs ${f.is_required ? "text-amber-500" : "text-slate-400"}">
-              ${f.is_required ? "Wajib" : "Optional"}
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] md:text-xs ${f.is_required ? "text-amber-500" : "text-slate-400"}">
+                ${f.is_required ? "Wajib" : "Optional"}
+              </span>
+              <button class="delete-field-btn text-[10px] px-2 py-1 rounded-md text-rose-600 hover:bg-rose-50 hover:text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                      data-field-id="${f.id}">
+                Padam
+              </button>
+            </div>
           `;
           fieldList.appendChild(item);
+        });
+
+        // Add delete event listeners
+        fieldList.querySelectorAll(".delete-field-btn").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            const fieldId = btn.dataset.fieldId;
+            if (confirm("Adakah anda pasti mahu memadam kolom ini?")) {
+              const { error } = await db
+                .from("appointment_fields")
+                .update({ is_active: false })
+                .eq("id", fieldId);
+              
+              if (error) {
+                console.error("Error delete field", error);
+                alert("Gagal memadam kolom.");
+              } else {
+                await loadCustomFields();
+                renderCustomFieldsForm();
+              }
+            }
+          });
         });
       }
 
@@ -998,7 +1084,7 @@
         .from("appointments")
         .select("id, patient_name, requested_date, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(30);
 
       if (error) {
         console.error("Error load staff appointments", error);
@@ -1036,97 +1122,124 @@
         return;
       }
 
-      listEl.innerHTML = "";
+      // Group appointments by service
+      const appointmentsByService = {};
       filtered.forEach(a => {
-        const card = document.createElement("div");
-        card.className =
-          "border border-slate-200 bg-white rounded-lg px-3 py-2 flex flex-col gap-1";
+        const serviceId = a.service_id;
+        if (!appointmentsByService[serviceId]) {
+          appointmentsByService[serviceId] = [];
+        }
+        appointmentsByService[serviceId].push(a);
+      });
 
-        const serviceName =
-          servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
+      listEl.innerHTML = "";
 
-        const topRow = document.createElement("div");
-        topRow.className = "flex items-center justify-between gap-3";
+      // Render each service group
+      Object.keys(appointmentsByService).forEach(serviceId => {
+        const serviceAppointments = appointmentsByService[serviceId];
+        const service = servicesCache.find(s => s.id === serviceId);
+        const serviceName = service?.name || "Servis Tidak Dikenali";
+        const serviceColor = getServiceColor(serviceId);
 
-        const left = document.createElement("div");
-        left.innerHTML = `
-          <div class="text-xs md:text-sm font-medium text-slate-900">${a.patient_name}</div>
-          <div class="text-[10px] md:text-xs text-slate-500">${serviceName}</div>
-          <div class="text-[10px] md:text-xs text-slate-400">Tarikh: ${formatDate(
-            a.requested_date
-          )}</div>
+        // Service header
+        const serviceHeader = document.createElement("div");
+        serviceHeader.className = "sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-slate-200 pb-2 mb-2";
+        serviceHeader.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="service-tag ${serviceColor}">${serviceName}</span>
+            <span class="text-[10px] md:text-xs text-slate-500">(${serviceAppointments.length} temujanji)</span>
+          </div>
         `;
+        listEl.appendChild(serviceHeader);
 
-        const badge = document.createElement("span");
-        let statusColor = "bg-slate-100 text-slate-600";
-        if (a.status === "pending") statusColor = "bg-amber-50 text-amber-700";
-        if (a.status === "approved") statusColor = "bg-emerald-50 text-emerald-700";
-        if (a.status === "rejected") statusColor = "bg-rose-50 text-rose-700";
-        badge.className =
-          "text-[10px] md:text-xs px-2 py-1 rounded-full border " +
-          statusColor.replace("bg", "border");
-        badge.textContent = a.status;
+        // Appointments for this service
+        serviceAppointments.forEach(a => {
+          const card = document.createElement("div");
+          card.className =
+            "border border-slate-200 bg-white rounded-lg px-3 py-2 flex flex-col gap-1 mb-2";
 
-        topRow.appendChild(left);
-        topRow.appendChild(badge);
-        card.appendChild(topRow);
+          const topRow = document.createElement("div");
+          topRow.className = "flex items-center justify-between gap-3";
 
-        // Extra actions ikut tab
-        if (activeStaffFilter === "approved") {
-          const btn = document.createElement("button");
-          btn.textContent = "WhatsApp Pesakit (temujanji disahkan)";
-          btn.className =
-            "mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-[11px] md:text-xs text-white font-medium shadow-sm";
-          btn.addEventListener("click", () => {
-            sendWhatsAppToPatientApproved(a);
-          });
-          card.appendChild(btn);
-        }
+          const left = document.createElement("div");
+          left.innerHTML = `
+            <div class="text-xs md:text-sm font-medium text-slate-900">${a.patient_name}</div>
+            <div class="text-[10px] md:text-xs text-slate-400">Tarikh: ${formatDate(
+              a.requested_date
+            )}</div>
+          `;
 
-        if (activeStaffFilter === "rejected") {
-          const info = document.createElement("div");
-          info.className = "mt-1 text-[10px] md:text-xs text-slate-600";
-          info.textContent =
-            "Cadangan tarikh doktor: " +
-            (a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : "-") +
-            " dan " +
-            (a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : "-");
-          card.appendChild(info);
+          const badge = document.createElement("span");
+          let statusColor = "bg-slate-100 text-slate-600";
+          if (a.status === "pending") statusColor = "bg-amber-50 text-amber-700";
+          if (a.status === "approved") statusColor = "bg-emerald-50 text-emerald-700";
+          if (a.status === "rejected") statusColor = "bg-rose-50 text-rose-700";
+          badge.className =
+            "text-[10px] md:text-xs px-2 py-1 rounded-full border " +
+            statusColor.replace("bg", "border");
+          badge.textContent = a.status;
 
-          const btnRow = document.createElement("div");
-          btnRow.className = "mt-2 flex flex-wrap gap-2";
+          topRow.appendChild(left);
+          topRow.appendChild(badge);
+          card.appendChild(topRow);
 
-          const btn1 = document.createElement("button");
-          btn1.textContent = "Pilih Tarikh 1 & WhatsApp Doktor";
-          btn1.className =
-            "px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-[11px] md:text-xs text-white font-medium shadow-sm";
-          btn1.disabled = !a.doctor_alt_date1;
+          // Extra actions ikut tab
+          if (activeStaffFilter === "approved") {
+            const btn = document.createElement("button");
+            btn.textContent = "WhatsApp Pesakit (temujanji disahkan)";
+            btn.className =
+              "mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-[11px] md:text-xs text-white font-medium shadow-sm";
+            btn.addEventListener("click", () => {
+              sendWhatsAppToPatientApproved(a);
+            });
+            card.appendChild(btn);
+          }
 
-          const btn2 = document.createElement("button");
-          btn2.textContent = "Pilih Tarikh 2 & WhatsApp Doktor";
-          btn2.className =
-            "px-3 py-1.5 rounded-lg bg-sky-500/90 hover:bg-sky-600 text-[11px] md:text-xs text-white font-medium shadow-sm";
-          btn2.disabled = !a.doctor_alt_date2;
+          if (activeStaffFilter === "rejected") {
+            const info = document.createElement("div");
+            info.className = "mt-1 text-[10px] md:text-xs text-slate-600";
+            info.textContent =
+              "Cadangan tarikh doktor: " +
+              (a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : "-") +
+              " dan " +
+              (a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : "-");
+            card.appendChild(info);
 
-          btn1.addEventListener("click", () => {
-            if (a.doctor_alt_date1) handleStaffChooseNewDate(a, a.doctor_alt_date1);
-          });
-          btn2.addEventListener("click", () => {
-            if (a.doctor_alt_date2) handleStaffChooseNewDate(a, a.doctor_alt_date2);
-          });
+            const btnRow = document.createElement("div");
+            btnRow.className = "mt-2 flex flex-wrap gap-2";
 
-          btnRow.appendChild(btn1);
-          btnRow.appendChild(btn2);
-          card.appendChild(btnRow);
+            const btn1 = document.createElement("button");
+            btn1.textContent = "Pilih Tarikh 1 & WhatsApp Doktor";
+            btn1.className =
+              "px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-[11px] md:text-xs text-white font-medium shadow-sm";
+            btn1.disabled = !a.doctor_alt_date1;
 
-          const hint = document.createElement("p");
-          hint.className = "mt-1 text-[10px] md:text-xs text-slate-500";
-          hint.textContent =
-            "Gunakan butang di atas selepas pesakit setuju dengan tarikh baharu.";
-          card.appendChild(hint);
-        }
+            const btn2 = document.createElement("button");
+            btn2.textContent = "Pilih Tarikh 2 & WhatsApp Doktor";
+            btn2.className =
+              "px-3 py-1.5 rounded-lg bg-sky-500/90 hover:bg-sky-600 text-[11px] md:text-xs text-white font-medium shadow-sm";
+            btn2.disabled = !a.doctor_alt_date2;
 
-        listEl.appendChild(card);
+            btn1.addEventListener("click", () => {
+              if (a.doctor_alt_date1) handleStaffChooseNewDate(a, a.doctor_alt_date1);
+            });
+            btn2.addEventListener("click", () => {
+              if (a.doctor_alt_date2) handleStaffChooseNewDate(a, a.doctor_alt_date2);
+            });
+
+            btnRow.appendChild(btn1);
+            btnRow.appendChild(btn2);
+            card.appendChild(btnRow);
+
+            const hint = document.createElement("p");
+            hint.className = "mt-1 text-[10px] md:text-xs text-slate-500";
+            hint.textContent =
+              "Gunakan butang di atas selepas pesakit setuju dengan tarikh baharu.";
+            card.appendChild(hint);
+          }
+
+          listEl.appendChild(card);
+        });
       });
     }
 
@@ -1218,54 +1331,156 @@
         return;
       }
 
+      // Approved today - dikelaskan mengikut servis
       if (approvedToday.length) {
-        const block = document.createElement("div");
-        block.className = "space-y-1";
-        block.innerHTML =
-          '<div class="font-semibold text-xs md:text-sm text-slate-900">Temujanji berlangsung hari ini</div>';
+        const approvedByService = {};
         approvedToday.forEach(a => {
-          const serviceName =
-            servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
-          const line = document.createElement("div");
-          line.className = "text-[11px] md:text-xs text-slate-700";
-          line.textContent = `${a.patient_name} • ${serviceName} • ${formatDate(
-            a.doctor_selected_date || a.requested_date
-          )}`;
-          block.appendChild(line);
+          const serviceId = a.service_id;
+          if (!approvedByService[serviceId]) {
+            approvedByService[serviceId] = [];
+          }
+          approvedByService[serviceId].push(a);
         });
-        todayActionsListEl.appendChild(block);
+
+        Object.keys(approvedByService).forEach(serviceId => {
+          const serviceAppointments = approvedByService[serviceId];
+          const service = servicesCache.find(s => s.id === serviceId);
+          const serviceName = service?.name || "Servis Tidak Dikenali";
+          const serviceColor = getServiceColor(serviceId);
+
+          const block = document.createElement("div");
+          block.className = "space-y-1 mb-3 p-3 border border-slate-200 rounded-lg bg-white";
+          
+          const serviceHeader = document.createElement("div");
+          serviceHeader.className = "flex items-center gap-2 mb-2";
+          serviceHeader.innerHTML = `
+            <span class="service-tag ${serviceColor}">${serviceName}</span>
+            <span class="text-[10px] font-semibold text-emerald-600">TINDAKAN: Temujanji Berlangsung Hari Ini</span>
+          `;
+          block.appendChild(serviceHeader);
+
+          serviceAppointments.forEach(a => {
+            const line = document.createElement("div");
+            line.className = "text-[11px] md:text-xs text-slate-700 ml-3";
+            line.textContent = `• ${a.patient_name} - ${formatDate(
+              a.doctor_selected_date || a.requested_date
+            )}`;
+            block.appendChild(line);
+          });
+          
+          const instruction = document.createElement("div");
+          instruction.className = "mt-2 text-[10px] text-slate-500 ml-3";
+          instruction.textContent = "Pesakit perlu dihadiri di klinik mengikut tarikh di atas.";
+          block.appendChild(instruction);
+          
+          todayActionsListEl.appendChild(block);
+        });
       }
 
+      // Pending - dikelaskan mengikut servis
       if (pendingList.length) {
-        const block = document.createElement("div");
-        block.className = "space-y-1 mt-2";
-        block.innerHTML =
-          '<div class="font-semibold text-xs md:text-sm text-slate-900">Perlu tindakan (Pending)</div>';
-        pendingList.slice(0, 5).forEach(a => {
-          const serviceName =
-            servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
-          const line = document.createElement("div");
-          line.className = "text-[11px] md:text-xs text-slate-700";
-          line.textContent = `${a.patient_name} • ${serviceName}`;
-          block.appendChild(line);
+        const pendingByService = {};
+        pendingList.forEach(a => {
+          const serviceId = a.service_id;
+          if (!pendingByService[serviceId]) {
+            pendingByService[serviceId] = [];
+          }
+          pendingByService[serviceId].push(a);
         });
-        todayActionsListEl.appendChild(block);
+
+        Object.keys(pendingByService).forEach(serviceId => {
+          const serviceAppointments = pendingByService[serviceId];
+          const service = servicesCache.find(s => s.id === serviceId);
+          const serviceName = service?.name || "Servis Tidak Dikenali";
+          const serviceColor = getServiceColor(serviceId);
+
+          const block = document.createElement("div");
+          block.className = "space-y-1 mb-3 p-3 border border-slate-200 rounded-lg bg-white";
+          
+          const serviceHeader = document.createElement("div");
+          serviceHeader.className = "flex items-center gap-2 mb-2";
+          serviceHeader.innerHTML = `
+            <span class="service-tag ${serviceColor}">${serviceName}</span>
+            <span class="text-[10px] font-semibold text-amber-600">TINDAKAN: Perlu Follow-up Dengan Doktor</span>
+          `;
+          block.appendChild(serviceHeader);
+
+          serviceAppointments.slice(0, 3).forEach(a => {
+            const line = document.createElement("div");
+            line.className = "text-[11px] md:text-xs text-slate-700 ml-3";
+            line.textContent = `• ${a.patient_name} - diminta untuk ${formatDate(a.requested_date)}`;
+            block.appendChild(line);
+          });
+          
+          if (serviceAppointments.length > 3) {
+            const more = document.createElement("div");
+            more.className = "text-[10px] text-slate-500 ml-3";
+            more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
+            block.appendChild(more);
+          }
+          
+          const instruction = document.createElement("div");
+          instruction.className = "mt-2 text-[10px] text-slate-500 ml-3";
+          instruction.textContent = "Sila pastikan doktor approve/reject temujanji ini secepat mungkin.";
+          block.appendChild(instruction);
+          
+          todayActionsListEl.appendChild(block);
+        });
       }
 
+      // Rejected - dikelaskan mengikut servis
       if (rejectedList.length) {
-        const block = document.createElement("div");
-        block.className = "space-y-1 mt-2";
-        block.innerHTML =
-          '<div class="font-semibold text-xs md:text-sm text-slate-900">Perlu hubungi pesakit (Rejected)</div>';
-        rejectedList.slice(0, 5).forEach(a => {
-          const line = document.createElement("div");
-          line.className = "text-[11px] md:text-xs text-slate-700";
-          line.textContent = `${a.patient_name} • cadangan tarikh: ${formatDate(
-            a.doctor_alt_date1
-          )} / ${formatDate(a.doctor_alt_date2)}`;
-          block.appendChild(line);
+        const rejectedByService = {};
+        rejectedList.forEach(a => {
+          const serviceId = a.service_id;
+          if (!rejectedByService[serviceId]) {
+            rejectedByService[serviceId] = [];
+          }
+          rejectedByService[serviceId].push(a);
         });
-        todayActionsListEl.appendChild(block);
+
+        Object.keys(rejectedByService).forEach(serviceId => {
+          const serviceAppointments = rejectedByService[serviceId];
+          const service = servicesCache.find(s => s.id === serviceId);
+          const serviceName = service?.name || "Servis Tidak Dikenali";
+          const serviceColor = getServiceColor(serviceId);
+
+          const block = document.createElement("div");
+          block.className = "space-y-1 mb-3 p-3 border border-slate-200 rounded-lg bg-white";
+          
+          const serviceHeader = document.createElement("div");
+          serviceHeader.className = "flex items-center gap-2 mb-2";
+          serviceHeader.innerHTML = `
+            <span class="service-tag ${serviceColor}">${serviceName}</span>
+            <span class="text-[10px] font-semibold text-rose-600">TINDAKAN: Hubungi Pesakit Untuk Tarikh Baharu</span>
+          `;
+          block.appendChild(serviceHeader);
+
+          serviceAppointments.slice(0, 3).forEach(a => {
+            const line = document.createElement("div");
+            line.className = "text-[11px] md:text-xs text-slate-700 ml-3";
+            const dates = [
+              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
+              a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
+            ].filter(Boolean).join(' atau ');
+            line.textContent = `• ${a.patient_name} - cadangan: ${dates}`;
+            block.appendChild(line);
+          });
+          
+          if (serviceAppointments.length > 3) {
+            const more = document.createElement("div");
+            more.className = "text-[10px] text-slate-500 ml-3";
+            more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
+            block.appendChild(more);
+          }
+          
+          const instruction = document.createElement("div");
+          instruction.className = "mt-2 text-[10px] text-slate-500 ml-3";
+          instruction.textContent = "Sila hubungi pesakit untuk memilih salah satu tarikh cadangan doktor.";
+          block.appendChild(instruction);
+          
+          todayActionsListEl.appendChild(block);
+        });
       }
     }
 
@@ -1297,15 +1512,33 @@
 
     async function refreshDoctorAppointmentsList() {
       if (!currentProfile || currentProfile.role !== "doctor") return;
-      const { data, error } = await db
+      
+      let query = db
         .from("appointments")
-        .select(
-          "id, patient_name, patient_ic, patient_phone, complaint, requested_date, status, doctor_selected_date, doctor_alt_date1, doctor_alt_date2, service_id"
-        )
-        .eq("doctor_id", currentProfile.id)
-        .in("status", ["pending", "reschedule_pending"])
-        .order("created_at", { ascending: false })
-        .limit(50);
+        .select("id, patient_name, patient_ic, patient_phone, complaint, requested_date, status, doctor_selected_date, doctor_alt_date1, doctor_alt_date2, service_id")
+        .eq("doctor_id", currentProfile.id);
+
+      if (activeDoctorTab === "pending") {
+        query = query.in("status", ["pending", "reschedule_pending"]);
+        doctorTabDescription.innerHTML = `
+          Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-semibold text-emerald-600">Approve</span> atau
+          <span class="font-semibold text-rose-500">Reject</span>. Jika pilih Reject, sistem akan minta dua tarikh cadangan.
+        `;
+      } else if (activeDoctorTab === "approved") {
+        query = query.eq("status", "approved");
+        doctorTabDescription.innerHTML = `
+          Senarai temujanji yang telah diluluskan. Doktor boleh melihat rekod pesakit yang akan datang.
+        `;
+      } else if (activeDoctorTab === "rejected") {
+        query = query.eq("status", "rejected");
+        doctorTabDescription.innerHTML = `
+          Senarai temujanji yang telah ditolak dengan cadangan tarikh alternatif. Status ini menunggu tindakan staff klinik.
+        `;
+      }
+
+      query = query.order("created_at", { ascending: false }).limit(50);
+
+      const { data, error } = await query;
 
       if (error) {
         console.error("Error load doctor appointments", error);
@@ -1315,8 +1548,13 @@
       }
 
       if (!data || data.length === 0) {
+        let message = "";
+        if (activeDoctorTab === "pending") message = "Belum ada temujanji yang menunggu tindakan.";
+        else if (activeDoctorTab === "approved") message = "Belum ada temujanji yang telah diluluskan.";
+        else if (activeDoctorTab === "rejected") message = "Belum ada temujanji yang ditolak.";
+        
         doctorAppointmentsList.innerHTML =
-          '<p class="text-xs text-slate-500">Belum ada temujanji yang menunggu tindakan.</p>';
+          `<p class="text-xs text-slate-500">${message}</p>`;
         return;
       }
 
@@ -1333,6 +1571,8 @@
           let cls = "bg-slate-100 text-slate-600";
           if (a.status === "pending") cls = "bg-amber-50 text-amber-700";
           if (a.status === "reschedule_pending") cls = "bg-sky-50 text-sky-700";
+          if (a.status === "approved") cls = "bg-emerald-50 text-emerald-700";
+          if (a.status === "rejected") cls = "bg-rose-50 text-rose-700";
           return `<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] md:text-xs ${cls} border border-current">${a.status}</span>`;
         })();
 
@@ -1358,159 +1598,184 @@
           }
         `;
 
-        // Action row
-        const actionRow = document.createElement("div");
-        actionRow.className = "mt-2 grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] gap-3";
+        // Action row hanya untuk pending
+        if (activeDoctorTab === "pending") {
+          const actionRow = document.createElement("div");
+          actionRow.className = "mt-2 grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] gap-3";
 
-        // Approve section
-        const approveDiv = document.createElement("div");
-        approveDiv.className = "space-y-1";
-        approveDiv.innerHTML = `
-          <label class="block text-[10px] md:text-xs text-slate-600">Tarikh dipersetujui</label>
-        `;
-        const approveInput = document.createElement("input");
-        approveInput.type = "date";
-        approveInput.value = a.doctor_selected_date || a.requested_date || "";
-        approveInput.className =
-          "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500";
+          // Approve section
+          const approveDiv = document.createElement("div");
+          approveDiv.className = "space-y-1";
+          approveDiv.innerHTML = `
+            <label class="block text-[10px] md:text-xs text-slate-600">Tarikh dipersetujui</label>
+          `;
+          const approveInput = document.createElement("input");
+          approveInput.type = "date";
+          approveInput.value = a.doctor_selected_date || a.requested_date || "";
+          approveInput.className =
+            "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500";
 
-        const approveBtn = document.createElement("button");
-        approveBtn.textContent = "Approve + WhatsApp Klinik";
-        approveBtn.className =
-          "w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 shadow-sm";
+          const approveBtn = document.createElement("button");
+          approveBtn.textContent = "Approve + WhatsApp Klinik";
+          approveBtn.className =
+            "w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 shadow-sm";
 
-        approveDiv.appendChild(approveInput);
-        approveDiv.appendChild(approveBtn);
+          approveDiv.appendChild(approveInput);
+          approveDiv.appendChild(approveBtn);
 
-        // Reject section
-        const rejectWrapper = document.createElement("div");
-        rejectWrapper.className = "space-y-1";
+          // Reject section
+          const rejectWrapper = document.createElement("div");
+          rejectWrapper.className = "space-y-1";
 
-        const rejectToggleBtn = document.createElement("button");
-        rejectToggleBtn.textContent = "Reject (cadang tarikh lain)";
-        rejectToggleBtn.className =
-          "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 shadow-sm";
+          const rejectToggleBtn = document.createElement("button");
+          rejectToggleBtn.textContent = "Reject (cadang tarikh lain)";
+          rejectToggleBtn.className =
+            "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 shadow-sm";
 
-        const rejectPanel = document.createElement("div");
-        rejectPanel.className = "mt-2 space-y-1 hidden";
+          const rejectPanel = document.createElement("div");
+          rejectPanel.className = "mt-2 space-y-1 hidden";
 
-        const rLabel1 = document.createElement("label");
-        rLabel1.className = "block text-[10px] md:text-xs text-slate-600";
-        rLabel1.textContent = "Tarikh cadangan 1";
-        const rInput1 = document.createElement("input");
-        rInput1.type = "date";
-        rInput1.className =
-          "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-rose-500";
+          const rLabel1 = document.createElement("label");
+          rLabel1.className = "block text-[10px] md:text-xs text-slate-600";
+          rLabel1.textContent = "Tarikh cadangan 1";
+          const rInput1 = document.createElement("input");
+          rInput1.type = "date";
+          rInput1.className =
+            "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-rose-500";
 
-        const rLabel2 = document.createElement("label");
-        rLabel2.className = "block text-[10px] md:text-xs text-slate-600";
-        rLabel2.textContent = "Tarikh cadangan 2";
-        const rInput2 = document.createElement("input");
-        rInput2.type = "date";
-        rInput2.className =
-          "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-rose-500";
+          const rLabel2 = document.createElement("label");
+          rLabel2.className = "block text-[10px] md:text-xs text-slate-600";
+          rLabel2.textContent = "Tarikh cadangan 2";
+          const rInput2 = document.createElement("input");
+          rInput2.type = "date";
+          rInput2.className =
+            "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-rose-500";
 
-        const rejectConfirmBtn = document.createElement("button");
-        rejectConfirmBtn.textContent = "Hantar Cadangan Tarikh + WhatsApp Klinik";
-        rejectConfirmBtn.className =
-          "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 mt-1 shadow-sm";
+          const rejectConfirmBtn = document.createElement("button");
+          rejectConfirmBtn.textContent = "Hantar Cadangan Tarikh + WhatsApp Klinik";
+          rejectConfirmBtn.className =
+            "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 mt-1 shadow-sm";
 
-        rejectPanel.appendChild(rLabel1);
-        rejectPanel.appendChild(rInput1);
-        rejectPanel.appendChild(rLabel2);
-        rejectPanel.appendChild(rInput2);
-        rejectPanel.appendChild(rejectConfirmBtn);
+          rejectPanel.appendChild(rLabel1);
+          rejectPanel.appendChild(rInput1);
+          rejectPanel.appendChild(rLabel2);
+          rejectPanel.appendChild(rInput2);
+          rejectPanel.appendChild(rejectConfirmBtn);
 
-        rejectWrapper.appendChild(rejectToggleBtn);
-        rejectWrapper.appendChild(rejectPanel);
+          rejectWrapper.appendChild(rejectToggleBtn);
+          rejectWrapper.appendChild(rejectPanel);
 
-        actionRow.appendChild(approveDiv);
-        actionRow.appendChild(rejectWrapper);
+          actionRow.appendChild(approveDiv);
+          actionRow.appendChild(rejectWrapper);
 
-        card.appendChild(actionRow);
+          card.appendChild(actionRow);
 
-        const infoText = document.createElement("p");
-        infoText.className =
-          "mt-1 text-[10px] md:text-xs text-slate-500";
-        infoText.textContent =
-          "Selepas update status, sistem akan buka WhatsApp ke nombor klinik di tab baharu.";
-        card.appendChild(infoText);
+          const infoText = document.createElement("p");
+          infoText.className =
+            "mt-1 text-[10px] md:text-xs text-slate-500";
+          infoText.textContent =
+            "Selepas update status, sistem akan buka WhatsApp ke nombor klinik di tab baharu.";
+          card.appendChild(infoText);
 
-        // Handlers
-        approveBtn.addEventListener("click", async () => {
-          const date = approveInput.value;
-          if (!date) {
-            alert("Sila pilih tarikh yang dipersetujui.");
-            return;
+          // Handlers
+          approveBtn.addEventListener("click", async () => {
+            const date = approveInput.value;
+            if (!date) {
+              alert("Sila pilih tarikh yang dipersetujui.");
+              return;
+            }
+            const { error } = await db
+              .from("appointments")
+              .update({ status: "approved", doctor_selected_date: date })
+              .eq("id", a.id);
+            if (error) {
+              console.error("Error approve", error);
+              alert("Gagal update status.");
+              return;
+            }
+            const clinicPhone = await fetchClinicWhatsapp();
+            const msg = [
+              "Assalamualaikum / Salam sejahtera,",
+              "",
+              "Saya setuju untuk temujanji pesakit berikut:",
+              `Servis: ${serviceName}`,
+              `Nama: ${a.patient_name}`,
+              `Tarikh temujanji: ${formatDate(date)}`,
+              "",
+              `Sistem: ${APP_URL}`
+            ].join("\n");
+            const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
+            window.open(waUrl, "_blank");
+            await refreshDoctorAppointmentsList();
+          });
+
+          rejectToggleBtn.addEventListener("click", () => {
+            rejectPanel.classList.toggle("hidden");
+          });
+
+          rejectConfirmBtn.addEventListener("click", async () => {
+            const d1 = rInput1.value;
+            const d2 = rInput2.value;
+            if (!d1 || !d2) {
+              alert("Sila isi kedua-dua tarikh cadangan.");
+              return;
+            }
+            const { error } = await db
+              .from("appointments")
+              .update({
+                status: "rejected",
+                doctor_alt_date1: d1,
+                doctor_alt_date2: d2
+              })
+              .eq("id", a.id);
+            if (error) {
+              console.error("Error reject", error);
+              alert("Gagal update status.");
+              return;
+            }
+            const clinicPhone = await fetchClinicWhatsapp();
+            const msg = [
+              "Assalamualaikum / Salam sejahtera,",
+              "",
+              "Saya TIDAK dapat hadir pada tarikh temujanji asal untuk pesakit berikut:",
+              `Servis: ${serviceName}`,
+              `Nama: ${a.patient_name}`,
+              `Tarikh asal: ${formatDate(a.requested_date)}`,
+              "",
+              "Cadangan tarikh baharu:",
+              `1) ${formatDate(d1)}`,
+              `2) ${formatDate(d2)}`,
+              "",
+              `Sistem: ${APP_URL}`
+            ].join("\n");
+            const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
+            window.open(waUrl, "_blank");
+            await refreshDoctorAppointmentsList();
+          });
+        } else if (activeDoctorTab === "rejected") {
+          // Untuk rejected tab, show suggested dates
+          if (a.doctor_alt_date1 || a.doctor_alt_date2) {
+            const datesDiv = document.createElement("div");
+            datesDiv.className = "mt-2 text-[10px] md:text-xs text-slate-600";
+            datesDiv.textContent = `Cadangan tarikh alternatif: ${
+              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : "-"
+            } atau ${a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : "-"}`;
+            card.appendChild(datesDiv);
+            
+            const note = document.createElement("div");
+            note.className = "mt-1 text-[10px] text-slate-500";
+            note.textContent = "Menunggu staff klinik hubungi pesakit untuk pilih tarikh baharu.";
+            card.appendChild(note);
           }
-          const { error } = await db
-            .from("appointments")
-            .update({ status: "approved", doctor_selected_date: date })
-            .eq("id", a.id);
-          if (error) {
-            console.error("Error approve", error);
-            alert("Gagal update status.");
-            return;
+        } else if (activeDoctorTab === "approved") {
+          // Untuk approved tab, show confirmed date
+          if (a.doctor_selected_date) {
+            const confirmedDiv = document.createElement("div");
+            confirmedDiv.className = "mt-2 text-[10px] md:text-xs text-emerald-600";
+            confirmedDiv.textContent = `Tarikh temujanji disahkan: ${formatDate(a.doctor_selected_date)}`;
+            card.appendChild(confirmedDiv);
           }
-          const clinicPhone = await fetchClinicWhatsapp();
-          const msg = [
-            "Assalamualaikum / Salam sejahtera,",
-            "",
-            "Saya setuju untuk temujanji pesakit berikut:",
-            `Servis: ${serviceName}`,
-            `Nama: ${a.patient_name}`,
-            `Tarikh temujanji: ${formatDate(date)}`,
-            "",
-            `Sistem: ${APP_URL}`
-          ].join("\n");
-          const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
-          window.open(waUrl, "_blank");
-          await refreshDoctorAppointmentsList();
-        });
-
-        rejectToggleBtn.addEventListener("click", () => {
-          rejectPanel.classList.toggle("hidden");
-        });
-
-        rejectConfirmBtn.addEventListener("click", async () => {
-          const d1 = rInput1.value;
-          const d2 = rInput2.value;
-          if (!d1 || !d2) {
-            alert("Sila isi kedua-dua tarikh cadangan.");
-            return;
-          }
-          const { error } = await db
-            .from("appointments")
-            .update({
-              status: "rejected",
-              doctor_alt_date1: d1,
-              doctor_alt_date2: d2
-            })
-            .eq("id", a.id);
-          if (error) {
-            console.error("Error reject", error);
-            alert("Gagal update status.");
-            return;
-          }
-          const clinicPhone = await fetchClinicWhatsapp();
-          const msg = [
-            "Assalamualaikum / Salam sejahtera,",
-            "",
-            "Saya TIDAK dapat hadir pada tarikh temujanji asal untuk pesakit berikut:",
-            `Servis: ${serviceName}`,
-            `Nama: ${a.patient_name}`,
-            `Tarikh asal: ${formatDate(a.requested_date)}`,
-            "",
-            "Cadangan tarikh baharu:",
-            `1) ${formatDate(d1)}`,
-            `2) ${formatDate(d2)}`,
-            "",
-            `Sistem: ${APP_URL}`
-          ].join("\n");
-          const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
-          window.open(waUrl, "_blank");
-          await refreshDoctorAppointmentsList();
-        });
+        }
 
         doctorAppointmentsList.appendChild(card);
       });
@@ -1520,6 +1785,23 @@
       refreshDoctorAppointmentsList();
     });
 
+    doctorTabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeDoctorTab = btn.dataset.tab;
+        
+        // Update tab button styles
+        doctorTabButtons.forEach(b => {
+          if (b.dataset.tab === activeDoctorTab) {
+            b.classList.add("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+          } else {
+            b.classList.remove("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+          }
+        });
+        
+        refreshDoctorAppointmentsList();
+      });
+    });
+
     // ==============================
     // INIT
     // ==============================
@@ -1527,6 +1809,14 @@
       setActiveTab("tab-login");
       loadSession();
       renderStaffFilterTabs();
+      
+      // Set default active doctor tab button
+      doctorTabButtons.forEach(btn => {
+        if (btn.dataset.tab === "pending") {
+          btn.classList.add("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+        }
+      });
+      
       todayActionsListEl.innerHTML =
         '<p class="text-xs md:text-sm text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
     });
