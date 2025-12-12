@@ -1,143 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistem Appointment Klinik</title>
 
-  <!-- Tailwind CDN (untuk styling cepat) -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Supabase JS v2 -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <style>
-    /* Tema umum: putih, clean, premium */
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #e0f2fe 0, #f9fafb 45%, #e5e7eb 100%);
+      background: radial-gradient(circle at top, #e0f2fe 0, #f8fafc 45%, #eef2ff 100%);
       min-height: 100vh;
-      color: #0f172a;
     }
     .tab-hidden { display: none; }
-
-    /* Tukar kad gelap kepada kad putih */
-    .bg-slate-950\/70,
-    .bg-slate-900\/50,
-    .bg-slate-900\/40,
-    .bg-slate-950\/60,
-    .bg-slate-950 {
-      background-color: #ffffff;
-    }
-
-    /* Lembutkan border */
-    .border-slate-800 { border-color: #e5e7eb; }
-    .border-slate-700 { border-color: #e5e7eb; }
-    .border-slate-600 { border-color: #d1d5db; }
-
-    /* Warna teks lebih gelap untuk background putih */
-    .text-slate-100,
-    .text-slate-200 {
-      color: #0f172a;
-    }
-    .text-slate-300 { color: #4b5563; }
-    .text-slate-400 { color: #6b7280; }
-    .text-slate-500 { color: #6b7280; }
-
-    /* Input & kad lebih "elevated" */
-    .elevated-card {
-      box-shadow:
-        0 18px 40px rgba(15, 23, 42, 0.08),
-        0 2px 6px rgba(15, 23, 42, 0.04);
-    }
-
-    .soft-input {
-      background-color: #f9fafb;
-      border-color: #e5e7eb;
-    }
-    .soft-input:focus {
-      background-color: #ffffff;
-      border-color: #0ea5e9;
-      box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.5);
-    }
-
-    /* Badges status pada background putih */
-    .badge-neutral {
-      background-color: #e5e7eb;
-      color: #374151;
-    }
-    .badge-pending {
-      background-color: rgba(245, 158, 11, 0.12);
-      color: #92400e;
-    }
-    .badge-approved {
-      background-color: rgba(16, 185, 129, 0.12);
-      color: #047857;
-    }
-    .badge-rejected {
-      background-color: rgba(239, 68, 68, 0.12);
-      color: #b91c1c;
-    }
-    .badge-reschedule {
-      background-color: rgba(56, 189, 248, 0.12);
-      color: #0369a1;
-    }
   </style>
 </head>
 <body class="text-slate-900">
   <div class="min-h-screen flex flex-col items-center px-4 py-6">
-    <!-- Header / App Shell -->
-    <div class="w-full max-w-6xl bg-white/80 border border-slate-200 rounded-2xl elevated-card p-4 md:p-6 backdrop-blur">
+    <!-- Shell -->
+    <div class="w-full max-w-6xl bg-white/90 border border-slate-200 rounded-2xl shadow-xl shadow-sky-100 p-4 md:p-6 backdrop-blur">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-        <div>
-          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-sky-50 border border-sky-100 mb-2">
-            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span class="text-[10px] font-medium text-sky-700">Live Appointment Dashboard</span>
+        <div class="space-y-1">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs border border-emerald-100">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Live Appointment Dashboard</span>
           </div>
-          <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight">
+          <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight mt-1">
             Sistem Appointment Klinik
           </h1>
-          <p class="text-xs md:text-sm text-slate-500 mt-1">
-            Panel temujanji moden untuk staff klinik &amp; doktor pakar, dengan WhatsApp automation.
+          <p class="text-xs md:text-sm text-slate-500">
+            Panel temujanji untuk staff klinik &amp; doktor pakar dengan WhatsApp automatik.
           </p>
         </div>
         <div id="userHeader" class="flex flex-col items-end gap-1 text-xs md:text-sm">
           <span id="userInfo" class="text-slate-500">Belum log masuk</span>
           <button id="logoutBtn"
-                  class="hidden text-xs px-3 py-1 rounded-full border border-slate-300 hover:border-red-400 hover:text-red-500 bg-white transition">
+                  class="hidden text-xs px-3 py-1 rounded-full border border-slate-300 hover:border-rose-400 hover:text-rose-500 transition bg-white">
             Log keluar
           </button>
         </div>
       </div>
 
-      <!-- Nav Tabs -->
+      <!-- Nav Tabs (selepas login) -->
       <div id="navTabs" class="hidden border-b border-slate-200 mb-4">
-        <nav class="-mb-px flex flex-wrap gap-1 md:gap-2 text-xs md:text-sm">
+        <nav class="-mb-px flex flex-wrap gap-2 text-xs md:text-sm">
           <button data-tab="tab-staff"
-                  class="tab-btn border-b-2 border-transparent px-3 py-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-t-lg transition"
+                  class="tab-btn border-b-2 border-transparent px-3 py-2 text-slate-500 hover:text-sky-600"
                   id="btnStaff">
             Staff Klinik
           </button>
           <button data-tab="tab-doctor"
-                  class="tab-btn border-b-2 border-transparent px-3 py-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-t-lg transition"
+                  class="tab-btn border-b-2 border-transparent px-3 py-2 text-slate-500 hover:text-sky-600"
                   id="btnDoctor">
             Doktor
           </button>
           <button data-tab="tab-settings"
-                  class="tab-btn border-b-2 border-transparent px-3 py-2 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-t-lg transition"
+                  class="tab-btn border-b-2 border-transparent px-3 py-2 text-slate-500 hover:text-sky-600"
                   id="btnSettings">
             Settings
           </button>
         </nav>
       </div>
 
-      <!-- Content Area -->
+      <!-- CONTENT -->
       <div class="mt-2 space-y-6">
 
-        <!-- Login Panel -->
+        <!-- LOGIN -->
         <section id="tab-login">
           <div class="grid md:grid-cols-2 gap-6">
-            <div class="space-y-4 bg-white rounded-xl border border-slate-200 p-4 elevated-card">
+            <!-- Log masuk -->
+            <div class="space-y-4 bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5">
               <h2 class="text-lg font-semibold text-slate-900">Log masuk</h2>
               <p class="text-xs md:text-sm text-slate-500">
                 Guna akaun yang telah didaftarkan di Supabase (staff atau doktor).
@@ -147,31 +84,33 @@
                 <div>
                   <label class="block text-xs mb-1 text-slate-600">Email</label>
                   <input id="loginEmail" type="email" required
-                         class="w-full rounded-lg soft-input border px-3 py-2 text-sm focus:outline-none focus:ring-0" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
                 </div>
                 <div>
                   <label class="block text-xs mb-1 text-slate-600">Password</label>
                   <input id="loginPassword" type="password" required
-                         class="w-full rounded-lg soft-input border px-3 py-2 text-sm focus:outline-none focus:ring-0" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
                 </div>
                 <button type="submit"
-                        class="w-full inline-flex justify-center items-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-sm font-medium text-white px-3 py-2 transition">
+                        class="w-full inline-flex justify-center items-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-sm font-medium text-white px-3 py-2 transition shadow-sm">
                   Log masuk
                 </button>
               </form>
 
-              <p id="loginError" class="text-xs text-red-500 mt-1 hidden"></p>
+              <p id="loginError" class="text-xs text-rose-500 mt-1 hidden"></p>
             </div>
 
-            <div class="space-y-3 text-xs md:text-sm text-slate-600 bg-white rounded-xl border border-slate-200 p-4 elevated-card">
-              <h3 class="text-sm md:text-base font-semibold text-slate-900">Nota konfigurasi</h3>
-              <ol class="list-decimal list-inside space-y-1">
-                <li>Pastikan projek Supabase sudah dibuat dan table &amp; RLS sudah disetup.</li>
-                <li>Buka kod HTML ini dan pastikan <code class="bg-slate-100 px-1 rounded text-[10px]">SUPABASE_URL</code> &amp; <code class="bg-slate-100 px-1 rounded text-[10px]">SUPABASE_ANON_KEY</code> betul di bahagian skrip.</li>
-                <li>Pastikan akaun staff &amp; doktor sudah dimasukkan ke jadual <code class="bg-slate-100 px-1 rounded text-[10px]">public.profiles</code>.</li>
-              </ol>
-              <div class="mt-2 p-3 rounded-lg bg-sky-50 border border-sky-100 text-[11px] text-sky-800">
-                Tip: Untuk first time, login sebagai staff dulu &amp; setup servis + kolom tambahan di tab <strong>Settings</strong>.
+            <!-- Info sistem -->
+            <div class="space-y-3 bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-5 text-xs md:text-sm text-slate-600">
+              <h3 class="text-sm md:text-base font-semibold text-slate-900">Maklumat sistem</h3>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Staff klinik daftar pesakit dan tarikh yang dicadangkan.</li>
+                <li>Doktor approve atau cadangkan tarikh baharu.</li>
+                <li>Status temujanji dipantau dalam 3 kategori: Pending, Approved dan Rejected.</li>
+                <li>WhatsApp automatik membantu staff &amp; doktor berhubung dengan lebih pantas.</li>
+              </ul>
+              <div class="mt-2 p-3 rounded-xl bg-sky-50 border border-sky-100 text-[11px] md:text-xs text-sky-800">
+                Tip: Untuk kali pertama, login sebagai <span class="font-semibold">staff</span>, tambah servis &amp; kolom tambahan di tab <span class="font-semibold">Settings</span>.
               </div>
             </div>
           </div>
@@ -179,116 +118,159 @@
 
         <!-- STAFF PANEL -->
         <section id="tab-staff" class="tab-hidden">
-          <div class="grid gap-6 lg:grid-cols-[minmax(0,1.25fr),minmax(0,1fr)]">
-            <!-- Create Appointment -->
-            <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3 elevated-card">
-              <div class="flex items-start justify-between gap-2">
+          <div class="space-y-4">
+            <!-- Tindakan Hari Ini -->
+            <div class="bg-sky-50 border border-sky-100 rounded-2xl p-4 md:p-5">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
                   <h2 class="text-base md:text-lg font-semibold text-slate-900">
-                    Daftar Temujanji Baru
+                    Tindakan Hari Ini
                   </h2>
-                  <p class="text-[11px] text-slate-500">
-                    Isi detail pesakit, pilih servis &amp; doktor. Sistem akan sediakan mesej WhatsApp automatik.
+                  <p class="text-xs md:text-sm text-slate-500 mt-1">
+                    Ringkasan temujanji yang perlu diberi perhatian hari ini.
                   </p>
                 </div>
-                <span class="text-[10px] md:text-xs px-2 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">
-                  Staff klinik
-                </span>
+                <div class="flex flex-wrap gap-2 text-[11px] md:text-xs">
+                  <div class="px-3 py-1.5 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    <span>Pending</span>
+                    <span class="font-semibold text-slate-900" id="todayPendingCount">0</span>
+                  </div>
+                  <div class="px-3 py-1.5 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Approved (hari ini)</span>
+                    <span class="font-semibold text-slate-900" id="todayApprovedCount">0</span>
+                  </div>
+                  <div class="px-3 py-1.5 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                    <span>Perlu follow-up</span>
+                    <span class="font-semibold text-slate-900" id="todayRejectedCount">0</span>
+                  </div>
+                </div>
               </div>
-
-              <form id="appointmentForm" class="space-y-3 text-xs md:text-sm mt-1.5">
-                <div class="grid md:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs mb-1 text-slate-600">Servis</label>
-                    <select id="serviceSelect"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0">
-                      <option value="">Pilih servis...</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-xs mb-1 text-slate-600">Doktor</label>
-                    <select id="doctorSelect"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0">
-                      <option value="">Pilih doktor...</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs mb-1 text-slate-600">Nama penuh pesakit</label>
-                    <input id="patientName" required
-                           class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0" />
-                  </div>
-                  <div>
-                    <label class="block text-xs mb-1 text-slate-600">No. IC / Passport</label>
-                    <input id="patientIC" required
-                           class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0" />
-                  </div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs mb-1 text-slate-600">No. Telefon Pesakit</label>
-                    <input id="patientPhone" required
-                           class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0" />
-                  </div>
-                  <div>
-                    <label class="block text-xs mb-1 text-slate-600">Tarikh yang pesakit available</label>
-                    <input id="requestedDate" type="date" required
-                           class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0" />
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-xs mb-1 text-slate-600">Ringkasan masalah / complaint</label>
-                  <textarea id="complaint" rows="2"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0"></textarea>
-                </div>
-
-                <!-- Dynamic custom fields container -->
-                <div id="customFieldsContainer" class="space-y-2">
-                  <!-- field tambahan (text/phone/date) akan dimasukkan melalui JS -->
-                </div>
-
-                <button type="submit"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-xs md:text-sm font-medium text-white px-4 py-2 mt-2 transition">
-                  Simpan temujanji
-                </button>
-
-                <p id="appointmentMessage" class="text-xs mt-1 text-emerald-600 hidden"></p>
-                <p id="appointmentError" class="text-xs mt-1 text-red-500 hidden"></p>
-              </form>
-
-              <!-- WhatsApp link selepas create -->
-              <div id="staffWhatsappBox" class="mt-4 hidden text-xs md:text-sm border border-emerald-100 bg-emerald-50 rounded-lg p-3 flex items-center justify-between gap-2">
-                <div>
-                  <p class="text-slate-700 mb-0.5 font-medium">Hantar butiran kepada doktor melalui WhatsApp</p>
-                  <p class="text-[11px] text-slate-500">Mesej sudah disediakan secara automatik, hanya tekan hantar.</p>
-                </div>
-                <a id="staffWhatsappLink"
-                   class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs md:text-sm font-medium text-white"
-                   href="#"
-                   target="_blank">
-                  <span class="text-lg">🟢</span> Buka WhatsApp
-                </a>
+              <div id="todayActionsList" class="mt-3 space-y-2 text-xs md:text-sm text-slate-700">
+                <!-- auto render -->
               </div>
             </div>
 
-            <!-- Appointment List (ringkas) -->
-            <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3 elevated-card">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h2 class="text-base md:text-lg font-semibold text-slate-900">Senarai Temujanji</h2>
-                  <p class="text-[11px] text-slate-500">20 rekod terkini untuk pantauan cepat.</p>
+            <!-- Borang & Senarai -->
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1.3fr),minmax(0,1fr)]">
+              <!-- Create Appointment -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                <h2 class="text-base md:text-lg font-semibold text-slate-900 flex items-center justify-between">
+                  Daftar Temujanji Baru
+                  <span class="text-[10px] md:text-xs text-slate-400">Staff klinik</span>
+                </h2>
+
+                <form id="appointmentForm" class="space-y-3 text-xs md:text-sm">
+                  <div class="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs mb-1 text-slate-600">Servis</label>
+                      <select id="serviceSelect"
+                              class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                        <option value="">Pilih servis...</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-xs mb-1 text-slate-600">Doktor</label>
+                      <select id="doctorSelect"
+                              class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+                        <option value="">Pilih doktor...</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs mb-1 text-slate-600">Nama penuh pesakit</label>
+                      <input id="patientName" required
+                             class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                    </div>
+                    <div>
+                      <label class="block text-xs mb-1 text-slate-600">No. IC / Passport</label>
+                      <input id="patientIC" required
+                             class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                    </div>
+                  </div>
+
+                  <div class="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs mb-1 text-slate-600">No. Telefon Pesakit</label>
+                      <input id="patientPhone" required
+                             class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                    </div>
+                    <div>
+                      <label class="block text-xs mb-1 text-slate-600">Tarikh yang pesakit available</label>
+                      <input id="requestedDate" type="date" required
+                             class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs mb-1 text-slate-600">Ringkasan masalah / complaint</label>
+                    <textarea id="complaint" rows="2"
+                              class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400"></textarea>
+                  </div>
+
+                  <!-- Dynamic custom fields -->
+                  <div id="customFieldsContainer" class="space-y-2">
+                    <!-- auto inject -->
+                  </div>
+
+                  <button type="submit"
+                          class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-xs md:text-sm font-medium text-white px-4 py-2 mt-2 shadow-sm">
+                    Simpan temujanji
+                  </button>
+
+                  <p id="appointmentMessage" class="text-xs mt-1 text-sky-700 hidden"></p>
+                  <p id="appointmentError" class="text-xs mt-1 text-rose-500 hidden"></p>
+                </form>
+
+                <!-- WhatsApp link ke doktor selepas create -->
+                <div id="staffWhatsappBox" class="mt-3 hidden text-xs md:text-sm">
+                  <p class="text-slate-700 mb-1">Hantar butiran kepada doktor melalui WhatsApp:</p>
+                  <a id="staffWhatsappLink"
+                     class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-xs md:text-sm font-medium text-white shadow-sm"
+                     href="#"
+                     target="_blank">
+                    Buka WhatsApp kepada doktor
+                  </a>
                 </div>
-                <button id="refreshStaffAppointments"
-                        class="text-[10px] md:text-xs px-3 py-1 rounded-full border border-slate-200 hover:border-sky-400 hover:text-sky-600 bg-white">
-                  Refresh
-                </button>
               </div>
-              <div id="staffAppointmentsList" class="space-y-2 text-xs md:text-sm max-h-80 overflow-auto">
-                <!-- appointment ringkas akan dirender di sini -->
+
+              <!-- Appointment List -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 class="text-base md:text-lg font-semibold text-slate-900">Senarai Temujanji</h2>
+                    <p class="text-[11px] md:text-xs text-slate-500">
+                      20 rekod terkini untuk pantauan cepat.
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-0.5 text-[11px] md:text-xs shadow-sm">
+                      <button class="staff-filter-btn px-3 py-1 rounded-full font-medium text-slate-500"
+                              data-status="pending">
+                        Pending
+                      </button>
+                      <button class="staff-filter-btn px-3 py-1 rounded-full font-medium text-slate-500"
+                              data-status="approved">
+                        Approved
+                      </button>
+                      <button class="staff-filter-btn px-3 py-1 rounded-full font-medium text-slate-500"
+                              data-status="rejected">
+                        Rejected
+                      </button>
+                    </div>
+                    <button id="refreshStaffAppointments"
+                            class="text-[11px] md:text-xs px-3 py-1 rounded-full border border-slate-300 hover:border-sky-400 hover:text-sky-600 bg-white shadow-sm">
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+                <div id="staffAppointmentsList" class="space-y-2 text-xs md:text-sm max-h-80 overflow-auto">
+                  <!-- render -->
+                </div>
               </div>
             </div>
           </div>
@@ -296,22 +278,21 @@
 
         <!-- DOCTOR PANEL -->
         <section id="tab-doctor" class="tab-hidden">
-          <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3 elevated-card">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <div>
-                <h2 class="text-base md:text-lg font-semibold text-slate-900">Temujanji Untuk Doktor</h2>
-                <p class="text-[11px] text-slate-500">
-                  Semak permohonan, pilih tarikh &amp; hantar notifikasi ke klinik melalui WhatsApp.
-                </p>
-              </div>
+              <h2 class="text-base md:text-lg font-semibold text-slate-900">Temujanji Untuk Doktor</h2>
               <button id="refreshDoctorAppointments"
-                      class="text-[10px] md:text-xs px-3 py-1 rounded-full border border-slate-200 hover:border-sky-400 hover:text-sky-600 bg-white">
+                      class="text-[11px] md:text-xs px-3 py-1 rounded-full border border-slate-300 hover:border-sky-400 hover:text-sky-600 bg-white shadow-sm">
                 Refresh
               </button>
             </div>
+            <p class="text-xs md:text-sm text-slate-500 mb-2">
+              Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-semibold text-emerald-600">Approve</span> atau
+              <span class="font-semibold text-rose-500">Reject</span>. Jika pilih Reject, sistem akan minta dua tarikh cadangan.
+            </p>
 
             <div id="doctorAppointmentsList" class="space-y-3 text-xs md:text-sm max-h-[520px] overflow-auto">
-              <!-- appointment doktor render di sini -->
+              <!-- render -->
             </div>
           </div>
         </section>
@@ -320,25 +301,25 @@
         <section id="tab-settings" class="tab-hidden">
           <div class="grid lg:grid-cols-2 gap-6 text-xs md:text-sm">
             <!-- Services -->
-            <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3 elevated-card">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
               <h2 class="text-base md:text-lg font-semibold text-slate-900">Servis Klinik</h2>
 
               <form id="serviceForm" class="space-y-2">
                 <div>
                   <label class="block text-xs mb-1 text-slate-600">Nama servis</label>
                   <input id="serviceName" required
-                         class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
                 </div>
                 <div>
                   <label class="block text-xs mb-1 text-slate-600">Keterangan (optional)</label>
                   <textarea id="serviceDescription" rows="2"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0"></textarea>
+                            class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="block text-xs mb-1 text-slate-600">Status</label>
                     <select id="serviceStatus"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
                     </select>
@@ -346,16 +327,16 @@
                   <div>
                     <label class="block text-xs mb-1 text-slate-600">Doktor default (optional)</label>
                     <select id="serviceDoctor"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
                       <option value="">Tiada (pilih manual masa daftar)</option>
                     </select>
                   </div>
                 </div>
                 <button type="submit"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-xs md:text-sm font-medium text-white px-4 py-2 mt-1">
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-xs md:text-sm font-medium text-white px-4 py-2 mt-1 shadow-sm">
                   Simpan Servis
                 </button>
-                <p id="serviceMessage" class="text-xs mt-1 text-emerald-600 hidden"></p>
+                <p id="serviceMessage" class="text-xs mt-1 text-sky-700 hidden"></p>
               </form>
 
               <div class="mt-4">
@@ -367,20 +348,20 @@
             </div>
 
             <!-- Custom Fields -->
-            <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3 elevated-card">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
               <h2 class="text-base md:text-lg font-semibold text-slate-900">Kolom Tambahan (Custom Fields)</h2>
 
               <form id="fieldForm" class="space-y-2">
                 <div>
                   <label class="block text-xs mb-1 text-slate-600">Label / Tajuk Pertanyaan</label>
                   <input id="fieldLabel" required
-                         class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" />
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="block text-xs mb-1 text-slate-600">Jenis Input</label>
                     <select id="fieldType"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
                       <option value="text">Text</option>
                       <option value="phone">Phone</option>
                       <option value="date">Date</option>
@@ -389,7 +370,7 @@
                   <div>
                     <label class="block text-xs mb-1 text-slate-600">Servis</label>
                     <select id="fieldService"
-                            class="w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
                       <option value="">Global (semua servis)</option>
                     </select>
                   </div>
@@ -402,10 +383,10 @@
                   </label>
                 </div>
                 <button type="submit"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-xs md:text-sm font-medium text-white px-4 py-2 mt-1">
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-xs md:text-sm font-medium text-white px-4 py-2 mt-1 shadow-sm">
                   Tambah Kolom
                 </button>
-                <p id="fieldMessage" class="text-xs mt-1 text-emerald-600 hidden"></p>
+                <p id="fieldMessage" class="text-xs mt-1 text-sky-700 hidden"></p>
               </form>
 
               <div class="mt-4">
@@ -423,10 +404,13 @@
 
   <script>
     // ==============================
-    // KONFIGURASI SUPABASE
+    // KONFIGURASI SUPABASE & APP
     // ==============================
     const SUPABASE_URL = "https://rzcrbseoiqbgkhprdbbz.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y3Jic2VvaXFiZ2tocHJkYmJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NTk5MDksImV4cCI6MjA4MTAzNTkwOX0.C5AHYqGKywrfOf2uEwZZUSYGByuLE_PKfImS7nuFKrs";
+
+    // 👉 Tukar kepada URL sebenar bila dah host (GitHub / Netlify / dll)
+    const APP_URL = "https://contoh-domain-anda.com/clinic_appointment_index.html";
 
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -438,6 +422,8 @@
     let servicesCache = [];
     let customFieldsCache = [];
     let lastCreatedAppointment = null;
+    let staffAppointmentsCache = [];
+    let activeStaffFilter = "pending";
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -476,12 +462,19 @@
     const staffWhatsappLink = document.getElementById("staffWhatsappLink");
     const staffAppointmentsList = document.getElementById("staffAppointmentsList");
     const refreshStaffAppointments = document.getElementById("refreshStaffAppointments");
+    const staffFilterButtons = document.querySelectorAll(".staff-filter-btn");
 
-    // Doctor panel elements
+    // Today actions
+    const todayPendingCountEl = document.getElementById("todayPendingCount");
+    const todayApprovedCountEl = document.getElementById("todayApprovedCount");
+    const todayRejectedCountEl = document.getElementById("todayRejectedCount");
+    const todayActionsListEl = document.getElementById("todayActionsList");
+
+    // Doctor panel
     const doctorAppointmentsList = document.getElementById("doctorAppointmentsList");
     const refreshDoctorAppointments = document.getElementById("refreshDoctorAppointments");
 
-    // Settings elements
+    // Settings
     const serviceForm = document.getElementById("serviceForm");
     const serviceName = document.getElementById("serviceName");
     const serviceDescription = document.getElementById("serviceDescription");
@@ -501,7 +494,6 @@
     // ==============================
     // UTILITI UI
     // ==============================
-
     function setActiveTab(tabId) {
       [tabLogin, tabStaff, tabDoctor, tabSettings].forEach(sec => {
         if (!sec) return;
@@ -514,9 +506,9 @@
 
       tabButtons.forEach(btn => {
         if (btn.dataset.tab === tabId) {
-          btn.classList.add("border-sky-400", "text-sky-600", "bg-sky-50");
+          btn.classList.add("border-sky-500", "text-sky-600", "font-semibold");
         } else {
-          btn.classList.remove("border-sky-400", "text-sky-600", "bg-sky-50");
+          btn.classList.remove("border-sky-500", "text-sky-600", "font-semibold");
         }
       });
     }
@@ -525,8 +517,8 @@
       if (!el) return;
       el.textContent = text;
       el.classList.remove("hidden");
-      el.classList.toggle("text-red-500", isError);
-      el.classList.toggle("text-emerald-600", !isError);
+      el.classList.toggle("text-rose-500", isError);
+      el.classList.toggle("text-sky-700", !isError);
       if (!text) el.classList.add("hidden");
     }
 
@@ -550,7 +542,6 @@
     // ==============================
     // AUTH & PROFILE
     // ==============================
-
     async function loadSession() {
       const { data, error } = await db.auth.getUser();
       if (error || !data.user) {
@@ -590,10 +581,8 @@
       btnSettings.classList.toggle("hidden", profile.role !== "staff");
       btnDoctor.classList.toggle("hidden", profile.role !== "doctor");
 
-      // Load dropdown doktor + servis + fields
       await Promise.all([loadDoctors(), loadServices(), loadCustomFields()]);
 
-      // By default:
       if (profile.role === "staff") {
         setActiveTab("tab-staff");
         await refreshStaffAppointmentsList();
@@ -641,7 +630,6 @@
     // ==============================
     // LOAD DOCTORS, SERVICES, FIELDS
     // ==============================
-
     async function loadDoctors() {
       const { data, error } = await db
         .from("profiles")
@@ -654,7 +642,7 @@
       }
       doctorsCache = data || [];
 
-      // Fill doctorSelect (staff form)
+      // dropdown doctor (staff)
       if (doctorSelect) {
         doctorSelect.innerHTML = '<option value="">Pilih doktor...</option>';
         doctorsCache.forEach(d => {
@@ -665,7 +653,7 @@
         });
       }
 
-      // Fill serviceDoctor (settings)
+      // dropdown default doctor (settings)
       if (serviceDoctor) {
         serviceDoctor.innerHTML = '<option value="">Tiada (pilih manual masa daftar)</option>';
         doctorsCache.forEach(d => {
@@ -702,7 +690,7 @@
           });
       }
 
-      // Settings dropdown untuk fields
+      // Fields dropdown
       if (fieldService) {
         fieldService.innerHTML = '<option value="">Global (semua servis)</option>';
         servicesCache.forEach(s => {
@@ -713,13 +701,13 @@
         });
       }
 
-      // List services di Settings
+      // List services
       if (serviceList) {
         serviceList.innerHTML = "";
         servicesCache.forEach(s => {
           const line = document.createElement("div");
           const statusColor = s.status === "active" ? "text-emerald-600" : "text-slate-400";
-          line.className = "flex justify-between items-center border border-slate-200 rounded-lg px-2 py-1 bg-slate-50";
+          line.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-2 py-1";
           const docName = doctorsCache.find(d => d.id === s.default_doctor_id)?.full_name || "-";
           line.innerHTML = `
             <div>
@@ -758,7 +746,7 @@
       }
       customFieldsCache = data || [];
 
-      // Senarai di Settings
+      // List di Settings
       if (fieldList) {
         fieldList.innerHTML = "";
         customFieldsCache.forEach(f => {
@@ -766,7 +754,7 @@
             ? (servicesCache.find(s => s.id === f.service_id)?.name || "Unknown")
             : "Global";
           const item = document.createElement("div");
-          item.className = "flex justify-between items-center border border-slate-200 rounded-lg px-2 py-1 bg-slate-50";
+          item.className = "flex justify-between items-center border border-slate-200 bg-white rounded-lg px-2 py-1";
           item.innerHTML = `
             <div>
               <div class="font-medium text-slate-900 text-xs md:text-sm">${f.label}</div>
@@ -774,7 +762,7 @@
                 Type: ${f.input_type} • Servis: ${serviceName}
               </div>
             </div>
-            <span class="text-[10px] md:text-xs ${f.is_required ? "text-amber-600" : "text-slate-400"}">
+            <span class="text-[10px] md:text-xs ${f.is_required ? "text-amber-500" : "text-slate-400"}">
               ${f.is_required ? "Wajib" : "Optional"}
             </span>
           `;
@@ -816,20 +804,19 @@
           }
         }
         input.dataset.fieldId = f.id;
-        input.className = "w-full rounded-lg soft-input border px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-0";
+        input.className = "w-full rounded-lg bg-white border border-slate-200 px-3 py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400";
 
         wrapper.appendChild(label);
         const divInput = document.createElement("div");
         divInput.appendChild(input);
-        customFieldsContainer.appendChild(wrapper);
         wrapper.appendChild(divInput);
+        customFieldsContainer.appendChild(wrapper);
       });
     }
 
     // ==============================
     // SETTINGS HANDLERS
     // ==============================
-
     serviceForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!currentProfile || currentProfile.role !== "staff") return;
@@ -888,7 +875,6 @@
     // ==============================
     // STAFF: CREATE APPOINTMENT
     // ==============================
-
     appointmentForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
       appointmentError.classList.add("hidden");
@@ -948,13 +934,12 @@
 
       if (valuesPayload.length > 0) {
         const { error: vErr } = await db.from("appointment_field_values").insert(valuesPayload);
-        if (vErr) {
-          console.error("Error insert field values", vErr);
-        }
+        if (vErr) console.error("Error insert field values", vErr);
       }
 
       showMessage(appointmentMessage, "Temujanji berjaya disimpan.", false);
-      // Jangan reset dropdown supaya staff boleh buat temujanji seterusnya dengan setting sama
+
+      // Clear input pesakit
       patientName.value = "";
       patientIC.value = "";
       patientPhone.value = "";
@@ -966,11 +951,20 @@
       buildStaffWhatsappLink(insertResult);
     });
 
+    async function fetchDoctorWhatsapp(doctorId) {
+      const { data, error } = await db
+        .from("profiles")
+        .select("whatsapp_phone")
+        .eq("id", doctorId)
+        .maybeSingle();
+      if (error || !data) return null;
+      return data.whatsapp_phone;
+    }
+
     function buildStaffWhatsappLink(appointment) {
       if (!appointment || !staffWhatsappLink || !staffWhatsappBox) return;
       const serviceName =
         servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
-      const clinicUrl = window.location.href;
 
       const message = [
         "Assalamualaikum / Salam sejahtera Dr,",
@@ -983,7 +977,7 @@
         `Tarikh dicadangkan pesakit: ${formatDate(appointment.requested_date)}`,
         appointment.complaint ? `Complaint: ${appointment.complaint}` : "",
         "",
-        `Sila buka sistem untuk approve / reject: ${clinicUrl}`
+        `Sila buka sistem untuk approve / reject: ${APP_URL}`
       ]
         .filter(Boolean)
         .join("\n");
@@ -995,74 +989,311 @@
       });
     }
 
-    async function fetchDoctorWhatsapp(doctorId) {
-      const { data, error } = await db
-        .from("profiles")
-        .select("whatsapp_phone")
-        .eq("id", doctorId)
-        .maybeSingle();
-      if (error || !data) return null;
-      return data.whatsapp_phone;
-    }
-
+    // ==============================
+    // STAFF: LIST + TINDAKAN HARI INI
+    // ==============================
     async function refreshStaffAppointmentsList() {
       if (!currentProfile || currentProfile.role !== "staff") return;
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, requested_date, status, service_id")
+        .select("id, patient_name, requested_date, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone")
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (error) {
         console.error("Error load staff appointments", error);
         staffAppointmentsList.innerHTML =
-          '<p class="text-xs text-red-500">Gagal load temujanji.</p>';
+          '<p class="text-xs text-rose-500">Gagal load temujanji.</p>';
         return;
       }
 
-      if (!data || data.length === 0) {
-        staffAppointmentsList.innerHTML =
-          '<p class="text-xs text-slate-500">Belum ada temujanji.</p>';
+      staffAppointmentsCache = data || [];
+      renderStaffFilterTabs();
+      renderStaffAppointmentsList();
+      renderTodayActions();
+    }
+
+    function renderStaffFilterTabs() {
+      staffFilterButtons.forEach(btn => {
+        const status = btn.dataset.status;
+        if (status === activeStaffFilter) {
+          btn.classList.add("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+        } else {
+          btn.classList.remove("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+        }
+      });
+    }
+
+    function renderStaffAppointmentsList() {
+      const listEl = staffAppointmentsList;
+      if (!listEl) return;
+
+      const filtered = staffAppointmentsCache.filter(a => a.status === activeStaffFilter);
+
+      if (!filtered.length) {
+        listEl.innerHTML =
+          '<p class="text-xs text-slate-500">Tiada temujanji untuk status ini.</p>';
         return;
       }
 
-      staffAppointmentsList.innerHTML = "";
-      data.forEach(a => {
+      listEl.innerHTML = "";
+      filtered.forEach(a => {
         const card = document.createElement("div");
-        let statusClass = "badge-neutral";
-        if (a.status === "pending") statusClass = "badge-pending";
-        if (a.status === "approved") statusClass = "badge-approved";
-        if (a.status === "rejected") statusClass = "badge-rejected";
-        if (a.status === "reschedule_pending") statusClass = "badge-reschedule";
+        card.className =
+          "border border-slate-200 bg-white rounded-lg px-3 py-2 flex flex-col gap-1";
 
         const serviceName =
           servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
 
-        card.className =
-          "border border-slate-200 rounded-lg px-3 py-2 flex items-center justify-between gap-3 bg-slate-50";
-        card.innerHTML = `
-          <div>
-            <div class="text-xs md:text-sm font-medium text-slate-900">${a.patient_name}</div>
-            <div class="text-[10px] md:text-xs text-slate-500">${serviceName}</div>
-            <div class="text-[10px] md:text-xs text-slate-400">Tarikh: ${formatDate(
-              a.requested_date
-            )}</div>
-          </div>
-          <span class="text-[10px] md:text-xs px-2 py-1 rounded-full ${statusClass}">
-            ${a.status}
-          </span>
+        const topRow = document.createElement("div");
+        topRow.className = "flex items-center justify-between gap-3";
+
+        const left = document.createElement("div");
+        left.innerHTML = `
+          <div class="text-xs md:text-sm font-medium text-slate-900">${a.patient_name}</div>
+          <div class="text-[10px] md:text-xs text-slate-500">${serviceName}</div>
+          <div class="text-[10px] md:text-xs text-slate-400">Tarikh: ${formatDate(
+            a.requested_date
+          )}</div>
         `;
-        staffAppointmentsList.appendChild(card);
+
+        const badge = document.createElement("span");
+        let statusColor = "bg-slate-100 text-slate-600";
+        if (a.status === "pending") statusColor = "bg-amber-50 text-amber-700";
+        if (a.status === "approved") statusColor = "bg-emerald-50 text-emerald-700";
+        if (a.status === "rejected") statusColor = "bg-rose-50 text-rose-700";
+        badge.className =
+          "text-[10px] md:text-xs px-2 py-1 rounded-full border " +
+          statusColor.replace("bg", "border");
+        badge.textContent = a.status;
+
+        topRow.appendChild(left);
+        topRow.appendChild(badge);
+        card.appendChild(topRow);
+
+        // Extra actions ikut tab
+        if (activeStaffFilter === "approved") {
+          const btn = document.createElement("button");
+          btn.textContent = "WhatsApp Pesakit (temujanji disahkan)";
+          btn.className =
+            "mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-[11px] md:text-xs text-white font-medium shadow-sm";
+          btn.addEventListener("click", () => {
+            sendWhatsAppToPatientApproved(a);
+          });
+          card.appendChild(btn);
+        }
+
+        if (activeStaffFilter === "rejected") {
+          const info = document.createElement("div");
+          info.className = "mt-1 text-[10px] md:text-xs text-slate-600";
+          info.textContent =
+            "Cadangan tarikh doktor: " +
+            (a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : "-") +
+            " dan " +
+            (a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : "-");
+          card.appendChild(info);
+
+          const btnRow = document.createElement("div");
+          btnRow.className = "mt-2 flex flex-wrap gap-2";
+
+          const btn1 = document.createElement("button");
+          btn1.textContent = "Pilih Tarikh 1 & WhatsApp Doktor";
+          btn1.className =
+            "px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-[11px] md:text-xs text-white font-medium shadow-sm";
+          btn1.disabled = !a.doctor_alt_date1;
+
+          const btn2 = document.createElement("button");
+          btn2.textContent = "Pilih Tarikh 2 & WhatsApp Doktor";
+          btn2.className =
+            "px-3 py-1.5 rounded-lg bg-sky-500/90 hover:bg-sky-600 text-[11px] md:text-xs text-white font-medium shadow-sm";
+          btn2.disabled = !a.doctor_alt_date2;
+
+          btn1.addEventListener("click", () => {
+            if (a.doctor_alt_date1) handleStaffChooseNewDate(a, a.doctor_alt_date1);
+          });
+          btn2.addEventListener("click", () => {
+            if (a.doctor_alt_date2) handleStaffChooseNewDate(a, a.doctor_alt_date2);
+          });
+
+          btnRow.appendChild(btn1);
+          btnRow.appendChild(btn2);
+          card.appendChild(btnRow);
+
+          const hint = document.createElement("p");
+          hint.className = "mt-1 text-[10px] md:text-xs text-slate-500";
+          hint.textContent =
+            "Gunakan butang di atas selepas pesakit setuju dengan tarikh baharu.";
+          card.appendChild(hint);
+        }
+
+        listEl.appendChild(card);
       });
+    }
+
+    function sendWhatsAppToPatientApproved(appointment) {
+      const doctorName =
+        doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
+      const serviceName =
+        servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
+      const date = appointment.doctor_selected_date || appointment.requested_date;
+
+      const msg = [
+        "Assalamualaikum / Salam sejahtera,",
+        "",
+        "Temujanji anda telah DISAHKAN.",
+        `Servis: ${serviceName}`,
+        `Doktor: ${doctorName}`,
+        `Tarikh temujanji: ${formatDate(date)}`,
+        "",
+        "Sila hadir ke klinik pada tarikh yang ditetapkan. Jika ingin ubah tarikh, sila hubungi klinik."
+      ].join("\n");
+
+      const waUrl = buildWhatsAppLink(appointment.patient_phone || "", msg);
+      window.open(waUrl, "_blank");
+    }
+
+    async function handleStaffChooseNewDate(appointment, chosenDate) {
+      // Update ke pending dengan tarikh baharu
+      const { error } = await db
+        .from("appointments")
+        .update({
+          status: "pending",
+          requested_date: chosenDate,
+          doctor_selected_date: null
+        })
+        .eq("id", appointment.id);
+
+      if (error) {
+        console.error("Error update reschedule", error);
+        alert("Gagal kemaskini tarikh baharu.");
+        return;
+      }
+
+      const serviceName =
+        servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
+      const doctorPhone = await fetchDoctorWhatsapp(appointment.doctor_id);
+
+      const msg = [
+        "Assalamualaikum / Salam sejahtera Dr,",
+        "",
+        "Pesakit telah bersetuju dengan tarikh baharu:",
+        `Servis: ${serviceName}`,
+        `Nama pesakit: ${appointment.patient_name}`,
+        `Tarikh baharu dipilih pesakit: ${formatDate(chosenDate)}`,
+        "",
+        `Sila semak & sahkan semula dalam sistem: ${APP_URL}`
+      ].join("\n");
+
+      const waUrl = buildWhatsAppLink(doctorPhone || "", msg);
+      window.open(waUrl, "_blank");
+
+      await refreshStaffAppointmentsList();
+      activeStaffFilter = "pending";
+      renderStaffFilterTabs();
+      renderStaffAppointmentsList();
+    }
+
+    function renderTodayActions() {
+      if (!todayActionsListEl) return;
+
+      const todayISO = new Date().toISOString().slice(0, 10);
+
+      const pendingList = staffAppointmentsCache.filter(a => a.status === "pending");
+      const rejectedList = staffAppointmentsCache.filter(a => a.status === "rejected");
+      const approvedToday = staffAppointmentsCache.filter(a => {
+        if (a.status !== "approved") return false;
+        const d = a.doctor_selected_date || a.requested_date;
+        return formatDate(d) === todayISO;
+      });
+
+      todayPendingCountEl.textContent = pendingList.length;
+      todayRejectedCountEl.textContent = rejectedList.length;
+      todayApprovedCountEl.textContent = approvedToday.length;
+
+      todayActionsListEl.innerHTML = "";
+
+      if (!pendingList.length && !rejectedList.length && !approvedToday.length) {
+        todayActionsListEl.innerHTML =
+          '<p class="text-xs md:text-sm text-slate-500">Tiada tindakan kritikal untuk hari ini. Boleh semak semula kemudian 🙂</p>';
+        return;
+      }
+
+      if (approvedToday.length) {
+        const block = document.createElement("div");
+        block.className = "space-y-1";
+        block.innerHTML =
+          '<div class="font-semibold text-xs md:text-sm text-slate-900">Temujanji berlangsung hari ini</div>';
+        approvedToday.forEach(a => {
+          const serviceName =
+            servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
+          const line = document.createElement("div");
+          line.className = "text-[11px] md:text-xs text-slate-700";
+          line.textContent = `${a.patient_name} • ${serviceName} • ${formatDate(
+            a.doctor_selected_date || a.requested_date
+          )}`;
+          block.appendChild(line);
+        });
+        todayActionsListEl.appendChild(block);
+      }
+
+      if (pendingList.length) {
+        const block = document.createElement("div");
+        block.className = "space-y-1 mt-2";
+        block.innerHTML =
+          '<div class="font-semibold text-xs md:text-sm text-slate-900">Perlu tindakan (Pending)</div>';
+        pendingList.slice(0, 5).forEach(a => {
+          const serviceName =
+            servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
+          const line = document.createElement("div");
+          line.className = "text-[11px] md:text-xs text-slate-700";
+          line.textContent = `${a.patient_name} • ${serviceName}`;
+          block.appendChild(line);
+        });
+        todayActionsListEl.appendChild(block);
+      }
+
+      if (rejectedList.length) {
+        const block = document.createElement("div");
+        block.className = "space-y-1 mt-2";
+        block.innerHTML =
+          '<div class="font-semibold text-xs md:text-sm text-slate-900">Perlu hubungi pesakit (Rejected)</div>';
+        rejectedList.slice(0, 5).forEach(a => {
+          const line = document.createElement("div");
+          line.className = "text-[11px] md:text-xs text-slate-700";
+          line.textContent = `${a.patient_name} • cadangan tarikh: ${formatDate(
+            a.doctor_alt_date1
+          )} / ${formatDate(a.doctor_alt_date2)}`;
+          block.appendChild(line);
+        });
+        todayActionsListEl.appendChild(block);
+      }
     }
 
     refreshStaffAppointments?.addEventListener("click", () => {
       refreshStaffAppointmentsList();
     });
 
+    staffFilterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeStaffFilter = btn.dataset.status;
+        renderStaffFilterTabs();
+        renderStaffAppointmentsList();
+      });
+    });
+
     // ==============================
     // DOCTOR PANEL HANDLERS
     // ==============================
+    async function fetchClinicWhatsapp() {
+      const { data, error } = await db
+        .from("profiles")
+        .select("whatsapp_phone")
+        .eq("role", "staff")
+        .limit(1)
+        .maybeSingle();
+      if (error || !data) return null;
+      return data.whatsapp_phone;
+    }
 
     async function refreshDoctorAppointmentsList() {
       if (!currentProfile || currentProfile.role !== "doctor") return;
@@ -1072,19 +1303,20 @@
           "id, patient_name, patient_ic, patient_phone, complaint, requested_date, status, doctor_selected_date, doctor_alt_date1, doctor_alt_date2, service_id"
         )
         .eq("doctor_id", currentProfile.id)
+        .in("status", ["pending", "reschedule_pending"])
         .order("created_at", { ascending: false })
         .limit(50);
 
       if (error) {
         console.error("Error load doctor appointments", error);
         doctorAppointmentsList.innerHTML =
-          '<p class="text-xs text-red-500">Gagal load temujanji.</p>';
+          '<p class="text-xs text-rose-500">Gagal load temujanji.</p>';
         return;
       }
 
       if (!data || data.length === 0) {
         doctorAppointmentsList.innerHTML =
-          '<p class="text-xs text-slate-500">Belum ada temujanji untuk doktor ini.</p>';
+          '<p class="text-xs text-slate-500">Belum ada temujanji yang menunggu tindakan.</p>';
         return;
       }
 
@@ -1092,22 +1324,20 @@
       data.forEach(a => {
         const card = document.createElement("div");
         card.className =
-          "border border-slate-200 rounded-lg px-3 py-2 space-y-1 bg-white";
-
-        const statusBadge = (() => {
-          let cls = "badge-neutral";
-          if (a.status === "pending") cls = "badge-pending";
-          if (a.status === "approved") cls = "badge-approved";
-          if (a.status === "rejected") cls = "badge-rejected";
-          if (a.status === "reschedule_pending") cls = "badge-reschedule";
-          return `<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] md:text-xs ${cls}">${a.status}</span>`;
-        })();
+          "border border-slate-200 rounded-xl px-3 py-2 space-y-1 bg-white shadow-sm";
 
         const serviceName =
           servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
 
+        const statusBadge = (() => {
+          let cls = "bg-slate-100 text-slate-600";
+          if (a.status === "pending") cls = "bg-amber-50 text-amber-700";
+          if (a.status === "reschedule_pending") cls = "bg-sky-50 text-sky-700";
+          return `<span class="inline-flex px-2 py-0.5 rounded-full text-[10px] md:text-xs ${cls} border border-current">${a.status}</span>`;
+        })();
+
         card.innerHTML = `
-          <div class="flex items-center justify-between gap-2">
+          <div class="flex items-start justify-between gap-2">
             <div>
               <div class="text-xs md:text-sm font-medium text-slate-900">${a.patient_name}</div>
               <div class="text-[10px] md:text-xs text-slate-500">${serviceName}</div>
@@ -1116,89 +1346,95 @@
               </div>
             </div>
             <div class="text-right text-[10px] md:text-xs text-slate-500">
-              <div>Diminta: ${formatDate(a.requested_date)}</div>
+              <div>Tarikh diminta: ${formatDate(a.requested_date)}</div>
               ${a.doctor_selected_date ? `<div>Tarikh dipilih: ${formatDate(a.doctor_selected_date)}</div>` : ""}
               ${statusBadge}
             </div>
           </div>
           ${
             a.complaint
-              ? `<div class="text-[10px] md:text-xs text-slate-600 mt-1">Complaint: ${a.complaint}</div>`
-              : ""
-          }
-          ${
-            a.status === "rejected"
-              ? `<div class="text-[10px] md:text-xs text-slate-600 mt-1">
-                  Cadangan tarikh: ${formatDate(a.doctor_alt_date1)} &amp; ${formatDate(
-                  a.doctor_alt_date2
-                )}
-                </div>`
+              ? `<div class="text-[10px] md:text-xs text-slate-700 mt-1">Complaint: ${a.complaint}</div>`
               : ""
           }
         `;
 
-        // Action area
+        // Action row
         const actionRow = document.createElement("div");
-        actionRow.className = "mt-3 grid md:grid-cols-3 gap-3 items-end border-t border-slate-100 pt-3";
+        actionRow.className = "mt-2 grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] gap-3";
 
-        // Approve controls
+        // Approve section
         const approveDiv = document.createElement("div");
         approveDiv.className = "space-y-1";
-        const approveLabel = document.createElement("label");
-        approveLabel.className = "block text-[10px] md:text-xs text-slate-600";
-        approveLabel.textContent = "Tarikh dipersetujui";
+        approveDiv.innerHTML = `
+          <label class="block text-[10px] md:text-xs text-slate-600">Tarikh dipersetujui</label>
+        `;
         const approveInput = document.createElement("input");
         approveInput.type = "date";
         approveInput.value = a.doctor_selected_date || a.requested_date || "";
         approveInput.className =
-          "w-full rounded-lg soft-input border px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-0";
+          "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500";
+
         const approveBtn = document.createElement("button");
         approveBtn.textContent = "Approve + WhatsApp Klinik";
         approveBtn.className =
-          "w-full rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-[10px] md:text-xs font-medium px-2 py-1 text-white";
-        approveDiv.appendChild(approveLabel);
+          "w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 shadow-sm";
+
         approveDiv.appendChild(approveInput);
         approveDiv.appendChild(approveBtn);
 
-        // Reject controls
-        const rejectDiv = document.createElement("div");
-        rejectDiv.className = "space-y-1";
+        // Reject section
+        const rejectWrapper = document.createElement("div");
+        rejectWrapper.className = "space-y-1";
+
+        const rejectToggleBtn = document.createElement("button");
+        rejectToggleBtn.textContent = "Reject (cadang tarikh lain)";
+        rejectToggleBtn.className =
+          "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 shadow-sm";
+
+        const rejectPanel = document.createElement("div");
+        rejectPanel.className = "mt-2 space-y-1 hidden";
+
         const rLabel1 = document.createElement("label");
         rLabel1.className = "block text-[10px] md:text-xs text-slate-600";
         rLabel1.textContent = "Tarikh cadangan 1";
         const rInput1 = document.createElement("input");
         rInput1.type = "date";
         rInput1.className =
-          "w-full rounded-lg soft-input border px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-0";
+          "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-rose-500";
+
         const rLabel2 = document.createElement("label");
         rLabel2.className = "block text-[10px] md:text-xs text-slate-600";
         rLabel2.textContent = "Tarikh cadangan 2";
         const rInput2 = document.createElement("input");
         rInput2.type = "date";
         rInput2.className =
-          "w-full rounded-lg soft-input border px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-0";
-        const rejectBtn = document.createElement("button");
-        rejectBtn.textContent = "Reject + WhatsApp Klinik";
-        rejectBtn.className =
-          "w-full rounded-lg bg-red-600 hover:bg-red-500 active:bg-red-700 text-[10px] md:text-xs font-medium px-2 py-1 mt-1 text-white";
-        rejectDiv.appendChild(rLabel1);
-        rejectDiv.appendChild(rInput1);
-        rejectDiv.appendChild(rLabel2);
-        rejectDiv.appendChild(rInput2);
-        rejectDiv.appendChild(rejectBtn);
+          "w-full rounded-lg bg-white border border-slate-200 px-2 py-1 text-[10px] md:text-xs focus:outline-none focus:ring-1 focus:ring-rose-500";
 
-        // Info / link area
-        const infoDiv = document.createElement("div");
-        infoDiv.className = "space-y-1 text-[10px] md:text-xs text-slate-500";
-        const infoText = document.createElement("p");
-        infoText.textContent =
-          "Selepas update status, pautan WhatsApp ke klinik akan dibuka di tab baharu.";
-        infoDiv.appendChild(infoText);
+        const rejectConfirmBtn = document.createElement("button");
+        rejectConfirmBtn.textContent = "Hantar Cadangan Tarikh + WhatsApp Klinik";
+        rejectConfirmBtn.className =
+          "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-[10px] md:text-xs font-medium text-white px-2 py-1 mt-1 shadow-sm";
+
+        rejectPanel.appendChild(rLabel1);
+        rejectPanel.appendChild(rInput1);
+        rejectPanel.appendChild(rLabel2);
+        rejectPanel.appendChild(rInput2);
+        rejectPanel.appendChild(rejectConfirmBtn);
+
+        rejectWrapper.appendChild(rejectToggleBtn);
+        rejectWrapper.appendChild(rejectPanel);
 
         actionRow.appendChild(approveDiv);
-        actionRow.appendChild(rejectDiv);
-        actionRow.appendChild(infoDiv);
+        actionRow.appendChild(rejectWrapper);
+
         card.appendChild(actionRow);
+
+        const infoText = document.createElement("p");
+        infoText.className =
+          "mt-1 text-[10px] md:text-xs text-slate-500";
+        infoText.textContent =
+          "Selepas update status, sistem akan buka WhatsApp ke nombor klinik di tab baharu.";
+        card.appendChild(infoText);
 
         // Handlers
         approveBtn.addEventListener("click", async () => {
@@ -1216,11 +1452,7 @@
             alert("Gagal update status.");
             return;
           }
-          // WhatsApp ke klinik
           const clinicPhone = await fetchClinicWhatsapp();
-          const serviceName =
-            servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
-          const clinicUrl = window.location.href;
           const msg = [
             "Assalamualaikum / Salam sejahtera,",
             "",
@@ -1229,14 +1461,18 @@
             `Nama: ${a.patient_name}`,
             `Tarikh temujanji: ${formatDate(date)}`,
             "",
-            `Sistem: ${clinicUrl}`
+            `Sistem: ${APP_URL}`
           ].join("\n");
           const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
           window.open(waUrl, "_blank");
           await refreshDoctorAppointmentsList();
         });
 
-        rejectBtn.addEventListener("click", async () => {
+        rejectToggleBtn.addEventListener("click", () => {
+          rejectPanel.classList.toggle("hidden");
+        });
+
+        rejectConfirmBtn.addEventListener("click", async () => {
           const d1 = rInput1.value;
           const d2 = rInput2.value;
           if (!d1 || !d2) {
@@ -1257,9 +1493,6 @@
             return;
           }
           const clinicPhone = await fetchClinicWhatsapp();
-          const serviceName =
-            servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
-          const clinicUrl = window.location.href;
           const msg = [
             "Assalamualaikum / Salam sejahtera,",
             "",
@@ -1272,7 +1505,7 @@
             `1) ${formatDate(d1)}`,
             `2) ${formatDate(d2)}`,
             "",
-            `Sistem: ${clinicUrl}`
+            `Sistem: ${APP_URL}`
           ].join("\n");
           const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
           window.open(waUrl, "_blank");
@@ -1283,18 +1516,6 @@
       });
     }
 
-    async function fetchClinicWhatsapp() {
-      // Anggap STAFF pertama sebagai nombor klinik utama
-      const { data, error } = await db
-        .from("profiles")
-        .select("whatsapp_phone")
-        .eq("role", "staff")
-        .limit(1)
-        .maybeSingle();
-      if (error || !data) return null;
-      return data.whatsapp_phone;
-    }
-
     refreshDoctorAppointments?.addEventListener("click", () => {
       refreshDoctorAppointmentsList();
     });
@@ -1302,10 +1523,12 @@
     // ==============================
     // INIT
     // ==============================
-
     document.addEventListener("DOMContentLoaded", () => {
       setActiveTab("tab-login");
       loadSession();
+      renderStaffFilterTabs();
+      todayActionsListEl.innerHTML =
+        '<p class="text-xs md:text-sm text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
     });
   </script>
 </body>
