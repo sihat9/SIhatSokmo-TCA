@@ -17,7 +17,7 @@
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #e0f2fe 0, #f8fafc 45%, #eef2ff 100%);
+      background: radial-gradient(circle at top, #f0fdf4 0, #f8fafc 45%, #f0fdf4 100%);
       min-height: 100vh;
     }
     .tab-hidden { display: none; }
@@ -74,12 +74,39 @@
       align-items: center;
       gap: 4px;
     }
+    .login-container {
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+      border: 1px solid #d1fae5;
+      box-shadow: 0 20px 40px -10px rgba(5, 150, 105, 0.1), 0 10px 20px -5px rgba(5, 150, 105, 0.05);
+    }
+    .gradient-border {
+      position: relative;
+      border: 1px solid transparent;
+      background: linear-gradient(white, white) padding-box,
+                  linear-gradient(135deg, #10b981 0%, #34d399 50%, #10b981 100%) border-box;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      color: white;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.4), 0 10px 10px -5px rgba(5, 150, 105, 0.1);
+    }
   </style>
 </head>
 <body class="text-slate-900">
   <div class="min-h-screen flex flex-col items-center px-4 py-6 md:px-8 md:py-8">
     <!-- Shell -->
-    <div class="w-full max-w-7xl bg-white/90 border border-slate-200 rounded-2xl shadow-xl shadow-sky-100 p-5 md:p-8 backdrop-blur">
+    <div class="w-full max-w-7xl bg-white/90 border border-slate-200 rounded-2xl shadow-xl shadow-emerald-100 p-5 md:p-8 backdrop-blur">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div class="space-y-2">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm border border-emerald-100">
@@ -106,22 +133,22 @@
       <div id="navTabs" class="hidden border-b border-slate-200 mb-6">
         <nav class="-mb-px flex flex-wrap gap-2 text-sm md:text-base">
           <button data-tab="tab-staff"
-                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
                   id="btnStaff">
             Staff Klinik
           </button>
           <button data-tab="tab-export"
-                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
                   id="btnExport">
             Export Data
           </button>
           <button data-tab="tab-doctor"
-                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
                   id="btnDoctor">
             Doktor
           </button>
           <button data-tab="tab-settings"
-                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-sky-600 hover:bg-sky-50"
+                  class="tab-btn tab-btn-premium border-b-2 border-transparent px-4 py-3 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
                   id="btnSettings">
             Settings
           </button>
@@ -131,57 +158,173 @@
       <!-- CONTENT -->
       <div class="mt-4 space-y-8">
 
-        <!-- LOGIN -->
+        <!-- LOGIN - REDESIGNED -->
         <section id="tab-login">
-          <div class="grid md:grid-cols-2 gap-8">
-            <!-- Log masuk -->
-            <div class="space-y-6 bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
-              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Log masuk</h2>
-              <p class="text-sm md:text-base text-slate-500">
-                Guna akaun yang telah didaftarkan di Supabase (staff atau doktor).
-              </p>
-
-              <form id="loginForm" class="space-y-4 mt-4">
-                <div>
-                  <label class="block text-sm md:text-base mb-2 text-slate-700">Email</label>
-                  <input id="loginEmail" type="email" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+          <div class="grid md:grid-cols-2 gap-8 items-stretch">
+            <!-- Log masuk - Premium Design -->
+            <div class="login-container rounded-2xl p-6 md:p-8 relative overflow-hidden">
+              <!-- Decorative elements -->
+              <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
+              <div class="absolute bottom-0 left-0 w-24 h-24 bg-emerald-50 rounded-full translate-y-12 -translate-x-12 opacity-70"></div>
+              
+              <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-900">Log Masuk</h2>
+                    <p class="text-sm md:text-base text-slate-500">
+                      Akses sistem appointment klinik
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <label class="block text-sm md:text-base mb-2 text-slate-700">Password</label>
-                  <input id="loginPassword" type="password" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
-                </div>
-                <button type="submit"
-                        class="w-full inline-flex justify-center items-center gap-3 rounded-lg bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-base md:text-lg font-semibold text-white px-6 py-3 transition shadow-lg hover:shadow-xl">
-                  Log masuk
-                </button>
-              </form>
 
-              <p id="loginError" class="text-sm md:text-base text-rose-500 mt-2 hidden"></p>
+                <form id="loginForm" class="space-y-6 mt-6">
+                  <div>
+                    <label class="block text-sm md:text-base mb-3 text-slate-700 font-medium">Email</label>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <input id="loginEmail" type="email" required
+                             class="w-full rounded-lg bg-white border border-slate-200 pl-10 pr-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" 
+                             placeholder="nama@klinik.com"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm md:text-base mb-3 text-slate-700 font-medium">Password</label>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input id="loginPassword" type="password" required
+                             class="w-full rounded-lg bg-white border border-slate-200 pl-10 pr-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                             placeholder="••••••••"/>
+                    </div>
+                  </div>
+                  <button type="submit"
+                          class="btn-primary w-full inline-flex justify-center items-center gap-3 rounded-lg px-6 py-3 text-base md:text-lg font-semibold mt-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Log Masuk
+                  </button>
+                </form>
+
+                <p id="loginError" class="text-sm md:text-base text-rose-500 mt-4 p-3 bg-rose-50 rounded-lg hidden"></p>
+
+                <div class="mt-8 pt-6 border-t border-slate-100">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p class="text-sm text-slate-500">
+                      Guna akaun yang telah didaftarkan di Supabase
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Info sistem -->
-            <div class="space-y-4 bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 text-sm md:text-base text-slate-600">
-              <h3 class="text-lg md:text-xl font-bold text-slate-900">Maklumat sistem</h3>
-              <ul class="list-disc list-inside space-y-3">
-                <li class="text-sm md:text-base">Staff klinik daftar pesakit dan tarikh yang dicadangkan.</li>
-                <li class="text-sm md:text-base">Doktor approve atau cadangkan tarikh baharu.</li>
-                <li class="text-sm md:text-base">Status temujanji dipantau dalam 3 kategori: Pending, Approved dan Rejected.</li>
-                <li class="text-sm md:text-base">WhatsApp automatik membantu staff &amp; doktor berhubung dengan lebih pantas.</li>
+            <!-- Info sistem dengan tema hijau -->
+            <div class="space-y-4 bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-6 md:p-8 text-sm md:text-base text-slate-600">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 rounded-full bg-white border border-emerald-200 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 gradient-text">Maklumat Sistem</h3>
+              </div>
+              
+              <ul class="space-y-4">
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">1</span>
+                  </div>
+                  <span class="text-sm md:text-base">Staff klinik daftar pesakit dan tarikh yang dicadangkan.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">2</span>
+                  </div>
+                  <span class="text-sm md:text-base">Doktor approve atau cadangkan tarikh baharu.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">3</span>
+                  </div>
+                  <span class="text-sm md:text-base">Status temujanji dipantau dalam 3 kategori: Pending, Approved dan Rejected.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">4</span>
+                  </div>
+                  <span class="text-sm md:text-base">WhatsApp automatik membantu staff &amp; doktor berhubung dengan lebih pantas.</span>
+                </li>
               </ul>
-              <div class="mt-4 p-4 rounded-xl bg-sky-50 border border-sky-100 text-sm md:text-base text-sky-800">
-                Tip: Untuk kali pertama, login sebagai <span class="font-bold">staff</span>, tambah servis &amp; kolom tambahan di tab <span class="font-bold">Settings</span>.
+              
+              <div class="mt-6 p-4 rounded-xl bg-white/80 border border-emerald-200 text-sm md:text-base">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Tip Penggunaan</p>
+                    <p class="text-slate-600">Untuk kali pertama, login sebagai <span class="font-bold text-emerald-600">staff</span>, tambah servis &amp; kolom tambahan di tab <span class="font-bold text-emerald-600">Settings</span>.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-6 pt-4 border-t border-emerald-100">
+                <div class="flex items-center justify-center gap-4">
+                  <div class="text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p class="text-xs text-slate-500">Pantauan Masa Nyata</p>
+                  </div>
+                  <div class="text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p class="text-xs text-slate-500">WhatsApp Automatik</p>
+                  </div>
+                  <div class="text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <p class="text-xs text-slate-500">Analytics & Export</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- STAFF PANEL -->
+        <!-- STAFF PANEL (TIDAK BERUBAH) -->
         <section id="tab-staff" class="tab-hidden">
+          <!-- ... (kandungan staff panel tidak berubah) ... -->
           <div class="space-y-6">
             <!-- Tindakan Hari Ini -->
-            <div class="bg-sky-50 border border-sky-100 rounded-2xl p-6 md:p-8">
+            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 md:p-8">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 class="text-xl md:text-2xl font-bold text-slate-900">
@@ -228,14 +371,14 @@
                     <div>
                       <label class="block text-sm md:text-base mb-2 text-slate-700">Servis</label>
                       <select id="serviceSelect"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih servis...</option>
                       </select>
                     </div>
                     <div>
                       <label class="block text-sm md:text-base mb-2 text-slate-700">Doktor</label>
                       <select id="doctorSelect"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
                     </div>
@@ -245,12 +388,12 @@
                     <div>
                       <label class="block text-sm md:text-base mb-2 text-slate-700">Nama penuh pesakit</label>
                       <input id="patientName" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                     <div>
                       <label class="block text-sm md:text-base mb-2 text-slate-700">No. IC / Passport</label>
                       <input id="patientIC" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                   </div>
 
@@ -258,19 +401,19 @@
                     <div>
                       <label class="block text-sm md:text-base mb-2 text-slate-700">No. Telefon Pesakit</label>
                       <input id="patientPhone" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                     <div>
                       <label class="block text-sm md:text-base mb-2 text-slate-700">Tarikh yang pesakit available</label>
                       <input id="requestedDate" type="date" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                   </div>
 
                   <div>
                     <label class="block text-sm md:text-base mb-2 text-slate-700">Ringkasan masalah / complaint</label>
                     <textarea id="complaint" rows="3"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm"></textarea>
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></textarea>
                   </div>
 
                   <!-- Dynamic custom fields -->
@@ -283,7 +426,7 @@
                     Simpan temujanji
                   </button>
 
-                  <p id="appointmentMessage" class="text-sm md:text-base mt-2 text-sky-700 hidden"></p>
+                  <p id="appointmentMessage" class="text-sm md:text-base mt-2 text-emerald-700 hidden"></p>
                   <p id="appointmentError" class="text-sm md:text-base mt-2 text-rose-500 hidden"></p>
                 </form>
 
@@ -324,7 +467,7 @@
                       </button>
                     </div>
                     <button id="refreshStaffAppointments"
-                            class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-sky-400 hover:text-sky-600 bg-white shadow-sm">
+                            class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
                       Refresh
                     </button>
                   </div>
@@ -346,14 +489,14 @@
                     <div>
                       <label class="block text-sm mb-2 text-slate-700">Servis</label>
                       <select id="serviceSelectMobile"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih servis...</option>
                       </select>
                     </div>
                     <div>
                       <label class="block text-sm mb-2 text-slate-700">Doktor</label>
                       <select id="doctorSelectMobile"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
                     </div>
@@ -363,12 +506,12 @@
                     <div>
                       <label class="block text-sm mb-2 text-slate-700">Nama penuh pesakit</label>
                       <input id="patientNameMobile" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                     <div>
                       <label class="block text-sm mb-2 text-slate-700">No. IC / Passport</label>
                       <input id="patientICMobile" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                   </div>
 
@@ -376,19 +519,19 @@
                     <div>
                       <label class="block text-sm mb-2 text-slate-700">No. Telefon Pesakit</label>
                       <input id="patientPhoneMobile" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                     <div>
                       <label class="block text-sm mb-2 text-slate-700">Tarikh yang pesakit available</label>
                       <input id="requestedDateMobile" type="date" required
-                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                             class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                     </div>
                   </div>
 
                   <div>
                     <label class="block text-sm mb-2 text-slate-700">Ringkasan masalah / complaint</label>
                     <textarea id="complaintMobile" rows="3"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm"></textarea>
+                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></textarea>
                   </div>
 
                   <!-- Dynamic custom fields -->
@@ -401,7 +544,7 @@
                     Simpan temujanji
                   </button>
 
-                  <p id="appointmentMessageMobile" class="text-sm mt-2 text-sky-700 hidden"></p>
+                  <p id="appointmentMessageMobile" class="text-sm mt-2 text-emerald-700 hidden"></p>
                   <p id="appointmentErrorMobile" class="text-sm mt-2 text-rose-500 hidden"></p>
                 </form>
 
@@ -442,7 +585,7 @@
                       </button>
                     </div>
                     <button id="refreshStaffAppointmentsMobile"
-                            class="text-sm px-4 py-2 rounded-full border border-slate-300 hover:border-sky-400 hover:text-sky-600 bg-white shadow-sm">
+                            class="text-sm px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
                       Refresh
                     </button>
                   </div>
@@ -455,8 +598,9 @@
           </div>
         </section>
 
-        <!-- EXPORT PANEL -->
+        <!-- EXPORT PANEL (TIDAK BERUBAH) -->
         <section id="tab-export" class="tab-hidden">
+          <!-- ... (kandungan export panel tidak berubah) ... -->
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div>
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Export Data Temujanji ke Excel</h2>
@@ -468,14 +612,14 @@
             <div class="grid md:grid-cols-3 gap-6">
               <div class="space-y-3">
                 <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Doktor</label>
-                <select id="exportDoctor" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                <select id="exportDoctor" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                   <option value="all">Semua Doktor</option>
                 </select>
               </div>
 
               <div class="space-y-3">
                 <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Bulan</label>
-                <select id="exportMonth" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                <select id="exportMonth" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                   <option value="all">Semua Bulan</option>
                   <option value="01">Januari</option>
                   <option value="02">Februari</option>
@@ -494,7 +638,7 @@
 
               <div class="space-y-3">
                 <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Tahun</label>
-                <select id="exportYear" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                <select id="exportYear" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                   <option value="all">Semua Tahun</option>
                 </select>
               </div>
@@ -505,17 +649,17 @@
               <div class="flex flex-wrap gap-4">
                 <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
                   <input id="exportPending" type="checkbox" checked
-                         class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5">
+                         class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
                   Pending
                 </label>
                 <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
                   <input id="exportApproved" type="checkbox" checked
-                         class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5">
+                         class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
                   Approved
                 </label>
                 <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
                   <input id="exportRejected" type="checkbox" checked
-                         class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5">
+                         class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
                   Rejected
                 </label>
               </div>
@@ -523,11 +667,11 @@
 
             <div class="flex flex-col sm:flex-row gap-4 pt-4">
               <button id="exportPreviewBtn"
-                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-sky-500 hover:bg-sky-600 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
                 Preview Data
               </button>
               <button id="exportExcelBtn"
-                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
                 Export ke Excel
               </button>
             </div>
@@ -543,14 +687,15 @@
             </div>
 
             <div id="exportLoading" class="hidden text-center py-8">
-              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
               <p class="mt-4 text-sm md:text-base text-slate-600">Sedang memuatkan data...</p>
             </div>
           </div>
         </section>
 
-        <!-- DOCTOR PANEL -->
+        <!-- DOCTOR PANEL (TIDAK BERUBAH) -->
         <section id="tab-doctor" class="tab-hidden">
+          <!-- ... (kandungan doctor panel tidak berubah) ... -->
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Panel Doktor</h2>
@@ -570,7 +715,7 @@
                   </button>
                 </div>
                 <button id="refreshDoctorAppointments"
-                        class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-sky-400 hover:text-sky-600 bg-white shadow-sm">
+                        class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
                   Refresh
                 </button>
               </div>
@@ -586,8 +731,9 @@
           </div>
         </section>
 
-        <!-- SETTINGS PANEL -->
+        <!-- SETTINGS PANEL (TIDAK BERUBAH) -->
         <section id="tab-settings" class="tab-hidden">
+          <!-- ... (kandungan settings panel tidak berubah) ... -->
           <div class="grid lg:grid-cols-2 gap-8 text-sm md:text-base">
             <!-- Services -->
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
@@ -597,18 +743,18 @@
                 <div>
                   <label class="block text-sm md:text-base mb-2 text-slate-700">Nama servis</label>
                   <input id="serviceName" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                 </div>
                 <div>
                   <label class="block text-sm md:text-base mb-2 text-slate-700">Keterangan (optional)</label>
                   <textarea id="serviceDescription" rows="3"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm"></textarea>
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-sm md:text-base mb-2 text-slate-700">Status</label>
                     <select id="serviceStatus"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
                     </select>
@@ -616,7 +762,7 @@
                   <div>
                     <label class="block text-sm md:text-base mb-2 text-slate-700">Doktor default (optional)</label>
                     <select id="serviceDoctor"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                       <option value="">Tiada (pilih manual masa daftar)</option>
                     </select>
                   </div>
@@ -625,7 +771,7 @@
                         class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 mt-2 shadow-lg hover:shadow-xl">
                   Simpan Servis
                 </button>
-                <p id="serviceMessage" class="text-sm md:text-base mt-2 text-sky-700 hidden"></p>
+                <p id="serviceMessage" class="text-sm md:text-base mt-2 text-emerald-700 hidden"></p>
               </form>
 
               <div class="mt-6">
@@ -644,13 +790,13 @@
                 <div>
                   <label class="block text-sm md:text-base mb-2 text-slate-700">Label / Tajuk Pertanyaan</label>
                   <input id="fieldLabel" required
-                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm" />
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-sm md:text-base mb-2 text-slate-700">Jenis Input</label>
                     <select id="fieldType"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                       <option value="text">Text</option>
                       <option value="phone">Phone</option>
                       <option value="date">Date</option>
@@ -659,7 +805,7 @@
                   <div>
                     <label class="block text-sm md:text-base mb-2 text-slate-700">Servis</label>
                     <select id="fieldService"
-                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm">
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                       <option value="">Global (semua servis)</option>
                     </select>
                   </div>
@@ -667,7 +813,7 @@
                 <div>
                   <label class="inline-flex items-center gap-3 text-sm md:text-base text-slate-700">
                     <input id="fieldRequired" type="checkbox"
-                           class="rounded border-slate-300 bg-white text-sky-600 focus:ring-sky-500 w-5 h-5" />
+                           class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5" />
                     Wajib diisi
                   </label>
                 </div>
@@ -675,7 +821,7 @@
                         class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 mt-2 shadow-lg hover:shadow-xl">
                   Tambah Kolom
                 </button>
-                <p id="fieldMessage" class="text-sm md:text-base mt-2 text-sky-700 hidden"></p>
+                <p id="fieldMessage" class="text-sm md:text-base mt-2 text-emerald-700 hidden"></p>
               </form>
 
               <div class="mt-6">
@@ -834,9 +980,9 @@
 
       tabButtons.forEach(btn => {
         if (btn.dataset.tab === tabId) {
-          btn.classList.add("border-sky-500", "text-sky-600", "font-bold", "bg-sky-50");
+          btn.classList.add("border-emerald-500", "text-emerald-600", "font-bold", "bg-emerald-50");
         } else {
-          btn.classList.remove("border-sky-500", "text-sky-600", "font-bold", "bg-sky-50");
+          btn.classList.remove("border-emerald-500", "text-emerald-600", "font-bold", "bg-emerald-50");
         }
       });
     }
@@ -846,7 +992,7 @@
       el.textContent = text;
       el.classList.remove("hidden");
       el.classList.toggle("text-rose-500", isError);
-      el.classList.toggle("text-sky-700", !isError);
+      el.classList.toggle("text-emerald-700", !isError);
       if (!text) el.classList.add("hidden");
     }
 
@@ -886,8 +1032,8 @@
 
     function getServiceColor(serviceId) {
       const colors = [
-        'bg-blue-100 text-blue-800 border-blue-200',
         'bg-emerald-100 text-emerald-800 border-emerald-200',
+        'bg-blue-100 text-blue-800 border-blue-200',
         'bg-amber-100 text-amber-800 border-amber-200',
         'bg-purple-100 text-purple-800 border-purple-200',
         'bg-rose-100 text-rose-800 border-rose-200',
@@ -1238,7 +1384,7 @@
           }
         }
         input.dataset.fieldId = f.id;
-        input.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm";
+        input.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm";
 
         wrapper.appendChild(label);
         const divInput = document.createElement("div");
@@ -1279,7 +1425,7 @@
           }
         }
         input.dataset.fieldId = f.id;
-        input.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-sm";
+        input.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm";
 
         wrapper.appendChild(label);
         wrapper.appendChild(input);
@@ -1601,9 +1747,9 @@
       staffFilterButtons.forEach(btn => {
         const status = btn.dataset.status;
         if (status === activeStaffFilter) {
-          btn.classList.add("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+          btn.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
         } else {
-          btn.classList.remove("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+          btn.classList.remove("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
         }
       });
 
@@ -1611,9 +1757,9 @@
       staffFilterButtonsMobile.forEach(btn => {
         const status = btn.dataset.status;
         if (status === activeStaffFilter) {
-          btn.classList.add("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+          btn.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
         } else {
-          btn.classList.remove("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+          btn.classList.remove("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
         }
       });
     }
@@ -1743,7 +1889,7 @@
                 <button class="delete-btn text-rose-500 hover:text-rose-700 transition-opacity"
                         title="Padam temujanji dari UI">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 00-1-1z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
                 </button>
               </div>
@@ -1797,7 +1943,7 @@
               <div class="text-xs text-rose-600 mb-2 font-medium">Cadangan tarikh doktor:</div>
               <div class="space-y-2">
                 ${dates.map(date => `
-                  <button class="w-full bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2" data-date="${date}">
+                  <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2" data-date="${date}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -1914,7 +2060,7 @@
                 <button class="delete-btn text-rose-500 hover:text-rose-700 transition-opacity text-xs"
                         title="Padam temujanji dari UI">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 00-1-1z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
                 </button>
               </div>
@@ -1963,7 +2109,7 @@
                 <div class="text-xs text-rose-600 mb-2 font-medium">Cadangan doktor:</div>
                 <div class="space-y-1">
                   ${dates.map(date => `
-                    <button class="w-full bg-sky-500 hover:bg-sky-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1" data-date="${date}">
+                    <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1" data-date="${date}">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -2560,7 +2706,7 @@
         const statusBadge = (() => {
           let cls = "bg-slate-100 text-slate-600";
           if (a.status === "pending") cls = "bg-amber-50 text-amber-700";
-          if (a.status === "reschedule_pending") cls = "bg-sky-50 text-sky-700";
+          if (a.status === "reschedule_pending") cls = "bg-emerald-50 text-emerald-700";
           if (a.status === "approved") cls = "bg-emerald-50 text-emerald-700";
           if (a.status === "rejected") cls = "bg-rose-50 text-rose-700";
           return `<span class="inline-flex px-3 py-1.5 rounded-full text-sm ${cls} border border-current">${a.status}</span>`;
@@ -2641,7 +2787,7 @@
           const addDateBtn = document.createElement("button");
           addDateBtn.textContent = "+ Tambah Tarikh Cadangan";
           addDateBtn.type = "button";
-          addDateBtn.className = "text-sm text-sky-600 hover:text-sky-700";
+          addDateBtn.className = "text-sm text-emerald-600 hover:text-emerald-700";
           addDateBtn.addEventListener("click", () => {
             const newDateInput = document.createElement("div");
             newDateInput.className = "space-y-2";
@@ -2846,9 +2992,9 @@
         // Update tab button styles
         doctorTabButtons.forEach(b => {
           if (b.dataset.tab === activeDoctorTab) {
-            b.classList.add("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+            b.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
           } else {
-            b.classList.remove("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+            b.classList.remove("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
           }
         });
         
@@ -2868,7 +3014,7 @@
       // Set default active doctor tab button
       doctorTabButtons.forEach(btn => {
         if (btn.dataset.tab === "pending") {
-          btn.classList.add("bg-sky-600", "text-white", "shadow", "shadow-sky-200");
+          btn.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
         }
       });
       
