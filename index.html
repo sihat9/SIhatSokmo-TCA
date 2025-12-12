@@ -319,9 +319,8 @@
           </div>
         </section>
 
-        <!-- STAFF PANEL (TIDAK BERUBAH) -->
+        <!-- STAFF PANEL -->
         <section id="tab-staff" class="tab-hidden">
-          <!-- ... (kandungan staff panel tidak berubah) ... -->
           <div class="space-y-6">
             <!-- Tindakan Hari Ini -->
             <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 md:p-8">
@@ -598,9 +597,8 @@
           </div>
         </section>
 
-        <!-- EXPORT PANEL (TIDAK BERUBAH) -->
+        <!-- EXPORT PANEL -->
         <section id="tab-export" class="tab-hidden">
-          <!-- ... (kandungan export panel tidak berubah) ... -->
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div>
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Export Data Temujanji ke Excel</h2>
@@ -693,9 +691,8 @@
           </div>
         </section>
 
-        <!-- DOCTOR PANEL (TIDAK BERUBAH) -->
+        <!-- DOCTOR PANEL -->
         <section id="tab-doctor" class="tab-hidden">
-          <!-- ... (kandungan doctor panel tidak berubah) ... -->
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Panel Doktor</h2>
@@ -731,9 +728,8 @@
           </div>
         </section>
 
-        <!-- SETTINGS PANEL (TIDAK BERUBAH) -->
+        <!-- SETTINGS PANEL -->
         <section id="tab-settings" class="tab-hidden">
-          <!-- ... (kandungan settings panel tidak berubah) ... -->
           <div class="grid lg:grid-cols-2 gap-8 text-sm md:text-base">
             <!-- Services -->
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
@@ -862,6 +858,7 @@
     let staffAppointmentsCache = [];
     let activeStaffFilter = "pending";
     let activeDoctorTab = "pending";
+    let realtimeSubscription = null;
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -1046,6 +1043,77 @@
     }
 
     // ==============================
+    // REAL-TIME UPDATES
+    // ==============================
+    function setupRealtimeUpdates() {
+      // Unsubscribe existing subscription
+      if (realtimeSubscription) {
+        db.removeChannel(realtimeSubscription);
+      }
+
+      // Subscribe to appointments table changes
+      realtimeSubscription = db
+        .channel('appointments-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'appointments'
+          },
+          (payload) => {
+            console.log('Realtime update received:', payload);
+            
+            // Refresh data based on current user role
+            if (currentProfile) {
+              if (currentProfile.role === 'staff') {
+                refreshStaffAppointmentsList();
+              } else if (currentProfile.role === 'doctor') {
+                refreshDoctorAppointmentsList();
+              }
+            }
+          }
+        )
+        .subscribe((status) => {
+          console.log('Realtime subscription status:', status);
+        });
+
+      // Subscribe to appointment_fields table changes
+      const fieldsSubscription = db
+        .channel('fields-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'appointment_fields'
+          },
+          (payload) => {
+            console.log('Fields update received:', payload);
+            loadCustomFields();
+          }
+        )
+        .subscribe();
+
+      // Subscribe to services table changes
+      const servicesSubscription = db
+        .channel('services-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'services'
+          },
+          (payload) => {
+            console.log('Services update received:', payload);
+            loadServices();
+          }
+        )
+        .subscribe();
+    }
+
+    // ==============================
     // AUTH & PROFILE
     // ==============================
     async function loadSession() {
@@ -1089,6 +1157,9 @@
       btnDoctor.classList.toggle("hidden", profile.role !== "doctor");
 
       await Promise.all([loadDoctors(), loadServices(), loadCustomFields()]);
+
+      // Setup real-time updates
+      setupRealtimeUpdates();
 
       if (profile.role === "staff") {
         setActiveTab("tab-staff");
@@ -1327,22 +1398,42 @@
           fieldList.appendChild(item);
         });
 
-        // Add delete event listeners - TIDAK DELETE DARI SUPABASE
+        // Add delete event listeners - DELETE DARI SUPABASE
         fieldList.querySelectorAll(".delete-field-btn").forEach(btn => {
           btn.addEventListener("click", async (e) => {
             e.stopPropagation();
             const fieldId = btn.dataset.fieldId;
-            if (confirm("Adakah anda pasti mahu memadam kolom ini? Kolom ini hanya akan dipadam dari UI sahaja.")) {
+            if (confirm("Adakah anda pasti mahu memadam kolom ini secara kekal?")) {
               try {
-                // Hanya remove dari UI, tidak delete dari Supabase
+                // Delete dari Supabase
+                const { error } = await db
+                  .from("appointment_fields")
+                  .delete()
+                  .eq("id", fieldId);
+
+                if (error) {
+                  console.error("Error delete field from Supabase", error);
+                  alert("Gagal memadam kolom dari database.");
+                  return;
+                }
+
+                // Remove dari UI
                 const fieldItem = btn.closest('div.flex.justify-between');
                 if (fieldItem) {
                   fieldItem.remove();
                 }
-                alert("Kolom berjaya dipadam dari UI.");
+                
+                // Update cache
+                customFieldsCache = customFieldsCache.filter(f => f.id !== fieldId);
+                
+                // Update form fields
+                renderCustomFieldsForm();
+                renderCustomFieldsFormMobile();
+                
+                alert("Kolom berjaya dipadam secara kekal.");
               } catch (error) {
-                console.error("Error delete field from UI", error);
-                alert("Gagal memadam kolom dari UI.");
+                console.error("Error delete field", error);
+                alert("Gagal memadam kolom.");
               }
             }
           });
@@ -1455,7 +1546,6 @@
       }
       serviceForm.reset();
       showMessage(serviceMessage, "Servis berjaya disimpan.", false);
-      await loadServices();
     });
 
     fieldForm?.addEventListener("submit", async (e) => {
@@ -1476,7 +1566,8 @@
         input_type: fieldType.value,
         is_required: fieldRequired.checked,
         service_id: fieldService.value || null,
-        sort_order: customFieldsCache.length + 1
+        sort_order: customFieldsCache.length + 1,
+        is_active: true
       };
 
       const { error } = await db.from("appointment_fields").insert(payload);
@@ -1488,7 +1579,6 @@
 
       fieldForm.reset();
       showMessage(fieldMessage, "Kolom berjaya ditambah.", false);
-      await loadCustomFields();
     });
 
     // ==============================
@@ -1566,7 +1656,6 @@
       requestedDate.value = "";
       customFieldsContainer.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
 
-      await refreshStaffAppointmentsList();
       buildStaffWhatsappLink(insertResult);
     });
 
@@ -1645,7 +1734,6 @@
       requestedDateMobile.value = "";
       customFieldsContainerMobile.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
 
-      await refreshStaffAppointmentsList();
       buildStaffWhatsappLinkMobile(insertResult);
     });
 
@@ -1764,45 +1852,32 @@
       });
     }
 
-    function deleteAppointmentFromUI(appointmentId) {
-      if (!confirm("Adakah anda pasti mahu memadam temujanji ini dari UI? Data masih kekal dalam Supabase.")) {
+    async function deleteAppointmentFromUI(appointmentId) {
+      if (!confirm("Adakah anda pasti mahu memadam temujanji ini secara kekal?")) {
         return;
       }
 
       try {
-        // Remove dari desktop list
-        const desktopCard = staffAppointmentsList.querySelector(`[data-appointment-id="${appointmentId}"]`);
-        if (desktopCard) {
-          desktopCard.remove();
-        }
+        // Delete dari Supabase
+        const { error } = await db
+          .from("appointments")
+          .delete()
+          .eq("id", appointmentId);
 
-        // Remove dari mobile list
-        const mobileCard = staffAppointmentsListMobile.querySelector(`[data-appointment-id="${appointmentId}"]`);
-        if (mobileCard) {
-          mobileCard.remove();
+        if (error) {
+          console.error("Error delete appointment from Supabase", error);
+          alert("Gagal memadam temujanji dari database.");
+          return;
         }
 
         // Remove dari cache
         staffAppointmentsCache = staffAppointmentsCache.filter(a => a.id !== appointmentId);
 
-        // Update counts
-        const pendingList = staffAppointmentsCache.filter(a => a.status === "pending");
-        const rejectedList = staffAppointmentsCache.filter(a => a.status === "rejected");
-        const todayISO = new Date().toISOString().slice(0, 10);
-        const approvedToday = staffAppointmentsCache.filter(a => {
-          if (a.status !== "approved") return false;
-          const d = a.doctor_selected_date || a.requested_date;
-          return formatDate(d) === todayISO;
-        });
-
-        todayPendingCountEl.textContent = pendingList.length;
-        todayRejectedCountEl.textContent = rejectedList.length;
-        todayApprovedCountEl.textContent = approvedToday.length;
-
-        alert("Temujanji berjaya dipadam dari UI.");
+        // Update UI akan dilakukan secara automatik melalui real-time updates
+        alert("Temujanji berjaya dipadam secara kekal.");
       } catch (error) {
-        console.error("Error delete appointment from UI", error);
-        alert("Gagal memadam temujanji dari UI.");
+        console.error("Error delete appointment", error);
+        alert("Gagal memadam temujanji.");
       }
     }
 
@@ -2194,17 +2269,11 @@
         `Nama pesakit: ${appointment.patient_name}`,
         `Tarikh baharu dipilih pesakit: ${formatDate(chosenDate)}`,
         "",
-        "Sila semak & sahkan semula dalam sistem."
+        `Sila semak & sahkan semula dalam sistem: ${APP_URL}`
       ].join("\n");
 
       const waUrl = buildWhatsAppLink(doctorPhone || "", msg);
       window.open(waUrl, "_blank");
-
-      await refreshStaffAppointmentsList();
-      activeStaffFilter = "pending";
-      renderStaffFilterTabs();
-      renderStaffAppointmentsList();
-      renderStaffAppointmentsListMobile();
     }
 
     function renderTodayActions() {
@@ -2836,7 +2905,6 @@
               return;
             }
             alert("Temujanji telah diluluskan.");
-            await refreshDoctorAppointmentsList();
           });
 
           approveWhatsappBtn.addEventListener("click", async () => {
@@ -2855,7 +2923,7 @@
               return;
             }
             
-            // Generate WhatsApp message
+            // Generate WhatsApp message DENGAN LINK SISTEM
             const clinicPhone = await fetchClinicWhatsapp();
             const msg = [
               "Assalamualaikum / Salam sejahtera,",
@@ -2863,12 +2931,13 @@
               "Saya setuju untuk temujanji pesakit berikut:",
               `Servis: ${serviceName}`,
               `Nama: ${a.patient_name}`,
-              `Tarikh temujanji: ${formatDate(date)}`
+              `Tarikh temujanji: ${formatDate(date)}`,
+              "",
+              `Link sistem: ${APP_URL}`
             ].join("\n");
             
             const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
             window.open(waUrl, "_blank");
-            await refreshDoctorAppointmentsList();
           });
 
           // Handlers untuk Reject
@@ -2903,7 +2972,6 @@
             }
             
             alert("Temujanji telah ditolak dengan cadangan tarikh alternatif.");
-            await refreshDoctorAppointmentsList();
           });
 
           rejectWhatsappBtn.addEventListener("click", async () => {
@@ -2932,7 +3000,7 @@
               return;
             }
             
-            // Generate WhatsApp message
+            // Generate WhatsApp message DENGAN LINK SISTEM
             const clinicPhone = await fetchClinicWhatsapp();
             const msg = [
               "Assalamualaikum / Salam sejahtera,",
@@ -2943,12 +3011,13 @@
               `Tarikh asal: ${formatDate(a.requested_date)}`,
               "",
               "Cadangan tarikh baharu:",
-              ...dates.map((date, idx) => `${idx + 1}) ${formatDate(date)}`)
+              ...dates.map((date, idx) => `${idx + 1}) ${formatDate(date)}`),
+              "",
+              `Link sistem: ${APP_URL}`
             ].join("\n");
             
             const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
             window.open(waUrl, "_blank");
-            await refreshDoctorAppointmentsList();
           });
         } else if (activeDoctorTab === "rejected") {
           // Untuk rejected tab, show suggested dates
