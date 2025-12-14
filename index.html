@@ -1650,36 +1650,47 @@
       }
     }
 
-    async function saveAvailabilityDates() {
-      if (!currentProfile || selectedDates.size === 0) return;
-      
-      try {
-        // Delete existing availability for this doctor
-        await db
-          .from('doctor_availability')
-          .delete()
-          .eq('doctor_id', currentProfile.id);
-        
-        // Insert new availability dates
-        const availabilityData = Array.from(selectedDates).map(date => ({
-          doctor_id: currentProfile.id,
-          date: date,
-          status: 'available'
-        }));
-        
-        const { error } = await db
-          .from('doctor_availability')
-          .insert(availabilityData);
-        
-        if (error) throw error;
-        
-        alert('Tarikh available berjaya disimpan!');
-        closeAvailabilityCalendar();
-      } catch (error) {
-        console.error('Error saving availability', error);
-        alert('Gagal menyimpan tarikh available. Sila cuba lagi.');
-      }
-    }
+    function getDayOfWeekNumber(dateStr) {
+  // Elak isu timezone (YYYY-MM-DD biasanya diparse UTC dalam browser)
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const localDate = new Date(y, m - 1, d); // local time
+  return localDate.getDay(); // 0=Ahad ... 6=Sabtu
+}
+
+async function saveAvailabilityDates() {
+  if (!currentProfile || selectedDates.size === 0) return;
+
+  try {
+    // 1) Delete existing availability for this doctor
+    const { error: delErr } = await db
+      .from("doctor_availability")
+      .delete()
+      .eq("doctor_id", currentProfile.id);
+
+    if (delErr) throw delErr;
+
+    // 2) Insert new availability dates (WAJIB include day_of_week)
+    const availabilityData = Array.from(selectedDates).map((date) => ({
+      doctor_id: currentProfile.id,
+      date: date,
+      day_of_week: getDayOfWeekNumber(date), // ✅ FIX UTAMA
+      status: "available",
+    }));
+
+    const { error: insErr } = await db
+      .from("doctor_availability")
+      .insert(availabilityData);
+
+    if (insErr) throw insErr;
+
+    alert("Tarikh available berjaya disimpan!");
+    closeAvailabilityCalendar();
+  } catch (error) {
+    console.error("Error saving availability", error);
+    alert("Gagal menyimpan tarikh available. Sila cuba lagi.");
+  }
+}
+
 
     // ==============================
     // FEATURE TABLE TERAPUNG STAFF
