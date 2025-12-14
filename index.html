@@ -2898,86 +2898,70 @@
     // ==============================
     // REAL-TIME SUBSCRIPTION
     // ==============================
-    function setupRealtimeSubscription() {
-      if (realtimeSubscription) {
-        db.removeSubscription(realtimeSubscription);
-      }
-
-      realtimeSubscription = db
-        .channel('appointments-channel')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'appointments'
-          },
-          async (payload) => {
-            console.log('Realtime update received:', payload);
-            
-            if (currentProfile) {
-              if (currentProfile.role === 'staff') {
-                await refreshStaffAppointmentsList();
-                await refreshTodayActions();
-              } else if (currentProfile.role === 'doctor') {
-                await refreshDoctorAppointmentsList();
-              }
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'appointment_fields'
-          },
-          async (payload) => {
-            console.log('Custom fields update received:', payload);
-            await loadCustomFields();
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'services'
-          },
-          async (payload) => {
-            console.log('Services update received:', payload);
-            await loadServices();
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'doctor_availability'
-          },
-          async (payload) => {
-            console.log('Availability update received:', payload);
-            if (currentSelectedDoctorId) {
-              await loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
-            }
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'doctor_schedules'
-          },
-          async (payload) => {
-            console.log('Doctor schedule update received:', payload);
-            await loadDoctorSchedules();
-          }
-        )
-        .subscribe();
+   function setupRealtimeSubscription() {
+  try {
+    if (realtimeSubscription) {
+      db.removeChannel(realtimeSubscription);
+      realtimeSubscription = null;
     }
+  } catch (e) {
+    console.warn("removeChannel failed (safe to ignore):", e);
+  }
 
+  realtimeSubscription = db
+    .channel("appointments-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "appointments" },
+      async (payload) => {
+        console.log("Realtime appointments:", payload);
+
+        if (!currentProfile) return;
+
+        if (currentProfile.role === "staff") {
+          await refreshStaffAppointmentsList();
+          await refreshTodayActions();
+        } else if (currentProfile.role === "doctor") {
+          await refreshDoctorAppointmentsList();
+        }
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "appointment_fields" },
+      async () => {
+        console.log("Realtime fields update");
+        await loadCustomFields();
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "services" },
+      async () => {
+        console.log("Realtime services update");
+        await loadServices();
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "doctor_availability" },
+      async () => {
+        console.log("Realtime availability update");
+        if (currentSelectedDoctorId) {
+          await loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
+        }
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "doctor_schedules" },
+      async () => {
+        console.log("Realtime schedules update");
+        await loadDoctorSchedules();
+      }
+    )
+    .subscribe();
+}
     // ==============================
     // AUTH & PROFILE
     // ==============================
