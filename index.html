@@ -101,6 +101,209 @@
       transform: translateY(-2px);
       box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.4), 0 10px 10px -5px rgba(5, 150, 105, 0.1);
     }
+    
+    /* STYLE UNTUK FULLSCREEN CALENDAR */
+    #availabilityCalendarModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+    }
+    
+    .calendar-header {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      font-size: 14px;
+    }
+    
+    .calendar-day:hover:not(.disabled):not(.holiday) {
+      background-color: #f0fdf4;
+      transform: scale(1.05);
+    }
+    
+    .calendar-day.selected {
+      background-color: #10b981;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .calendar-day.disabled {
+      color: #cbd5e1;
+      cursor: not-allowed;
+      background-color: #f8fafc;
+    }
+    
+    .calendar-day.holiday {
+      background-color: #fee2e2;
+      color: #dc2626;
+      cursor: not-allowed;
+      position: relative;
+    }
+    
+    .calendar-day.holiday::after {
+      content: attr(data-holiday);
+      position: absolute;
+      bottom: 2px;
+      font-size: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      text-align: center;
+      padding: 0 2px;
+    }
+    
+    .calendar-day-header {
+      text-align: center;
+      padding: 10px 0;
+      font-weight: 600;
+      color: #64748b;
+      background: #f8fafc;
+    }
+    
+    /* STYLE UNTUK TABLE TERAPUNG */
+    #availabilityTableContainer {
+      position: absolute;
+      z-index: 1000;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 5px;
+      min-width: 300px;
+      display: none;
+    }
+    
+    .availability-table-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .availability-tab-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .availability-tab-btn.active {
+      background: #10b981;
+      color: white;
+    }
+    
+    .availability-date-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .availability-date-item:hover {
+      background: #f8fafc;
+    }
+    
+    .availability-date-item:last-child {
+      border-bottom: none;
+    }
+    
+    .availability-mini-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      padding: 12px;
+    }
+    
+    .availability-mini-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .availability-mini-day.available {
+      background-color: #d1fae5;
+      color: #065f46;
+      font-weight: 600;
+    }
+    
+    .availability-mini-day.today {
+      border: 2px solid #10b981;
+    }
+    
+    .availability-mini-day.selected {
+      background-color: #10b981;
+      color: white;
+    }
+    
+    .close-availability-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    /* Cuti indicator */
+    .holiday-indicator {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 6px;
+      height: 6px;
+      background-color: #dc2626;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body class="text-slate-900">
@@ -319,9 +522,8 @@
           </div>
         </section>
 
-        <!-- STAFF PANEL (TIDAK BERUBAH) -->
+        <!-- STAFF PANEL (TAMBAH TABLE TERAPUNG) -->
         <section id="tab-staff" class="tab-hidden">
-          <!-- ... (kandungan staff panel tidak berubah) ... -->
           <div class="space-y-6">
             <!-- Tindakan Hari Ini -->
             <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 md:p-8">
@@ -375,12 +577,28 @@
                         <option value="">Pilih servis...</option>
                       </select>
                     </div>
-                    <div>
+                    <div class="relative">
                       <label class="block text-sm md:text-base mb-2 text-slate-700">Doktor</label>
                       <select id="doctorSelect"
                               class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
+                      <!-- TABLE TERAPUNG AKAN MUNCUL DI BAWAH -->
+                      <div id="availabilityTableContainer">
+                        <div class="availability-table-header">
+                          <div>
+                            <span class="font-semibold text-slate-700">Tarikh Available</span>
+                            <span class="text-xs text-slate-500 ml-2">Doktor: <span id="tableDoctorName">-</span></span>
+                          </div>
+                          <div class="flex gap-1">
+                            <button type="button" class="availability-tab-btn active" data-view="list">Senarai</button>
+                            <button type="button" class="availability-tab-btn" data-view="calendar">Kalendar</button>
+                          </div>
+                        </div>
+                        <div id="availabilityTableView" class="p-0">
+                          <!-- Content akan diisi oleh JavaScript -->
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -493,7 +711,7 @@
                         <option value="">Pilih servis...</option>
                       </select>
                     </div>
-                    <div>
+                    <div class="relative">
                       <label class="block text-sm mb-2 text-slate-700">Doktor</label>
                       <select id="doctorSelectMobile"
                               class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
@@ -600,7 +818,6 @@
 
         <!-- EXPORT PANEL (TIDAK BERUBAH) -->
         <section id="tab-export" class="tab-hidden">
-          <!-- ... (kandungan export panel tidak berubah) ... -->
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div>
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Export Data Temujanji ke Excel</h2>
@@ -693,13 +910,17 @@
           </div>
         </section>
 
-        <!-- DOCTOR PANEL (TIDAK BERUBAH) -->
+        <!-- DOCTOR PANEL (TAMBAH TOMBOL AVAILABILITY) -->
         <section id="tab-doctor" class="tab-hidden">
-          <!-- ... (kandungan doctor panel tidak berubah) ... -->
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Panel Doktor</h2>
               <div class="flex flex-wrap items-center gap-3">
+                <button id="availabilityBtn"
+                        class="inline-flex items-center gap-2 text-sm md:text-base px-4 py-2 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition">
+                  <span>📅</span>
+                  Masukkan Tarikh Available
+                </button>
                 <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
                   <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                           data-tab="pending">
@@ -733,7 +954,6 @@
 
         <!-- SETTINGS PANEL (TIDAK BERUBAH) -->
         <section id="tab-settings" class="tab-hidden">
-          <!-- ... (kandungan settings panel tidak berubah) ... -->
           <div class="grid lg:grid-cols-2 gap-8 text-sm md:text-base">
             <!-- Services -->
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
@@ -840,6 +1060,28 @@
     </div>
   </div>
 
+  <!-- FULLSCREEN CALENDAR MODAL -->
+  <div id="availabilityCalendarModal">
+    <div class="calendar-header">
+      <button id="backFromCalendar" class="flex items-center gap-2 text-white hover:text-emerald-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Kembali
+      </button>
+      <h2 class="text-xl md:text-2xl font-bold">Pilih Tarikh Available</h2>
+      <button id="saveAvailability" class="hidden items-center gap-2 bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold">
+        💾 Save
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-auto">
+      <div id="calendarContainer" class="p-4">
+        <!-- Calendar akan diisi oleh JavaScript -->
+      </div>
+    </div>
+  </div>
+
   <script>
     // ==============================
     // KONFIGURASI SUPABASE & APP
@@ -863,6 +1105,15 @@
     let activeStaffFilter = "pending";
     let activeDoctorTab = "pending";
     let realtimeSubscription = null;
+    
+    // State untuk availability
+    let selectedDates = new Set();
+    let currentAvailabilityView = 'list';
+    let currentSelectedDoctorId = null;
+
+    // State untuk kalendar doktor
+    let currentCalendarMonth = new Date().getMonth();
+    let currentCalendarYear = new Date().getFullYear();
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -944,6 +1195,7 @@
     const exportLoading = document.getElementById("exportLoading");
 
     // Doctor panel
+    const availabilityBtn = document.getElementById("availabilityBtn");
     const doctorAppointmentsList = document.getElementById("doctorAppointmentsList");
     const refreshDoctorAppointments = document.getElementById("refreshDoctorAppointments");
     const doctorTabButtons = document.querySelectorAll(".doctor-tab-btn");
@@ -965,6 +1217,108 @@
     const fieldRequired = document.getElementById("fieldRequired");
     const fieldMessage = document.getElementById("fieldMessage");
     const fieldList = document.getElementById("fieldList");
+
+    // Availability elements
+    const availabilityCalendarModal = document.getElementById("availabilityCalendarModal");
+    const backFromCalendar = document.getElementById("backFromCalendar");
+    const saveAvailability = document.getElementById("saveAvailability");
+    const calendarContainer = document.getElementById("calendarContainer");
+    const availabilityTableContainer = document.getElementById("availabilityTableContainer");
+    const availabilityTableView = document.getElementById("availabilityTableView");
+    const tableDoctorName = document.getElementById("tableDoctorName");
+
+    // ==============================
+    // CUTI UMUM MALAYSIA - DINAMIK UNTUK TAHUN SEMASA
+    // ==============================
+    function getMalaysiaHolidays(year) {
+      // Cuti umum tetap Malaysia (tanpa negeri tertentu)
+      const holidays = [
+        // Cuti Nasional
+        { date: `${year}-01-01`, name: 'Tahun Baru' },
+        { date: `${year}-05-01`, name: 'Hari Pekerja' },
+        { date: `${year}-06-03`, name: 'Hari Keputeraan DYMM Yang di-Pertuan Agong' },
+        { date: `${year}-08-31`, name: 'Hari Kebangsaan' },
+        { date: `${year}-09-16`, name: 'Hari Malaysia' },
+        { date: `${year}-12-25`, name: 'Hari Krismas' },
+      ];
+      
+      // Cuti bergerak - dikira berdasarkan tahun
+      // Tahun Baru Cina (biasanya Jan/Feb)
+      const chineseNewYear1 = getChineseNewYearDate(year);
+      const chineseNewYear2 = new Date(chineseNewYear1);
+      chineseNewYear2.setDate(chineseNewYear2.getDate() + 1);
+      
+      holidays.push(
+        { date: chineseNewYear1.toISOString().split('T')[0], name: 'Tahun Baru Cina' },
+        { date: chineseNewYear2.toISOString().split('T')[0], name: 'Tahun Baru Cina (Hari 2)' }
+      );
+      
+      // Hari Raya Aidilfitri (bergantung kepada kalendar Islam)
+      const aidilfitri1 = getIslamicHolidayDate(year, 'aidilfitri', 1);
+      const aidilfitri2 = getIslamicHolidayDate(year, 'aidilfitri', 2);
+      
+      if (aidilfitri1) holidays.push({ date: aidilfitri1, name: 'Hari Raya Aidilfitri' });
+      if (aidilfitri2) holidays.push({ date: aidilfitri2, name: 'Hari Raya Aidilfitri (Hari 2)' });
+      
+      // Hari Wesak (bergantung kepada kalendar lunar)
+      const wesakDate = getWesakDate(year);
+      if (wesakDate) holidays.push({ date: wesakDate, name: 'Hari Wesak' });
+      
+      // Hari Raya Haji
+      const hajiDate = getIslamicHolidayDate(year, 'haji', 1);
+      if (hajiDate) holidays.push({ date: hajiDate, name: 'Hari Raya Haji' });
+      
+      // Deepavali
+      const deepavaliDate = getDeepavaliDate(year);
+      if (deepavaliDate) holidays.push({ date: deepavaliDate, name: 'Deepavali' });
+      
+      // Cuti Negeri Terengganu
+      const terengganuHolidays = getTerengganuHolidays(year);
+      holidays.push(...terengganuHolidays);
+      
+      return holidays;
+    }
+    
+    // Fungsi helper untuk cuti bergerak
+    function getChineseNewYearDate(year) {
+      // Contoh: Tahun Baru Cina biasanya antara 21 Jan - 20 Feb
+      // Ini adalah approximation sahaja
+      const baseDate = new Date(year, 0, 21); // 21 Januari
+      const dayOfWeek = baseDate.getDay();
+      // Adjust untuk jatuh pada hari tertentu jika perlu
+      return baseDate;
+    }
+    
+    function getIslamicHolidayDate(year, holiday, day = 1) {
+      // Ini adalah approximation untuk tujuan demo
+      // Dalam aplikasi sebenar, gunakan library kalendar Islam
+      if (holiday === 'aidilfitri') {
+        // Contoh: Aidilfitri biasanya sekitar April/Mei
+        return `${year}-04-${10 + day}`;
+      } else if (holiday === 'haji') {
+        // Contoh: Hari Raya Haji biasanya sekitar Jun/Julai
+        return `${year}-06-${17 + day}`;
+      }
+      return null;
+    }
+    
+    function getWesakDate(year) {
+      // Wesak biasanya pada bulan Mei
+      return `${year}-05-22`;
+    }
+    
+    function getDeepavaliDate(year) {
+      // Deepavali biasanya Oktober/November
+      return `${year}-10-31`;
+    }
+    
+    // Cuti Negeri Terengganu
+    function getTerengganuHolidays(year) {
+      return [
+        { date: `${year}-03-04`, name: 'Hari Ulang Tahun Keputeraan Sultan Terengganu' },
+        { date: `${year}-07-20`, name: 'Hari Keputeraan Sultan Terengganu' },
+      ];
+    }
 
     // ==============================
     // UTILITI UI
@@ -1047,6 +1401,433 @@
     }
 
     // ==============================
+    // FEATURE AVAILABILITY DOKTOR (DINAMIK)
+    // ==============================
+    function openAvailabilityCalendar() {
+      if (!currentProfile || currentProfile.role !== 'doctor') return;
+      
+      selectedDates.clear();
+      availabilityCalendarModal.style.display = 'flex';
+      saveAvailability.classList.add('hidden');
+      
+      // Set bulan dan tahun semasa
+      currentCalendarMonth = new Date().getMonth();
+      currentCalendarYear = new Date().getFullYear();
+      
+      renderCalendar();
+      loadDoctorAvailability();
+    }
+
+    function closeAvailabilityCalendar() {
+      availabilityCalendarModal.style.display = 'none';
+      selectedDates.clear();
+    }
+
+    async function loadDoctorAvailability() {
+      if (!currentProfile) return;
+      
+      const { data, error } = await db
+        .from('doctor_availability')
+        .select('date')
+        .eq('doctor_id', currentProfile.id)
+        .gte('date', new Date().toISOString().split('T')[0]);
+      
+      if (error) {
+        console.error('Error loading availability', error);
+        return;
+      }
+      
+      if (data) {
+        data.forEach(item => {
+          selectedDates.add(item.date);
+        });
+        renderCalendar();
+        
+        // Show save button if there are selected dates
+        if (selectedDates.size > 0) {
+          saveAvailability.classList.remove('hidden');
+        }
+      }
+    }
+
+    function renderCalendar() {
+      const monthNames = [
+        'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
+        'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
+      ];
+      
+      const dayNames = ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'];
+      
+      calendarContainer.innerHTML = '';
+      
+      // Navigation header dengan tahun
+      const navHeader = document.createElement('div');
+      navHeader.className = 'flex justify-between items-center mb-4 px-4';
+      navHeader.innerHTML = `
+        <button id="prevMonth" class="p-2 rounded-lg hover:bg-slate-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div class="text-center">
+          <h3 class="text-lg font-semibold text-slate-800">${monthNames[currentCalendarMonth]} ${currentCalendarYear}</h3>
+          <div class="text-sm text-slate-500">Klik pada tarikh untuk pilih/buang</div>
+          <div class="text-xs text-rose-500 mt-1">🟥 = Cuti Umum Malaysia/Terengganu</div>
+        </div>
+        <button id="nextMonth" class="p-2 rounded-lg hover:bg-slate-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      `;
+      calendarContainer.appendChild(navHeader);
+      
+      // Dapatkan cuti untuk tahun semasa
+      const holidays = getMalaysiaHolidays(currentCalendarYear);
+      
+      // Calendar grid
+      const calendarGrid = document.createElement('div');
+      calendarGrid.className = 'calendar-grid';
+      
+      // Day headers
+      dayNames.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+      });
+      
+      // Get first day of month
+      const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
+      const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
+      const today = new Date();
+      
+      // Empty cells for days before first day of month
+      for (let i = 0; i < firstDay.getDay(); i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-day disabled';
+        emptyCell.textContent = '';
+        calendarGrid.appendChild(emptyCell);
+      }
+      
+      // Days of month
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(currentCalendarYear, currentCalendarMonth, day);
+        const dateStr = date.toISOString().split('T')[0];
+        const dateObj = new Date(dateStr);
+        
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = day;
+        
+        // Check if today
+        if (dateObj.toDateString() === today.toDateString()) {
+          dayElement.classList.add('border-2', 'border-emerald-500', 'font-bold');
+          dayElement.title = 'Hari ini';
+        }
+        
+        // Check if holiday
+        const holiday = holidays.find(h => h.date === dateStr);
+        if (holiday) {
+          dayElement.classList.add('holiday');
+          dayElement.dataset.holiday = holiday.name;
+          dayElement.title = holiday.name;
+          
+          // Add red indicator
+          const holidayIndicator = document.createElement('div');
+          holidayIndicator.className = 'holiday-indicator';
+          dayElement.appendChild(holidayIndicator);
+          
+          // Check if selected despite being holiday
+          if (selectedDates.has(dateStr)) {
+            dayElement.classList.add('selected');
+          }
+        }
+        
+        // Check if past date
+        if (dateObj < today && dateObj.toDateString() !== today.toDateString()) {
+          dayElement.classList.add('disabled');
+        }
+        
+        // Check if selected
+        if (selectedDates.has(dateStr)) {
+          dayElement.classList.add('selected');
+          dayElement.title = holiday ? `${holiday.name} - Dipilih` : 'Tarikh dipilih';
+        } else if (holiday) {
+          dayElement.title = holiday.name;
+        } else if (dateObj.toDateString() === today.toDateString()) {
+          dayElement.title = 'Hari ini';
+        }
+        
+        // Add click event only if not holiday and not past date
+        if (!holiday && dateObj >= today) {
+          dayElement.addEventListener('click', () => {
+            toggleDateSelection(dateStr, dayElement);
+          });
+        } else if (holiday) {
+          dayElement.style.cursor = 'not-allowed';
+        }
+        
+        calendarGrid.appendChild(dayElement);
+      }
+      
+      calendarContainer.appendChild(calendarGrid);
+      
+      // Add event listeners for month navigation
+      document.getElementById('prevMonth')?.addEventListener('click', () => {
+        if (currentCalendarMonth === 0) {
+          currentCalendarMonth = 11;
+          currentCalendarYear--;
+        } else {
+          currentCalendarMonth--;
+        }
+        renderCalendar();
+      });
+      
+      document.getElementById('nextMonth')?.addEventListener('click', () => {
+        if (currentCalendarMonth === 11) {
+          currentCalendarMonth = 0;
+          currentCalendarYear++;
+        } else {
+          currentCalendarMonth++;
+        }
+        renderCalendar();
+      });
+    }
+
+    function toggleDateSelection(dateStr, element) {
+      if (selectedDates.has(dateStr)) {
+        selectedDates.delete(dateStr);
+        element.classList.remove('selected');
+      } else {
+        selectedDates.add(dateStr);
+        element.classList.add('selected');
+      }
+      
+      // Show/hide save button
+      if (selectedDates.size > 0) {
+        saveAvailability.classList.remove('hidden');
+      } else {
+        saveAvailability.classList.add('hidden');
+      }
+    }
+
+    async function saveAvailabilityDates() {
+      if (!currentProfile || selectedDates.size === 0) return;
+      
+      try {
+        // Delete existing availability for this doctor
+        await db
+          .from('doctor_availability')
+          .delete()
+          .eq('doctor_id', currentProfile.id);
+        
+        // Insert new availability dates
+        const availabilityData = Array.from(selectedDates).map(date => ({
+          doctor_id: currentProfile.id,
+          date: date,
+          status: 'available'
+        }));
+        
+        const { error } = await db
+          .from('doctor_availability')
+          .insert(availabilityData);
+        
+        if (error) throw error;
+        
+        alert('Tarikh available berjaya disimpan!');
+        closeAvailabilityCalendar();
+      } catch (error) {
+        console.error('Error saving availability', error);
+        alert('Gagal menyimpan tarikh available. Sila cuba lagi.');
+      }
+    }
+
+    // ==============================
+    // FEATURE TABLE TERAPUNG STAFF
+    // ==============================
+    function showAvailabilityTable(doctorId, doctorName) {
+      if (!doctorId) return;
+      
+      currentSelectedDoctorId = doctorId;
+      tableDoctorName.textContent = doctorName;
+      
+      // Position the table
+      const doctorSelectRect = doctorSelect.getBoundingClientRect();
+      availabilityTableContainer.style.top = `${doctorSelectRect.bottom + window.scrollY}px`;
+      availabilityTableContainer.style.left = `${doctorSelectRect.left + window.scrollX}px`;
+      availabilityTableContainer.style.width = `${doctorSelectRect.width}px`;
+      
+      availabilityTableContainer.style.display = 'block';
+      loadDoctorAvailabilityForStaff(doctorId);
+    }
+
+    function hideAvailabilityTable() {
+      availabilityTableContainer.style.display = 'none';
+    }
+
+    async function loadDoctorAvailabilityForStaff(doctorId) {
+      if (!doctorId) return;
+      
+      const { data, error } = await db
+        .from('doctor_availability')
+        .select('date')
+        .eq('doctor_id', doctorId)
+        .gte('date', new Date().toISOString().split('T')[0])
+        .order('date', { ascending: true });
+      
+      if (error) {
+        console.error('Error loading availability for staff', error);
+        availabilityTableView.innerHTML = '<p class="p-4 text-slate-500">Gagal memuatkan tarikh available.</p>';
+        return;
+      }
+      
+      renderAvailabilityView(data || []);
+    }
+
+    function renderAvailabilityView(availabilityData) {
+      if (currentAvailabilityView === 'list') {
+        renderAvailabilityList(availabilityData);
+      } else {
+        renderAvailabilityCalendar(availabilityData);
+      }
+    }
+
+    function renderAvailabilityList(availabilityData) {
+      if (!availabilityData.length) {
+        availabilityTableView.innerHTML = `
+          <div class="p-4 text-center text-slate-500">
+            Doktor belum memasukkan tarikh available.
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '<div class="divide-y divide-slate-100">';
+      
+      availabilityData.forEach(item => {
+        const date = new Date(item.date);
+        const dateStr = date.toLocaleDateString('ms-MY', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        html += `
+          <div class="availability-date-item">
+            <div>
+              <div class="font-medium text-slate-800">${dateStr}</div>
+              <div class="text-xs text-slate-500">${formatDate(item.date)}</div>
+            </div>
+            <button class="select-date-btn px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm rounded-lg transition-colors"
+                    data-date="${item.date}">
+              Pilih
+            </button>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      availabilityTableView.innerHTML = html;
+      
+      // Add event listeners to select buttons
+      availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const date = btn.dataset.date;
+          requestedDate.value = date;
+          hideAvailabilityTable();
+        });
+      });
+    }
+
+    function renderAvailabilityCalendar(availabilityData) {
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      // Get available dates for this month
+      const availableDates = availabilityData
+        .filter(item => {
+          const date = new Date(item.date);
+          return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+        })
+        .map(item => new Date(item.date).getDate());
+      
+      let html = '<div class="availability-mini-calendar">';
+      
+      // Day headers
+      const days = ['A', 'I', 'S', 'R', 'K', 'J', 'S'];
+      days.forEach(day => {
+        html += `<div class="availability-mini-day text-xs text-slate-500">${day}</div>`;
+      });
+      
+      // Get first day of month
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      
+      // Empty cells
+      for (let i = 0; i < firstDay; i++) {
+        html += '<div class="availability-mini-day"></div>';
+      }
+      
+      // Days of month
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const isToday = day === today.getDate() && currentMonth === today.getMonth();
+        const isAvailable = availableDates.includes(day);
+        
+        let dayClass = 'availability-mini-day';
+        if (isToday) dayClass += ' today';
+        if (isAvailable) dayClass += ' available';
+        
+        html += `<div class="${dayClass}">${day}</div>';
+      }
+      
+      html += '</div>';
+      
+      // Add available dates list below calendar
+      html += '<div class="mt-4 p-4 border-t border-slate-100">';
+      html += '<p class="text-sm font-medium text-slate-700 mb-2">Tarikh Available Bulan Ini:</p>';
+      
+      if (availableDates.length > 0) {
+        html += '<div class="space-y-2">';
+        availabilityData.forEach(item => {
+          const date = new Date(item.date);
+          if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+            const dateStr = date.toLocaleDateString('ms-MY', {
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short'
+            });
+            html += `
+              <button class="w-full text-left p-2 text-sm text-slate-600 hover:bg-slate-50 rounded-lg select-date-btn"
+                      data-date="${item.date}">
+                📅 ${dateStr}
+              </button>
+            `;
+          }
+        });
+        html += '</div>';
+      } else {
+        html += '<p class="text-sm text-slate-500">Tiada tarikh available untuk bulan ini.</p>';
+      }
+      
+      html += '</div>';
+      
+      availabilityTableView.innerHTML = html;
+      
+      // Add event listeners to select buttons
+      availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const date = btn.dataset.date;
+          requestedDate.value = date;
+          hideAvailabilityTable();
+        });
+      });
+    }
+
+    // ==============================
     // REAL-TIME SUBSCRIPTION
     // ==============================
     function setupRealtimeSubscription() {
@@ -1101,6 +1882,21 @@
           async (payload) => {
             console.log('Services update received:', payload);
             await loadServices();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'doctor_availability'
+          },
+          async (payload) => {
+            console.log('Availability update received:', payload);
+            // Refresh availability table jika doktor dipilih
+            if (currentSelectedDoctorId) {
+              await loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
+            }
           }
         )
         .subscribe();
@@ -1422,6 +2218,18 @@
           opt.textContent = d.full_name;
           doctorSelect.appendChild(opt);
         });
+        
+        // Add event listener untuk show availability table
+        doctorSelect.addEventListener('change', (e) => {
+          const doctorId = e.target.value;
+          const doctorName = doctorsCache.find(d => d.id === doctorId)?.full_name || '';
+          
+          if (doctorId) {
+            showAvailabilityTable(doctorId, doctorName);
+          } else {
+            hideAvailabilityTable();
+          }
+        });
       }
 
       // dropdown doctor (staff mobile)
@@ -1534,6 +2342,8 @@
         const selected = servicesCache.find(s => s.id === serviceSelect.value);
         if (selected && selected.default_doctor_id && doctorSelect) {
           doctorSelect.value = selected.default_doctor_id;
+          // Trigger change event untuk show availability table
+          doctorSelect.dispatchEvent(new Event('change'));
         }
         renderCustomFieldsForm();
       });
@@ -1938,6 +2748,9 @@
       return data.whatsapp_phone;
     }
 
+    // ==============================
+    // STAFF TO DOCTOR WHATSAPP DENGAN LINK SISTEM
+    // ==============================
     function buildStaffWhatsappLink(appointment) {
       if (!appointment || !staffWhatsappLink || !staffWhatsappBox) return;
       const serviceName =
@@ -2955,7 +3768,7 @@
               return;
             }
             
-            // Generate WhatsApp message dengan link sistem
+            // WhatsApp ke staff TANPA LINK SISTEM
             const clinicPhone = await fetchClinicWhatsapp();
             const msg = [
               "Assalamualaikum / Salam sejahtera,",
@@ -2966,7 +3779,7 @@
               `Complaint: ${a.complaint || "Tiada complaint dinyatakan"}`,
               `Tarikh temujanji: ${formatDate(date)}`,
               "",
-              `Link sistem: ${APP_URL}`
+              "Sila maklumkan kepada pesakit."
             ].join("\n");
             
             const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
@@ -3035,7 +3848,7 @@
               return;
             }
             
-            // Generate WhatsApp message dengan link sistem
+            // WhatsApp ke staff TANPA LINK SISTEM
             const clinicPhone = await fetchClinicWhatsapp();
             const msg = [
               "Assalamualaikum / Salam sejahtera,",
@@ -3049,7 +3862,7 @@
               "Cadangan tarikh baharu:",
               ...dates.map((date, idx) => `${idx + 1}) ${formatDate(date)}`),
               "",
-              `Link sistem: ${APP_URL}`
+              "Sila hubungi pesakit untuk maklumat lanjut."
             ].join("\n");
             
             const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
@@ -3109,6 +3922,42 @@
     });
 
     // ==============================
+    // EVENT LISTENERS UNTUK FEATURE BARU
+    // ==============================
+    
+    // Availability calendar untuk doktor
+    availabilityBtn?.addEventListener('click', openAvailabilityCalendar);
+    backFromCalendar?.addEventListener('click', closeAvailabilityCalendar);
+    saveAvailability?.addEventListener('click', saveAvailabilityDates);
+    
+    // Availability table untuk staff
+    document.querySelectorAll('.availability-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update active tab
+        document.querySelectorAll('.availability-tab-btn').forEach(b => {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+        
+        currentAvailabilityView = btn.dataset.view;
+        
+        // Reload availability data dengan view baru
+        if (currentSelectedDoctorId) {
+          loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
+        }
+      });
+    });
+    
+    // Close availability table ketika klik di luar
+    document.addEventListener('click', (e) => {
+      if (!availabilityTableContainer.contains(e.target) && 
+          e.target !== doctorSelect && 
+          !doctorSelect.contains(e.target)) {
+        hideAvailabilityTable();
+      }
+    });
+
+    // ==============================
     // INIT
     // ==============================
     document.addEventListener("DOMContentLoaded", () => {
@@ -3129,4 +3978,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
