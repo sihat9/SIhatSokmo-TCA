@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistem Appointment Klinik SihatSokmo</title>
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind CSS via CDN (production warning removed) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Supabase JS v2 -->
@@ -1234,12 +1234,12 @@
       // Cuti umum tetap Malaysia (tanpa negeri tertentu)
       const holidays = [
         // Cuti Nasional
-        { date: `${year}-01-01`, name: 'Tahun Baru' },
-        { date: `${year}-05-01`, name: 'Hari Pekerja' },
-        { date: `${year}-06-03`, name: 'Hari Keputeraan DYMM Yang di-Pertuan Agong' },
-        { date: `${year}-08-31`, name: 'Hari Kebangsaan' },
-        { date: `${year}-09-16`, name: 'Hari Malaysia' },
-        { date: `${year}-12-25`, name: 'Hari Krismas' },
+        { date: year + "-01-01", name: 'Tahun Baru' },
+        { date: year + "-05-01", name: 'Hari Pekerja' },
+        { date: year + "-06-03", name: 'Hari Keputeraan DYMM Yang di-Pertuan Agong' },
+        { date: year + "-08-31", name: 'Hari Kebangsaan' },
+        { date: year + "-09-16", name: 'Hari Malaysia' },
+        { date: year + "-12-25", name: 'Hari Krismas' },
       ];
       
       // Cuti bergerak - dikira berdasarkan tahun
@@ -1289,34 +1289,34 @@
       return baseDate;
     }
     
-    function getIslamicHolidayDate(year, holiday, day = 1) {
+    function getIslamicHolidayDate(year, holiday, day) {
       // Ini adalah approximation untuk tujuan demo
       // Dalam aplikasi sebenar, gunakan library kalendar Islam
       if (holiday === 'aidilfitri') {
         // Contoh: Aidilfitri biasanya sekitar April/Mei
-        return `${year}-04-${10 + day}`;
+        return year + "-04-" + (10 + day).toString().padStart(2, '0');
       } else if (holiday === 'haji') {
         // Contoh: Hari Raya Haji biasanya sekitar Jun/Julai
-        return `${year}-06-${17 + day}`;
+        return year + "-06-" + (17 + day).toString().padStart(2, '0');
       }
       return null;
     }
     
     function getWesakDate(year) {
       // Wesak biasanya pada bulan Mei
-      return `${year}-05-22`;
+      return year + "-05-22";
     }
     
     function getDeepavaliDate(year) {
       // Deepavali biasanya Oktober/November
-      return `${year}-10-31`;
+      return year + "-10-31";
     }
     
     // Cuti Negeri Terengganu
     function getTerengganuHolidays(year) {
       return [
-        { date: `${year}-03-04`, name: 'Hari Ulang Tahun Keputeraan Sultan Terengganu' },
-        { date: `${year}-07-20`, name: 'Hari Keputeraan Sultan Terengganu' },
+        { date: year + "-03-04", name: 'Hari Ulang Tahun Keputeraan Sultan Terengganu' },
+        { date: year + "-07-20", name: 'Hari Keputeraan Sultan Terengganu' },
       ];
     }
 
@@ -1342,12 +1342,17 @@
       });
     }
 
-    function showMessage(el, text, isError = false) {
+    function showMessage(el, text, isError) {
       if (!el) return;
       el.textContent = text;
       el.classList.remove("hidden");
-      el.classList.toggle("text-rose-500", isError);
-      el.classList.toggle("text-emerald-700", !isError);
+      if (isError) {
+        el.classList.add("text-rose-500");
+        el.classList.remove("text-emerald-700");
+      } else {
+        el.classList.remove("text-rose-500");
+        el.classList.add("text-emerald-700");
+      }
       if (!text) el.classList.add("hidden");
     }
 
@@ -1382,7 +1387,7 @@
     function buildWhatsAppLink(phone, message) {
       const cleanPhone = (phone || "").replace(/[^0-9]/g, "");
       const encoded = encodeURIComponent(message || "");
-      return `https://wa.me/${cleanPhone}?text=${encoded}`;
+      return "https://wa.me/" + cleanPhone + "?text=" + encoded;
     }
 
     function getServiceColor(serviceId) {
@@ -1552,7 +1557,11 @@
         // Check if selected
         if (selectedDates.has(dateStr)) {
           dayElement.classList.add('selected');
-          dayElement.title = holiday ? `${holiday.name} - Dipilih` : 'Tarikh dipilih';
+          if (holiday) {
+            dayElement.title = holiday.name + ' - Dipilih';
+          } else {
+            dayElement.title = 'Tarikh dipilih';
+          }
         } else if (holiday) {
           dayElement.title = holiday.name;
         } else if (dateObj.toDateString() === today.toDateString()) {
@@ -1574,25 +1583,32 @@
       calendarContainer.appendChild(calendarGrid);
       
       // Add event listeners for month navigation
-      document.getElementById('prevMonth')?.addEventListener('click', () => {
-        if (currentCalendarMonth === 0) {
-          currentCalendarMonth = 11;
-          currentCalendarYear--;
-        } else {
-          currentCalendarMonth--;
-        }
-        renderCalendar();
-      });
+      const prevMonthBtn = document.getElementById('prevMonth');
+      const nextMonthBtn = document.getElementById('nextMonth');
       
-      document.getElementById('nextMonth')?.addEventListener('click', () => {
-        if (currentCalendarMonth === 11) {
-          currentCalendarMonth = 0;
-          currentCalendarYear++;
-        } else {
-          currentCalendarMonth++;
-        }
-        renderCalendar();
-      });
+      if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+          if (currentCalendarMonth === 0) {
+            currentCalendarMonth = 11;
+            currentCalendarYear--;
+          } else {
+            currentCalendarMonth--;
+          }
+          renderCalendar();
+        });
+      }
+      
+      if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+          if (currentCalendarMonth === 11) {
+            currentCalendarMonth = 0;
+            currentCalendarYear++;
+          } else {
+            currentCalendarMonth++;
+          }
+          renderCalendar();
+        });
+      }
     }
 
     function toggleDateSelection(dateStr, element) {
@@ -1654,9 +1670,9 @@
       
       // Position the table
       const doctorSelectRect = doctorSelect.getBoundingClientRect();
-      availabilityTableContainer.style.top = `${doctorSelectRect.bottom + window.scrollY}px`;
-      availabilityTableContainer.style.left = `${doctorSelectRect.left + window.scrollX}px`;
-      availabilityTableContainer.style.width = `${doctorSelectRect.width}px`;
+      availabilityTableContainer.style.top = (doctorSelectRect.bottom + window.scrollY) + 'px';
+      availabilityTableContainer.style.left = (doctorSelectRect.left + window.scrollX) + 'px';
+      availabilityTableContainer.style.width = doctorSelectRect.width + 'px';
       
       availabilityTableContainer.style.display = 'block';
       loadDoctorAvailabilityForStaff(doctorId);
@@ -1781,7 +1797,7 @@
         if (isToday) dayClass += ' today';
         if (isAvailable) dayClass += ' available';
         
-        html += `<div class="${dayClass}">${day}</div>';
+        html += `<div class="${dayClass}">${day}</div>`;
       }
       
       html += '</div>';
@@ -2133,10 +2149,17 @@
 
       // Show tabs ikut role
       navTabs.classList.remove("hidden");
-      btnStaff.classList.toggle("hidden", profile.role !== "staff");
-      btnExport.classList.toggle("hidden", profile.role !== "staff");
-      btnSettings.classList.toggle("hidden", profile.role !== "staff");
-      btnDoctor.classList.toggle("hidden", profile.role !== "doctor");
+      if (profile.role === "staff") {
+        btnStaff.classList.remove("hidden");
+        btnExport.classList.remove("hidden");
+        btnSettings.classList.remove("hidden");
+        btnDoctor.classList.add("hidden");
+      } else if (profile.role === "doctor") {
+        btnStaff.classList.add("hidden");
+        btnExport.classList.add("hidden");
+        btnSettings.classList.add("hidden");
+        btnDoctor.classList.remove("hidden");
+      }
 
       await Promise.all([loadDoctors(), loadServices(), loadCustomFields()]);
 
@@ -2152,39 +2175,43 @@
       }
     }
 
-    loginForm?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      showMessage(loginError, "", false);
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value;
+    if (loginForm) {
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        showMessage(loginError, "", false);
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value;
 
-      const { data, error } = await db.auth.signInWithPassword({ email, password });
-      if (error) {
-        showMessage(loginError, error.message || "Gagal log masuk. Sila cuba lagi.", true);
-        return;
-      }
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
+        if (error) {
+          showMessage(loginError, error.message || "Gagal log masuk. Sila cuba lagi.", true);
+          return;
+        }
 
-      loginPassword.value = "";
-      await loadSession();
-    });
+        loginPassword.value = "";
+        await loadSession();
+      });
+    }
 
-    logoutBtn?.addEventListener("click", async () => {
-      await db.auth.signOut();
-      currentUser = null;
-      currentProfile = null;
-      staffAppointmentsList.innerHTML = "";
-      doctorAppointmentsList.innerHTML = "";
-      navTabs.classList.add("hidden");
-      userInfoEl.textContent = "Belum log masuk";
-      logoutBtn.classList.add("hidden");
-      setActiveTab("tab-login");
-      
-      // Hentikan real-time subscription
-      if (realtimeSubscription) {
-        db.removeSubscription(realtimeSubscription);
-        realtimeSubscription = null;
-      }
-    });
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        await db.auth.signOut();
+        currentUser = null;
+        currentProfile = null;
+        if (staffAppointmentsList) staffAppointmentsList.innerHTML = "";
+        if (doctorAppointmentsList) doctorAppointmentsList.innerHTML = "";
+        navTabs.classList.add("hidden");
+        userInfoEl.textContent = "Belum log masuk";
+        logoutBtn.classList.add("hidden");
+        setActiveTab("tab-login");
+        
+        // Hentikan real-time subscription
+        if (realtimeSubscription) {
+          db.removeSubscription(realtimeSubscription);
+          realtimeSubscription = null;
+        }
+      });
+    }
 
     tabButtons.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -2338,24 +2365,28 @@
       }
 
       // Bila servis bertukar, auto pilih default doctor & reload custom fields (desktop)
-      serviceSelect?.addEventListener("change", () => {
-        const selected = servicesCache.find(s => s.id === serviceSelect.value);
-        if (selected && selected.default_doctor_id && doctorSelect) {
-          doctorSelect.value = selected.default_doctor_id;
-          // Trigger change event untuk show availability table
-          doctorSelect.dispatchEvent(new Event('change'));
-        }
-        renderCustomFieldsForm();
-      });
+      if (serviceSelect) {
+        serviceSelect.addEventListener("change", () => {
+          const selected = servicesCache.find(s => s.id === serviceSelect.value);
+          if (selected && selected.default_doctor_id && doctorSelect) {
+            doctorSelect.value = selected.default_doctor_id;
+            // Trigger change event untuk show availability table
+            doctorSelect.dispatchEvent(new Event('change'));
+          }
+          renderCustomFieldsForm();
+        });
+      }
 
       // Bila servis bertukar, auto pilih default doctor & reload custom fields (mobile)
-      serviceSelectMobile?.addEventListener("change", () => {
-        const selected = servicesCache.find(s => s.id === serviceSelectMobile.value);
-        if (selected && selected.default_doctor_id && doctorSelectMobile) {
-          doctorSelectMobile.value = selected.default_doctor_id;
-        }
-        renderCustomFieldsFormMobile();
-      });
+      if (serviceSelectMobile) {
+        serviceSelectMobile.addEventListener("change", () => {
+          const selected = servicesCache.find(s => s.id === serviceSelectMobile.value);
+          if (selected && selected.default_doctor_id && doctorSelectMobile) {
+            doctorSelectMobile.value = selected.default_doctor_id;
+          }
+          renderCustomFieldsFormMobile();
+        });
+      }
     }
 
     async function loadCustomFields() {
@@ -2525,218 +2556,226 @@
     // ==============================
     // SETTINGS HANDLERS
     // ==============================
-    serviceForm?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentProfile || currentProfile.role !== "staff") return;
+    if (serviceForm) {
+      serviceForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!currentProfile || currentProfile.role !== "staff") return;
 
-      const payload = {
-        name: serviceName.value.trim(),
-        description: serviceDescription.value.trim() || null,
-        status: serviceStatus.value,
-        default_doctor_id: serviceDoctor.value || null
-      };
+        const payload = {
+          name: serviceName.value.trim(),
+          description: serviceDescription.value.trim() || null,
+          status: serviceStatus.value,
+          default_doctor_id: serviceDoctor.value || null
+        };
 
-      const { error } = await db.from("services").insert(payload);
-      if (error) {
-        console.error("Error insert service", error);
-        showMessage(serviceMessage, error.message || "Gagal simpan servis.", true);
-        return;
-      }
-      serviceForm.reset();
-      showMessage(serviceMessage, "Servis berjaya disimpan.", false);
-      await loadServices();
-    });
+        const { error } = await db.from("services").insert(payload);
+        if (error) {
+          console.error("Error insert service", error);
+          showMessage(serviceMessage, error.message || "Gagal simpan servis.", true);
+          return;
+        }
+        serviceForm.reset();
+        showMessage(serviceMessage, "Servis berjaya disimpan.", false);
+        await loadServices();
+      });
+    }
 
-    fieldForm?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!currentProfile || currentProfile.role !== "staff") return;
+    if (fieldForm) {
+      fieldForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!currentProfile || currentProfile.role !== "staff") return;
 
-      const label = fieldLabel.value.trim();
-      if (!label) return;
+        const label = fieldLabel.value.trim();
+        if (!label) return;
 
-      const fieldKey = label
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "_")
-        .replace(/^_+|_+$/g, "");
+        const fieldKey = label
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "");
 
-      const payload = {
-        label,
-        field_key: fieldKey,
-        input_type: fieldType.value,
-        is_required: fieldRequired.checked,
-        service_id: fieldService.value || null,
-        sort_order: customFieldsCache.length + 1
-      };
+        const payload = {
+          label,
+          field_key: fieldKey,
+          input_type: fieldType.value,
+          is_required: fieldRequired.checked,
+          service_id: fieldService.value || null,
+          sort_order: customFieldsCache.length + 1
+        };
 
-      const { error } = await db.from("appointment_fields").insert(payload);
-      if (error) {
-        console.error("Error insert field", error);
-        showMessage(fieldMessage, error.message || "Gagal tambah kolom.", true);
-        return;
-      }
+        const { error } = await db.from("appointment_fields").insert(payload);
+        if (error) {
+          console.error("Error insert field", error);
+          showMessage(fieldMessage, error.message || "Gagal tambah kolom.", true);
+          return;
+        }
 
-      fieldForm.reset();
-      showMessage(fieldMessage, "Kolom berjaya ditambah.", false);
-      await loadCustomFields();
-    });
+        fieldForm.reset();
+        showMessage(fieldMessage, "Kolom berjaya ditambah.", false);
+        await loadCustomFields();
+      });
+    }
 
     // ==============================
     // STAFF: CREATE APPOINTMENT (DESKTOP)
     // ==============================
-    appointmentForm?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      appointmentError.classList.add("hidden");
-      appointmentMessage.classList.add("hidden");
-      staffWhatsappBox.classList.add("hidden");
-      lastCreatedAppointment = null;
+    if (appointmentForm) {
+      appointmentForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        appointmentError.classList.add("hidden");
+        appointmentMessage.classList.add("hidden");
+        staffWhatsappBox.classList.add("hidden");
+        lastCreatedAppointment = null;
 
-      if (!currentProfile || currentProfile.role !== "staff") {
-        showMessage(appointmentError, "Hanya staff boleh cipta temujanji.", true);
-        return;
-      }
+        if (!currentProfile || currentProfile.role !== "staff") {
+          showMessage(appointmentError, "Hanya staff boleh cipta temujanji.", true);
+          return;
+        }
 
-      const serviceId = serviceSelect.value || null;
-      const doctorId = doctorSelect.value || null;
-      if (!serviceId || !doctorId) {
-        showMessage(appointmentError, "Sila pilih servis dan doktor.", true);
-        return;
-      }
+        const serviceId = serviceSelect.value || null;
+        const doctorId = doctorSelect.value || null;
+        if (!serviceId || !doctorId) {
+          showMessage(appointmentError, "Sila pilih servis dan doktor.", true);
+          return;
+        }
 
-      const payload = {
-        service_id: serviceId,
-        doctor_id: doctorId,
-        patient_name: patientName.value.trim(),
-        patient_ic: patientIC.value.trim(),
-        patient_phone: patientPhone.value.trim(),
-        complaint: complaint.value.trim() || null,
-        requested_date: requestedDate.value,
-        status: "pending"
-      };
+        const payload = {
+          service_id: serviceId,
+          doctor_id: doctorId,
+          patient_name: patientName.value.trim(),
+          patient_ic: patientIC.value.trim(),
+          patient_phone: patientPhone.value.trim(),
+          complaint: complaint.value.trim() || null,
+          requested_date: requestedDate.value,
+          status: "pending"
+        };
 
-      const { data: insertResult, error } = await db
-        .from("appointments")
-        .insert(payload)
-        .select("*")
-        .single();
+        const { data: insertResult, error } = await db
+          .from("appointments")
+          .insert(payload)
+          .select("*")
+          .single();
 
-      if (error) {
-        console.error("Error insert appointment", error);
-        showMessage(appointmentError, error.message || "Gagal simpan temujanji.", true);
-        return;
-      }
+        if (error) {
+          console.error("Error insert appointment", error);
+          showMessage(appointmentError, error.message || "Gagal simpan temujanji.", true);
+          return;
+        }
 
-      const appointmentId = insertResult.id;
-      lastCreatedAppointment = insertResult;
+        const appointmentId = insertResult.id;
+        lastCreatedAppointment = insertResult;
 
-      // Simpan custom field values
-      const fieldInputs = customFieldsContainer.querySelectorAll("input[data-field-id]");
-      const valuesPayload = [];
-      fieldInputs.forEach(input => {
-        if (!input.value) return;
-        valuesPayload.push({
-          appointment_id: appointmentId,
-          field_id: input.dataset.fieldId,
-          value_text: input.value
+        // Simpan custom field values
+        const fieldInputs = customFieldsContainer.querySelectorAll("input[data-field-id]");
+        const valuesPayload = [];
+        fieldInputs.forEach(input => {
+          if (!input.value) return;
+          valuesPayload.push({
+            appointment_id: appointmentId,
+            field_id: input.dataset.fieldId,
+            value_text: input.value
+          });
         });
+
+        if (valuesPayload.length > 0) {
+          const { error: vErr } = await db.from("appointment_field_values").insert(valuesPayload);
+          if (vErr) console.error("Error insert field values", vErr);
+        }
+
+        showMessage(appointmentMessage, "Temujanji berjaya disimpan.", false);
+
+        // Clear input pesakit
+        patientName.value = "";
+        patientIC.value = "";
+        patientPhone.value = "";
+        complaint.value = "";
+        requestedDate.value = "";
+        customFieldsContainer.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
+
+        await refreshStaffAppointmentsList();
+        buildStaffWhatsappLink(insertResult);
       });
-
-      if (valuesPayload.length > 0) {
-        const { error: vErr } = await db.from("appointment_field_values").insert(valuesPayload);
-        if (vErr) console.error("Error insert field values", vErr);
-      }
-
-      showMessage(appointmentMessage, "Temujanji berjaya disimpan.", false);
-
-      // Clear input pesakit
-      patientName.value = "";
-      patientIC.value = "";
-      patientPhone.value = "";
-      complaint.value = "";
-      requestedDate.value = "";
-      customFieldsContainer.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
-
-      await refreshStaffAppointmentsList();
-      buildStaffWhatsappLink(insertResult);
-    });
+    }
 
     // ==============================
     // STAFF: CREATE APPOINTMENT (MOBILE)
     // ==============================
-    appointmentFormMobile?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      appointmentErrorMobile.classList.add("hidden");
-      appointmentMessageMobile.classList.add("hidden");
-      staffWhatsappBoxMobile.classList.add("hidden");
-      lastCreatedAppointment = null;
+    if (appointmentFormMobile) {
+      appointmentFormMobile.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        appointmentErrorMobile.classList.add("hidden");
+        appointmentMessageMobile.classList.add("hidden");
+        staffWhatsappBoxMobile.classList.add("hidden");
+        lastCreatedAppointment = null;
 
-      if (!currentProfile || currentProfile.role !== "staff") {
-        showMessage(appointmentErrorMobile, "Hanya staff boleh cipta temujanji.", true);
-        return;
-      }
+        if (!currentProfile || currentProfile.role !== "staff") {
+          showMessage(appointmentErrorMobile, "Hanya staff boleh cipta temujanji.", true);
+          return;
+        }
 
-      const serviceId = serviceSelectMobile.value || null;
-      const doctorId = doctorSelectMobile.value || null;
-      if (!serviceId || !doctorId) {
-        showMessage(appointmentErrorMobile, "Sila pilih servis dan doktor.", true);
-        return;
-      }
+        const serviceId = serviceSelectMobile.value || null;
+        const doctorId = doctorSelectMobile.value || null;
+        if (!serviceId || !doctorId) {
+          showMessage(appointmentErrorMobile, "Sila pilih servis dan doktor.", true);
+          return;
+        }
 
-      const payload = {
-        service_id: serviceId,
-        doctor_id: doctorId,
-        patient_name: patientNameMobile.value.trim(),
-        patient_ic: patientICMobile.value.trim(),
-        patient_phone: patientPhoneMobile.value.trim(),
-        complaint: complaintMobile.value.trim() || null,
-        requested_date: requestedDateMobile.value,
-        status: "pending"
-      };
+        const payload = {
+          service_id: serviceId,
+          doctor_id: doctorId,
+          patient_name: patientNameMobile.value.trim(),
+          patient_ic: patientICMobile.value.trim(),
+          patient_phone: patientPhoneMobile.value.trim(),
+          complaint: complaintMobile.value.trim() || null,
+          requested_date: requestedDateMobile.value,
+          status: "pending"
+        };
 
-      const { data: insertResult, error } = await db
-        .from("appointments")
-        .insert(payload)
-        .select("*")
-        .single();
+        const { data: insertResult, error } = await db
+          .from("appointments")
+          .insert(payload)
+          .select("*")
+          .single();
 
-      if (error) {
-        console.error("Error insert appointment", error);
-        showMessage(appointmentErrorMobile, error.message || "Gagal simpan temujanji.", true);
-        return;
-      }
+        if (error) {
+          console.error("Error insert appointment", error);
+          showMessage(appointmentErrorMobile, error.message || "Gagal simpan temujanji.", true);
+          return;
+        }
 
-      const appointmentId = insertResult.id;
-      lastCreatedAppointment = insertResult;
+        const appointmentId = insertResult.id;
+        lastCreatedAppointment = insertResult;
 
-      // Simpan custom field values
-      const fieldInputs = customFieldsContainerMobile.querySelectorAll("input[data-field-id]");
-      const valuesPayload = [];
-      fieldInputs.forEach(input => {
-        if (!input.value) return;
-        valuesPayload.push({
-          appointment_id: appointmentId,
-          field_id: input.dataset.fieldId,
-          value_text: input.value
+        // Simpan custom field values
+        const fieldInputs = customFieldsContainerMobile.querySelectorAll("input[data-field-id]");
+        const valuesPayload = [];
+        fieldInputs.forEach(input => {
+          if (!input.value) return;
+          valuesPayload.push({
+            appointment_id: appointmentId,
+            field_id: input.dataset.fieldId,
+            value_text: input.value
+          });
         });
+
+        if (valuesPayload.length > 0) {
+          const { error: vErr } = await db.from("appointment_field_values").insert(valuesPayload);
+          if (vErr) console.error("Error insert field values", vErr);
+        }
+
+        showMessage(appointmentMessageMobile, "Temujanji berjaya disimpan.", false);
+
+        // Clear input pesakit
+        patientNameMobile.value = "";
+        patientICMobile.value = "";
+        patientPhoneMobile.value = "";
+        complaintMobile.value = "";
+        requestedDateMobile.value = "";
+        customFieldsContainerMobile.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
+
+        await refreshStaffAppointmentsList();
+        buildStaffWhatsappLinkMobile(insertResult);
       });
-
-      if (valuesPayload.length > 0) {
-        const { error: vErr } = await db.from("appointment_field_values").insert(valuesPayload);
-        if (vErr) console.error("Error insert field values", vErr);
-      }
-
-      showMessage(appointmentMessageMobile, "Temujanji berjaya disimpan.", false);
-
-      // Clear input pesakit
-      patientNameMobile.value = "";
-      patientICMobile.value = "";
-      patientPhoneMobile.value = "";
-      complaintMobile.value = "";
-      requestedDateMobile.value = "";
-      customFieldsContainerMobile.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
-
-      await refreshStaffAppointmentsList();
-      buildStaffWhatsappLinkMobile(insertResult);
-    });
+    }
 
     async function fetchDoctorWhatsapp(doctorId) {
       const { data, error } = await db
@@ -2822,10 +2861,14 @@
 
       if (error) {
         console.error("Error load staff appointments", error);
-        staffAppointmentsList.innerHTML =
-          '<p class="text-base text-rose-500">Gagal load temujanji.</p>';
-        staffAppointmentsListMobile.innerHTML =
-          '<p class="text-sm text-rose-500">Gagal load temujanji.</p>';
+        if (staffAppointmentsList) {
+          staffAppointmentsList.innerHTML =
+            '<p class="text-base text-rose-500">Gagal load temujanji.</p>';
+        }
+        if (staffAppointmentsListMobile) {
+          staffAppointmentsListMobile.innerHTML =
+            '<p class="text-sm text-rose-500">Gagal load temujanji.</p>';
+        }
         return;
       }
 
@@ -3302,13 +3345,17 @@
       // Real-time subscription akan auto refresh UI
     }
 
-    refreshStaffAppointments?.addEventListener("click", () => {
-      refreshStaffAppointmentsList();
-    });
+    if (refreshStaffAppointments) {
+      refreshStaffAppointments.addEventListener("click", () => {
+        refreshStaffAppointmentsList();
+      });
+    }
 
-    refreshStaffAppointmentsMobile?.addEventListener("click", () => {
-      refreshStaffAppointmentsList();
-    });
+    if (refreshStaffAppointmentsMobile) {
+      refreshStaffAppointmentsMobile.addEventListener("click", () => {
+        refreshStaffAppointmentsList();
+      });
+    }
 
     staffFilterButtons.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -3548,8 +3595,13 @@
     }
 
     // Event listeners untuk export
-    exportPreviewBtn?.addEventListener("click", previewExportData);
-    exportExcelBtn?.addEventListener("click", exportToExcel);
+    if (exportPreviewBtn) {
+      exportPreviewBtn.addEventListener("click", previewExportData);
+    }
+    
+    if (exportExcelBtn) {
+      exportExcelBtn.addEventListener("click", exportToExcel);
+    }
 
     // ==============================
     // DOCTOR PANEL HANDLERS
@@ -3900,9 +3952,11 @@
       });
     }
 
-    refreshDoctorAppointments?.addEventListener("click", () => {
-      refreshDoctorAppointmentsList();
-    });
+    if (refreshDoctorAppointments) {
+      refreshDoctorAppointments.addEventListener("click", () => {
+        refreshDoctorAppointmentsList();
+      });
+    }
 
     doctorTabButtons.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -3926,9 +3980,17 @@
     // ==============================
     
     // Availability calendar untuk doktor
-    availabilityBtn?.addEventListener('click', openAvailabilityCalendar);
-    backFromCalendar?.addEventListener('click', closeAvailabilityCalendar);
-    saveAvailability?.addEventListener('click', saveAvailabilityDates);
+    if (availabilityBtn) {
+      availabilityBtn.addEventListener('click', openAvailabilityCalendar);
+    }
+    
+    if (backFromCalendar) {
+      backFromCalendar.addEventListener('click', closeAvailabilityCalendar);
+    }
+    
+    if (saveAvailability) {
+      saveAvailability.addEventListener('click', saveAvailabilityDates);
+    }
     
     // Availability table untuk staff
     document.querySelectorAll('.availability-tab-btn').forEach(btn => {
@@ -3950,7 +4012,7 @@
     
     // Close availability table ketika klik di luar
     document.addEventListener('click', (e) => {
-      if (!availabilityTableContainer.contains(e.target) && 
+      if (availabilityTableContainer && !availabilityTableContainer.contains(e.target) && 
           e.target !== doctorSelect && 
           !doctorSelect.contains(e.target)) {
         hideAvailabilityTable();
@@ -3973,8 +4035,10 @@
         }
       });
       
-      todayActionsListEl.innerHTML =
-        '<p class="text-base text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
+      if (todayActionsListEl) {
+        todayActionsListEl.innerHTML =
+          '<p class="text-base text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
+      }
     });
   </script>
 </body>
