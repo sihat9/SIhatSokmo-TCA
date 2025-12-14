@@ -145,7 +145,7 @@
       font-size: 14px;
     }
     
-    .calendar-day:hover:not(.disabled):not(.holiday) {
+    .calendar-day:hover:not(.disabled) {
       background-color: #f0fdf4;
       transform: scale(1.05);
     }
@@ -165,7 +165,6 @@
     .calendar-day.holiday {
       background-color: #fee2e2;
       color: #dc2626;
-      cursor: not-allowed;
       position: relative;
     }
     
@@ -180,6 +179,11 @@
       width: 100%;
       text-align: center;
       padding: 0 2px;
+    }
+    
+    .calendar-day.holiday.selected {
+      background-color: #10b981;
+      color: white;
     }
     
     .calendar-day-header {
@@ -1477,7 +1481,7 @@
         <div class="text-center">
           <h3 class="text-lg font-semibold text-slate-800">${monthNames[currentCalendarMonth]} ${currentCalendarYear}</h3>
           <div class="text-sm text-slate-500">Klik pada tarikh untuk pilih/buang</div>
-          <div class="text-xs text-rose-500 mt-1">🟥 = Cuti Umum Malaysia/Terengganu</div>
+          <div class="text-xs text-rose-500 mt-1">🟥 = Cuti Umum Malaysia/Terengganu (hanya rujukan)</div>
         </div>
         <button id="nextMonth" class="p-2 rounded-lg hover:bg-slate-100">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1536,7 +1540,7 @@
         if (holiday) {
           dayElement.classList.add('holiday');
           dayElement.dataset.holiday = holiday.name;
-          dayElement.title = holiday.name;
+          dayElement.title = holiday.name + ' - Cuti (boleh dipilih)';
           
           // Add red indicator
           const holidayIndicator = document.createElement('div');
@@ -1546,34 +1550,38 @@
           // Check if selected despite being holiday
           if (selectedDates.has(dateStr)) {
             dayElement.classList.add('selected');
+            dayElement.title = holiday.name + ' - Cuti (sudah dipilih)';
           }
+        } else {
+          dayElement.title = 'Klik untuk pilih tarikh available';
         }
         
         // Check if past date
         if (dateObj < today && dateObj.toDateString() !== today.toDateString()) {
           dayElement.classList.add('disabled');
+          dayElement.title = 'Tarikh telah berlalu';
         }
         
         // Check if selected
         if (selectedDates.has(dateStr)) {
           dayElement.classList.add('selected');
           if (holiday) {
-            dayElement.title = holiday.name + ' - Dipilih';
+            dayElement.title = holiday.name + ' - Cuti (sudah dipilih)';
           } else {
-            dayElement.title = 'Tarikh dipilih';
+            dayElement.title = 'Tarikh available (sudah dipilih)';
           }
         } else if (holiday) {
-          dayElement.title = holiday.name;
+          dayElement.title = holiday.name + ' - Cuti (boleh dipilih)';
         } else if (dateObj.toDateString() === today.toDateString()) {
-          dayElement.title = 'Hari ini';
+          dayElement.title = 'Hari ini (boleh dipilih)';
         }
         
-        // Add click event only if not holiday and not past date
-        if (!holiday && dateObj >= today) {
+        // Add click event - SEMUA TARIKH BUKAN PAST DATE BOLEH DIPILIH (termasuk hari cuti)
+        if (dateObj >= today) {
           dayElement.addEventListener('click', () => {
             toggleDateSelection(dateStr, dayElement);
           });
-        } else if (holiday) {
+        } else {
           dayElement.style.cursor = 'not-allowed';
         }
         
@@ -1615,9 +1623,23 @@
       if (selectedDates.has(dateStr)) {
         selectedDates.delete(dateStr);
         element.classList.remove('selected');
+        // Update title
+        const holidayName = element.dataset.holiday;
+        if (holidayName) {
+          element.title = holidayName + ' - Cuti (boleh dipilih)';
+        } else {
+          element.title = 'Klik untuk pilih tarikh available';
+        }
       } else {
         selectedDates.add(dateStr);
         element.classList.add('selected');
+        // Update title
+        const holidayName = element.dataset.holiday;
+        if (holidayName) {
+          element.title = holidayName + ' - Cuti (sudah dipilih)';
+        } else {
+          element.title = 'Tarikh available (sudah dipilih)';
+        }
       }
       
       // Show/hide save button
@@ -1990,7 +2012,7 @@
           
           const instruction = document.createElement("div");
           instruction.className = "mt-3 text-sm text-slate-500 ml-4";
-          instruction.textContent = "Pesakit perlu dihadiri di klinik mengikut tarikh di atas.";
+          instruction.textContent = "Pesakit perlu dihadiri di klinik pada tarikh yang ditetapkan.";
           block.appendChild(instruction);
           
           todayActionsListEl.appendChild(block);
@@ -4042,4 +4064,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
