@@ -15,7 +15,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
-    /* Semua CSS asal dikekalkan */
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #f0fdf4 0, #f8fafc 45%, #f0fdf4 100%);
@@ -309,118 +308,6 @@
       background-color: #dc2626;
       border-radius: 50%;
     }
-    
-    /* NEW: Styles untuk time slots */
-    .time-slot-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 8px;
-      margin-top: 12px;
-    }
-    
-    .time-slot {
-      padding: 8px 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 13px;
-    }
-    
-    .time-slot:hover {
-      background-color: #f0fdf4;
-      border-color: #10b981;
-    }
-    
-    .time-slot.selected {
-      background-color: #10b981;
-      color: white;
-      border-color: #10b981;
-      font-weight: bold;
-    }
-    
-    .time-slot.disabled {
-      background-color: #f8fafc;
-      color: #cbd5e1;
-      cursor: not-allowed;
-      border-color: #e2e8f0;
-    }
-    
-    .batch-action-bar {
-      background: #f8fafc;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-      display: none;
-    }
-    
-    .batch-action-bar.show {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .appointment-checkbox {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      border: 2px solid #cbd5e1;
-      cursor: pointer;
-    }
-    
-    .doctor-time-preference {
-      background: #fef3c7;
-      border: 1px solid #fbbf24;
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin-bottom: 12px;
-      font-size: 13px;
-    }
-    
-    .remark-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 500;
-      margin-left: 8px;
-    }
-    
-    .remark-match {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
-    
-    .remark-mismatch {
-      background-color: #fee2e2;
-      color: #991b1b;
-    }
-    
-    /* Modal untuk doktor set masa tetap */
-    #fixedTimeModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 10000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .fixed-time-modal-content {
-      background: white;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 24px;
-    }
   </style>
 </head>
 <body class="text-slate-900">
@@ -480,10 +367,166 @@
 
         <!-- LOGIN - REDESIGNED -->
         <section id="tab-login">
-          <!-- ... Kekalkan sama seperti asal ... -->
+          <div class="grid md:grid-cols-2 gap-8 items-stretch">
+            <!-- Log masuk - Premium Design -->
+            <div class="login-container rounded-2xl p-6 md:p-8 relative overflow-hidden">
+              <!-- Decorative elements -->
+              <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
+              <div class="absolute bottom-0 left-0 w-24 h-24 bg-emerald-50 rounded-full translate-y-12 -translate-x-12 opacity-70"></div>
+              
+              <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-900">Log Masuk</h2>
+                    <p class="text-sm md:text-base text-slate-500">
+                      Akses sistem appointment klinik
+                    </p>
+                  </div>
+                </div>
+
+                <form id="loginForm" class="space-y-6 mt-6">
+                  <div>
+                    <label class="block text-sm md:text-base mb-3 text-slate-700 font-medium">Email</label>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <input id="loginEmail" type="email" required
+                             class="w-full rounded-lg bg-white border border-slate-200 pl-10 pr-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" 
+                             placeholder="nama@klinik.com"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm md:text-base mb-3 text-slate-700 font-medium">Password</label>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                      <input id="loginPassword" type="password" required
+                             class="w-full rounded-lg bg-white border border-slate-200 pl-10 pr-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+                             placeholder="••••••••"/>
+                    </div>
+                  </div>
+                  <button type="submit"
+                          class="btn-primary w-full inline-flex justify-center items-center gap-3 rounded-lg px-6 py-3 text-base md:text-lg font-semibold mt-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Log Masuk
+                  </button>
+                </form>
+
+                <p id="loginError" class="text-sm md:text-base text-rose-500 mt-4 p-3 bg-rose-50 rounded-lg hidden"></p>
+
+                <div class="mt-8 pt-6 border-t border-slate-100">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p class="text-sm text-slate-500">
+                      Guna akaun yang telah didaftarkan oleh pihak Admin
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info sistem dengan tema hijau -->
+            <div class="space-y-4 bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-6 md:p-8 text-sm md:text-base text-slate-600">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 rounded-full bg-white border border-emerald-200 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 gradient-text">Maklumat Sistem</h3>
+              </div>
+              
+              <ul class="space-y-4">
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">1</span>
+                  </div>
+                  <span class="text-sm md:text-base">Staff klinik daftar pesakit dan tarikh yang dicadangkan.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">2</span>
+                  </div>
+                  <span class="text-sm md:text-base">Doktor approve atau cadangkan tarikh baharu.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">3</span>
+                  </div>
+                  <span class="text-sm md:text-base">Status temujanji dipantau dalam 3 kategori: Pending, Approved dan Rejected.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">4</span>
+                  </div>
+                  <span class="text-sm md:text-base">WhatsApp automatik membantu staff &amp; doktor berhubung dengan lebih pantas.</span>
+                </li>
+              </ul>
+              
+              <div class="mt-6 p-4 rounded-xl bg-white/80 border border-emerald-200 text-sm md:text-base">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Tip Penggunaan</p>
+                    <p class="text-slate-600">Untuk kali pertama dan tiada akaun login sila hubungi Admin, dan login sebagai <span class="font-bold text-emerald-600">staff</span>, tambah servis &amp; kolom tambahan di tab <span class="font-bold text-emerald-600">Settings</span>.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-6 pt-4 border-t border-emerald-100">
+                <div class="flex items-center justify-center gap-4">
+                  <div class="text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p class="text-xs text-slate-500">Pantauan Masa Nyata</p>
+                  </div>
+                  <div class="text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <p class="text-xs text-slate-500">WhatsApp Automatik</p>
+                  </div>
+                  <div class="text-center">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <p class="text-xs text-slate-500">Analytics & Export</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <!-- STAFF PANEL (DITAMBAH INPUT MASA) -->
+        <!-- STAFF PANEL (TAMBAH TABLE TERAPUNG) -->
         <section id="tab-staff" class="tab-hidden">
           <div class="space-y-6">
             <!-- Tindakan Hari Ini -->
@@ -548,7 +591,7 @@
                       <div id="availabilityTableContainer">
                         <div class="availability-table-header">
                           <div>
-                            <span class="font-semibold text-slate-700">Tarikh & Masa Available</span>
+                            <span class="font-semibold text-slate-700">Tarikh Available</span>
                             <span class="text-xs text-slate-500 ml-2">Doktor: <span id="tableDoctorName">-</span></span>
                           </div>
                           <div class="flex gap-1">
@@ -586,49 +629,6 @@
                       <label class="block text-sm md:text-base mb-2 text-slate-700">Tarikh yang pesakit available</label>
                       <input id="requestedDate" type="date" required
                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
-                    </div>
-                  </div>
-
-                  <!-- NEW: Input untuk masa temujanji -->
-                  <div class="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm md:text-base mb-2 text-slate-700">Masa yang pesakit available</label>
-                      <div class="flex gap-2">
-                        <select id="requestedTime" required
-                                class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
-                          <option value="">Pilih masa...</option>
-                          <option value="08:00">08:00 AM</option>
-                          <option value="09:00">09:00 AM</option>
-                          <option value="10:00">10:00 AM</option>
-                          <option value="11:00">11:00 AM</option>
-                          <option value="12:00">12:00 PM</option>
-                          <option value="14:00">02:00 PM</option>
-                          <option value="15:00">03:00 PM</option>
-                          <option value="16:00">04:00 PM</option>
-                          <option value="17:00">05:00 PM</option>
-                          <option value="18:00">06:00 PM</option>
-                          <option value="19:00">07:00 PM</option>
-                          <option value="20:00">08:00 PM</option>
-                        </select>
-                        <button type="button" id="showDoctorTimeSlots" 
-                                class="px-4 py-3 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 whitespace-nowrap text-sm">
-                          Lihat Masa Doktor
-                        </button>
-                      </div>
-                      <div id="doctorTimePreferences" class="mt-2 text-sm text-slate-600 hidden">
-                        <!-- Paparan masa tetap doktor -->
-                      </div>
-                    </div>
-                    <div>
-                      <label class="block text-sm md:text-base mb-2 text-slate-700">Tempoh temujanji (minit)</label>
-                      <select id="appointmentDuration"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
-                        <option value="30">30 minit</option>
-                        <option value="45">45 minit</option>
-                        <option value="60">60 minit</option>
-                        <option value="90">90 minit</option>
-                        <option value="120">120 minit</option>
-                      </select>
                     </div>
                   </div>
 
@@ -750,40 +750,6 @@
                     </div>
                   </div>
 
-                  <!-- NEW: Input untuk masa temujanji (Mobile) -->
-                  <div class="space-y-4">
-                    <div>
-                      <label class="block text-sm mb-2 text-slate-700">Masa yang pesakit available</label>
-                      <select id="requestedTimeMobile" required
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
-                        <option value="">Pilih masa...</option>
-                        <option value="08:00">08:00 AM</option>
-                        <option value="09:00">09:00 AM</option>
-                        <option value="10:00">10:00 AM</option>
-                        <option value="11:00">11:00 AM</option>
-                        <option value="12:00">12:00 PM</option>
-                        <option value="14:00">02:00 PM</option>
-                        <option value="15:00">03:00 PM</option>
-                        <option value="16:00">04:00 PM</option>
-                        <option value="17:00">05:00 PM</option>
-                        <option value="18:00">06:00 PM</option>
-                        <option value="19:00">07:00 PM</option>
-                        <option value="20:00">08:00 PM</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-sm mb-2 text-slate-700">Tempoh temujanji (minit)</label>
-                      <select id="appointmentDurationMobile"
-                              class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
-                        <option value="30">30 minit</option>
-                        <option value="45">45 minit</option>
-                        <option value="60">60 minit</option>
-                        <option value="90">90 minit</option>
-                        <option value="120">120 minit</option>
-                      </select>
-                    </div>
-                  </div>
-
                   <div>
                     <label class="block text-sm mb-2 text-slate-700">Ringkasan masalah / complaint</label>
                     <textarea id="complaintMobile" rows="3"
@@ -854,12 +820,101 @@
           </div>
         </section>
 
-        <!-- EXPORT PANEL (TAMBAH KOLOM MASA) -->
+        <!-- EXPORT PANEL (TIDAK BERUBAH) -->
         <section id="tab-export" class="tab-hidden">
-          <!-- ... Kekalkan sama seperti asal ... -->
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
+            <div>
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Export Data Temujanji ke Excel</h2>
+              <p class="text-sm md:text-base text-slate-500 mt-2">
+                Pilih doktor dan tempoh masa untuk export data temujanji ke format Excel.
+              </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="space-y-3">
+                <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Doktor</label>
+                <select id="exportDoctor" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+                  <option value="all">Semua Doktor</option>
+                </select>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Bulan</label>
+                <select id="exportMonth" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+                  <option value="all">Semua Bulan</option>
+                  <option value="01">Januari</option>
+                  <option value="02">Februari</option>
+                  <option value="03">Mac</option>
+                  <option value="04">April</option>
+                  <option value="05">Mei</option>
+                  <option value="06">Jun</option>
+                  <option value="07">Julai</option>
+                  <option value="08">Ogos</option>
+                  <option value="09">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Disember</option>
+                </select>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Tahun</label>
+                <select id="exportYear" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+                  <option value="all">Semua Tahun</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <label class="block text-sm md:text-base font-semibold text-slate-700">Pilih Status</label>
+              <div class="flex flex-wrap gap-4">
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportPending" type="checkbox" checked
+                         class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
+                  Pending
+                </label>
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportApproved" type="checkbox" checked
+                         class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
+                  Approved
+                </label>
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportRejected" type="checkbox" checked
+                         class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
+                  Rejected
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+              <button id="exportPreviewBtn"
+                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                Preview Data
+              </button>
+              <button id="exportExcelBtn"
+                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                Export ke Excel
+              </button>
+            </div>
+
+            <div id="exportPreview" class="mt-6 space-y-4 hidden">
+              <h3 class="text-lg md:text-xl font-semibold text-slate-900">Preview Data</h3>
+              <div class="bg-white border border-slate-200 rounded-xl p-4">
+                <div id="exportStats" class="text-sm md:text-base text-slate-600 mb-4"></div>
+                <div id="exportPreviewTable" class="overflow-auto max-h-80 scrollbar-thin">
+                  <!-- Preview table akan diisi di sini -->
+                </div>
+              </div>
+            </div>
+
+            <div id="exportLoading" class="hidden text-center py-8">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+              <p class="mt-4 text-sm md:text-base text-slate-600">Sedang memuatkan data...</p>
+            </div>
+          </div>
         </section>
 
-        <!-- DOCTOR PANEL (DITAMBAH BATCH ACTION & REMARK) -->
+        <!-- DOCTOR PANEL (TAMBAH TOMBOL AVAILABILITY) -->
         <section id="tab-doctor" class="tab-hidden">
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -868,12 +923,7 @@
                 <button id="availabilityBtn"
                         class="inline-flex items-center gap-2 text-sm md:text-base px-4 py-2 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition">
                   <span>📅</span>
-                  Masukkan Tarikh & Masa Available
-                </button>
-                <button id="setFixedTimeBtn"
-                        class="inline-flex items-center gap-2 text-sm md:text-base px-4 py-2 rounded-full border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:border-amber-300 transition">
-                  <span>⏰</span>
-                  Tetap Masa Tetap
+                  Masukkan Tarikh Available
                 </button>
                 <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
                   <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
@@ -895,32 +945,9 @@
                 </button>
               </div>
             </div>
-            
-            <!-- NEW: Batch Action Bar -->
-            <div id="batchActionBar" class="batch-action-bar">
-              <div class="flex items-center gap-3">
-                <input type="checkbox" id="selectAllBatch" class="appointment-checkbox">
-                <span id="batchSelectionCount" class="font-semibold text-slate-700">0 item dipilih</span>
-              </div>
-              <div class="flex gap-2">
-                <button id="batchApproveBtn" 
-                        class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm">
-                  Approve Terpilih
-                </button>
-                <button id="batchRejectBtn"
-                        class="px-4 py-2 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-semibold text-sm">
-                  Reject Terpilih
-                </button>
-                <button id="cancelBatchBtn"
-                        class="px-4 py-2 rounded-lg bg-slate-300 hover:bg-slate-400 text-slate-700 font-semibold text-sm">
-                  Batal
-                </button>
-              </div>
-            </div>
-            
             <p id="doctorTabDescription" class="text-sm md:text-base text-slate-500 mb-4">
               Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-semibold text-emerald-600">Approve</span> atau
-              <span class="font-semibold text-rose-500">Reject</span>. Jika pilih Reject, sistem akan minta dua tarikh & masa cadangan.
+              <span class="font-semibold text-rose-500">Reject</span>. Jika pilih Reject, sistem akan minta dua tarikh cadangan.
             </p>
 
             <div id="doctorAppointmentsList" class="space-y-6 text-sm md:text-base max-h-[600px] overflow-auto scrollbar-thin">
@@ -931,13 +958,113 @@
 
         <!-- SETTINGS PANEL (TIDAK BERUBAH) -->
         <section id="tab-settings" class="tab-hidden">
-          <!-- ... Kekalkan sama seperti asal ... -->
+          <div class="grid lg:grid-cols-2 gap-8 text-sm md:text-base">
+            <!-- Services -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Servis Klinik</h2>
+
+              <form id="serviceForm" class="space-y-4">
+                <div>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Nama servis</label>
+                  <input id="serviceName" required
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                </div>
+                <div>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Keterangan (optional)</label>
+                  <textarea id="serviceDescription" rows="3"
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Status</label>
+                    <select id="serviceStatus"
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Doktor default (optional)</label>
+                    <select id="serviceDoctor"
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+                      <option value="">Tiada (pilih manual masa daftar)</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit"
+                        class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 mt-2 shadow-lg hover:shadow-xl">
+                  Simpan Servis
+                </button>
+                <p id="serviceMessage" class="text-sm md:text-base mt-2 text-emerald-700 hidden"></p>
+              </form>
+
+              <div class="mt-6">
+                <h3 class="text-sm md:text-base font-bold text-slate-800 mb-3">Senarai Servis</h3>
+                <div id="serviceList" class="space-y-3 max-h-72 overflow-auto scrollbar-thin">
+                  <!-- senarai servis -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Fields -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+              <h2 class="text-xl md:text-2xl font-bold text-slate-900">Kolom Tambahan (Custom Fields)</h2>
+
+              <form id="fieldForm" class="space-y-4">
+                <div>
+                  <label class="block text-sm md:text-base mb-2 text-slate-700">Label / Tajuk Pertanyaan</label>
+                  <input id="fieldLabel" required
+                         class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm" />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Jenis Input</label>
+                    <select id="fieldType"
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+                      <option value="text">Text</option>
+                      <option value="phone">Phone</option>
+                      <option value="date">Date</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm md:text-base mb-2 text-slate-700">Servis</label>
+                    <select id="fieldService"
+                            class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
+                      <option value="">Global (semua servis)</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="inline-flex items-center gap-3 text-sm md:text-base text-slate-700">
+                    <input id="fieldRequired" type="checkbox"
+                           class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5" />
+                    Wajib diisi
+                  </label>
+                </div>
+                <button type="submit"
+                        class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base md:text-lg font-semibold text-white px-6 py-3 mt-2 shadow-lg hover:shadow-xl">
+                  Tambah Kolom
+                </button>
+                <p id="fieldMessage" class="text-sm md:text-base mt-2 text-emerald-700 hidden"></p>
+              </form>
+
+              <div class="mt-6">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="text-sm md:text-base font-bold text-slate-800">Senarai Kolom Aktif</h3>
+                  <span class="text-sm text-slate-500">Klik untuk padam</span>
+                </div>
+                <div id="fieldList" class="space-y-3 max-h-72 overflow-auto scrollbar-thin">
+                  <!-- senarai fields -->
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </div>
   </div>
 
-  <!-- FULLSCREEN CALENDAR MODAL (DITAMBAH TIME SLOTS) -->
+  <!-- FULLSCREEN CALENDAR MODAL -->
   <div id="availabilityCalendarModal">
     <div class="calendar-header">
       <button id="backFromCalendar" class="flex items-center gap-2 text-white hover:text-emerald-100">
@@ -946,7 +1073,7 @@
         </svg>
         Kembali
       </button>
-      <h2 class="text-xl md:text-2xl font-bold">Pilih Tarikh & Masa Available</h2>
+      <h2 class="text-xl md:text-2xl font-bold">Pilih Tarikh Available</h2>
       <button id="saveAvailability" class="hidden items-center gap-2 bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold">
         💾 Save
       </button>
@@ -956,1859 +1083,10 @@
       <div id="calendarContainer" class="p-4">
         <!-- Calendar akan diisi oleh JavaScript -->
       </div>
-      
-      <!-- NEW: Time Slots Section -->
-      <div id="timeSlotsSection" class="border-t border-slate-200 p-4 hidden">
-        <h3 class="text-lg font-semibold mb-4">Pilih Masa Available untuk <span id="selectedDateTitle"></span></h3>
-        <div class="time-slot-container" id="timeSlotsContainer">
-          <!-- Time slots akan diisi oleh JavaScript -->
-        </div>
-        <div class="mt-4 flex justify-end">
-          <button id="saveTimeSlots" class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">
-            Simpan Masa
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NEW: Modal untuk doktor set masa tetap -->
-  <div id="fixedTimeModal">
-    <div class="fixed-time-modal-content">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold text-slate-900">Tetap Masa Tetap</h3>
-        <button id="closeFixedTimeModal" class="text-slate-500 hover:text-slate-700">
-          ✕
-        </button>
-      </div>
-      
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm mb-2 text-slate-700">Hari</label>
-            <select id="fixedDay" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3">
-              <option value="0">Ahad</option>
-              <option value="1">Isnin</option>
-              <option value="2">Selasa</option>
-              <option value="3">Rabu</option>
-              <option value="4">Khamis</option>
-              <option value="5">Jumaat</option>
-              <option value="6">Sabtu</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm mb-2 text-slate-700">Status</label>
-            <select id="fixedStatus" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3">
-              <option value="available">Available</option>
-              <option value="not_available">Not Available</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm mb-2 text-slate-700">Masa Mula</label>
-            <input type="time" id="fixedStartTime" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3">
-          </div>
-          <div>
-            <label class="block text-sm mb-2 text-slate-700">Masa Tamat</label>
-            <input type="time" id="fixedEndTime" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3">
-          </div>
-        </div>
-        
-        <div>
-          <label class="block text-sm mb-2 text-slate-700">Nota (Optional)</label>
-          <textarea id="fixedNote" rows="2" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3" 
-                    placeholder="Contoh: Klinik Pakar Tulang, Sabtu sahaja"></textarea>
-        </div>
-        
-        <div class="mt-6 flex justify-end gap-3">
-          <button id="cancelFixedTime" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50">
-            Batal
-          </button>
-          <button id="saveFixedTime" class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">
-            Simpan Masa Tetap
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 
   <script>
-    // ==============================
-    // KONFIGURASI SUPABASE & APP
-    // ==============================
-    const SUPABASE_URL = "https://rzcrbseoiqbgkhprdbbz.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6Y3Jic2VvaXFiZ2tocHJkYmJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NTk5MDksImV4cCI6MjA4MTAzNTkwOX0.C5AHYqGKywrfOf2uEwZZUSYGByuLE_PKfImS7nuFKrs";
-
-    const APP_URL = window.location.origin + window.location.pathname;
-
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // State
-    let currentUser = null;
-    let currentProfile = null;
-    let doctorsCache = [];
-    let servicesCache = [];
-    let customFieldsCache = [];
-    let lastCreatedAppointment = null;
-    let staffAppointmentsCache = [];
-    let activeStaffFilter = "pending";
-    let activeDoctorTab = "pending";
-    let realtimeSubscription = null;
-    
-    // State untuk availability
-    let selectedDates = new Set();
-    let selectedDatesWithTime = {}; // { date: {time_slots: []} }
-    let currentAvailabilityView = 'list';
-    let currentSelectedDoctorId = null;
-    let currentSelectedDateForTime = null;
-
-    // State untuk kalendar doktor
-    let currentCalendarMonth = new Date().getMonth();
-    let currentCalendarYear = new Date().getFullYear();
-
-    // State untuk batch selection
-    let selectedAppointments = new Set();
-
-    // Elements
-    const tabLogin = document.getElementById("tab-login");
-    const tabStaff = document.getElementById("tab-staff");
-    const tabExport = document.getElementById("tab-export");
-    const tabDoctor = document.getElementById("tab-doctor");
-    const tabSettings = document.getElementById("tab-settings");
-    const navTabs = document.getElementById("navTabs");
-
-    const userInfoEl = document.getElementById("userInfo");
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    const tabButtons = document.querySelectorAll(".tab-btn");
-    const btnStaff = document.getElementById("btnStaff");
-    const btnExport = document.getElementById("btnExport");
-    const btnDoctor = document.getElementById("btnDoctor");
-    const btnSettings = document.getElementById("btnSettings");
-
-    // Login form
-    const loginForm = document.getElementById("loginForm");
-    const loginEmail = document.getElementById("loginEmail");
-    const loginPassword = document.getElementById("loginPassword");
-    const loginError = document.getElementById("loginError");
-
-    // NEW: Time-related elements
-    const requestedTime = document.getElementById("requestedTime");
-    const requestedTimeMobile = document.getElementById("requestedTimeMobile");
-    const appointmentDuration = document.getElementById("appointmentDuration");
-    const appointmentDurationMobile = document.getElementById("appointmentDurationMobile");
-    const showDoctorTimeSlots = document.getElementById("showDoctorTimeSlots");
-    const doctorTimePreferences = document.getElementById("doctorTimePreferences");
-    const timeSlotsSection = document.getElementById("timeSlotsSection");
-    const timeSlotsContainer = document.getElementById("timeSlotsContainer");
-    const selectedDateTitle = document.getElementById("selectedDateTitle");
-    const saveTimeSlots = document.getElementById("saveTimeSlots");
-    
-    // NEW: Fixed time modal elements
-    const fixedTimeModal = document.getElementById("fixedTimeModal");
-    const setFixedTimeBtn = document.getElementById("setFixedTimeBtn");
-    const closeFixedTimeModal = document.getElementById("closeFixedTimeModal");
-    const cancelFixedTime = document.getElementById("cancelFixedTime");
-    const saveFixedTime = document.getElementById("saveFixedTime");
-    const fixedDay = document.getElementById("fixedDay");
-    const fixedStartTime = document.getElementById("fixedStartTime");
-    const fixedEndTime = document.getElementById("fixedEndTime");
-    const fixedStatus = document.getElementById("fixedStatus");
-    const fixedNote = document.getElementById("fixedNote");
-    
-    // NEW: Batch action elements
-    const batchActionBar = document.getElementById("batchActionBar");
-    const selectAllBatch = document.getElementById("selectAllBatch");
-    const batchSelectionCount = document.getElementById("batchSelectionCount");
-    const batchApproveBtn = document.getElementById("batchApproveBtn");
-    const batchRejectBtn = document.getElementById("batchRejectBtn");
-    const cancelBatchBtn = document.getElementById("cancelBatchBtn");
-
-    // Staff form elements (Desktop)
-    const serviceSelect = document.getElementById("serviceSelect");
-    const doctorSelect = document.getElementById("doctorSelect");
-    const patientName = document.getElementById("patientName");
-    const patientIC = document.getElementById("patientIC");
-    const patientPhone = document.getElementById("patientPhone");
-    const requestedDate = document.getElementById("requestedDate");
-    const complaint = document.getElementById("complaint");
-    const customFieldsContainer = document.getElementById("customFieldsContainer");
-    const appointmentForm = document.getElementById("appointmentForm");
-    const appointmentMessage = document.getElementById("appointmentMessage");
-    const appointmentError = document.getElementById("appointmentError");
-    const staffWhatsappBox = document.getElementById("staffWhatsappBox");
-    const staffWhatsappLink = document.getElementById("staffWhatsappLink");
-    const staffAppointmentsList = document.getElementById("staffAppointmentsList");
-    const refreshStaffAppointments = document.getElementById("refreshStaffAppointments");
-    const staffFilterButtons = document.querySelectorAll(".staff-filter-btn");
-
-    // Staff form elements (Mobile)
-    const serviceSelectMobile = document.getElementById("serviceSelectMobile");
-    const doctorSelectMobile = document.getElementById("doctorSelectMobile");
-    const patientNameMobile = document.getElementById("patientNameMobile");
-    const patientICMobile = document.getElementById("patientICMobile");
-    const patientPhoneMobile = document.getElementById("patientPhoneMobile");
-    const requestedDateMobile = document.getElementById("requestedDateMobile");
-    const complaintMobile = document.getElementById("complaintMobile");
-    const customFieldsContainerMobile = document.getElementById("customFieldsContainerMobile");
-    const appointmentFormMobile = document.getElementById("appointmentFormMobile");
-    const appointmentMessageMobile = document.getElementById("appointmentMessageMobile");
-    const appointmentErrorMobile = document.getElementById("appointmentErrorMobile");
-    const staffWhatsappBoxMobile = document.getElementById("staffWhatsappBoxMobile");
-    const staffWhatsappLinkMobile = document.getElementById("staffWhatsappLinkMobile");
-    const staffAppointmentsListMobile = document.getElementById("staffAppointmentsListMobile");
-    const refreshStaffAppointmentsMobile = document.getElementById("refreshStaffAppointmentsMobile");
-    const staffFilterButtonsMobile = document.querySelectorAll(".staff-filter-btn-mobile");
-
-    // Today actions
-    const todayPendingCountEl = document.getElementById("todayPendingCount");
-    const todayApprovedCountEl = document.getElementById("todayApprovedCount");
-    const todayRejectedCountEl = document.getElementById("todayRejectedCount");
-    const todayActionsListEl = document.getElementById("todayActionsList");
-
-    // Export elements
-    const exportDoctor = document.getElementById("exportDoctor");
-    const exportMonth = document.getElementById("exportMonth");
-    const exportYear = document.getElementById("exportYear");
-    const exportPending = document.getElementById("exportPending");
-    const exportApproved = document.getElementById("exportApproved");
-    const exportRejected = document.getElementById("exportRejected");
-    const exportPreviewBtn = document.getElementById("exportPreviewBtn");
-    const exportExcelBtn = document.getElementById("exportExcelBtn");
-    const exportPreview = document.getElementById("exportPreview");
-    const exportStats = document.getElementById("exportStats");
-    const exportPreviewTable = document.getElementById("exportPreviewTable");
-    const exportLoading = document.getElementById("exportLoading");
-
-    // Doctor panel
-    const availabilityBtn = document.getElementById("availabilityBtn");
-    const doctorAppointmentsList = document.getElementById("doctorAppointmentsList");
-    const refreshDoctorAppointments = document.getElementById("refreshDoctorAppointments");
-    const doctorTabButtons = document.querySelectorAll(".doctor-tab-btn");
-    const doctorTabDescription = document.getElementById("doctorTabDescription");
-
-    // Settings
-    const serviceForm = document.getElementById("serviceForm");
-    const serviceName = document.getElementById("serviceName");
-    const serviceDescription = document.getElementById("serviceDescription");
-    const serviceStatus = document.getElementById("serviceStatus");
-    const serviceDoctor = document.getElementById("serviceDoctor");
-    const serviceMessage = document.getElementById("serviceMessage");
-    const serviceList = document.getElementById("serviceList");
-
-    const fieldForm = document.getElementById("fieldForm");
-    const fieldLabel = document.getElementById("fieldLabel");
-    const fieldType = document.getElementById("fieldType");
-    const fieldService = document.getElementById("fieldService");
-    const fieldRequired = document.getElementById("fieldRequired");
-    const fieldMessage = document.getElementById("fieldMessage");
-    const fieldList = document.getElementById("fieldList");
-
-    // Availability elements
-    const availabilityCalendarModal = document.getElementById("availabilityCalendarModal");
-    const backFromCalendar = document.getElementById("backFromCalendar");
-    const saveAvailability = document.getElementById("saveAvailability");
-    const calendarContainer = document.getElementById("calendarContainer");
-    const availabilityTableContainer = document.getElementById("availabilityTableContainer");
-    const availabilityTableView = document.getElementById("availabilityTableView");
-    const tableDoctorName = document.getElementById("tableDoctorName");
-
-    // ==============================
-    // FUNGSI BARU UNTUK MASA
-    // ==============================
-
-    // Format masa dari 24h ke 12h
-    function formatTimeTo12h(time24) {
-      if (!time24) return '';
-      const [hours, minutes] = time24.split(':');
-      const hour = parseInt(hours);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const hour12 = hour % 12 || 12;
-      return `${hour12}:${minutes} ${ampm}`;
-    }
-
-    // Dapatkan time slots piawai
-    function getStandardTimeSlots() {
-      return [
-        '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-        '11:00', '11:30', '12:00', '12:30', '14:00', '14:30',
-        '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
-        '18:00', '18:30', '19:00', '19:30', '20:00'
-      ];
-    }
-
-    // Generate time slots untuk display
-    function generateTimeSlotHTML(date, selectedTimes = []) {
-      const timeSlots = getStandardTimeSlots();
-      let html = '';
-      
-      timeSlots.forEach(slot => {
-        const isSelected = selectedTimes.includes(slot);
-        const isDisabled = false; // Boleh ditambah logik untuk check availability
-        
-        html += `
-          <div class="time-slot ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}" 
-               data-time="${slot}">
-            ${formatTimeTo12h(slot)}
-          </div>
-        `;
-      });
-      
-      return html;
-    }
-
-    // Load doctor fixed time preferences
-    async function loadDoctorFixedTimes(doctorId) {
-      if (!doctorId) return [];
-      
-      const { data, error } = await db
-        .from('doctor_fixed_times')
-        .select('*')
-        .eq('doctor_id', doctorId)
-        .eq('is_active', true);
-      
-      if (error) {
-        console.error('Error loading fixed times', error);
-        return [];
-      }
-      
-      return data || [];
-    }
-
-    // Load doctor availability with time slots
-    async function loadDoctorAvailabilityWithTime(doctorId) {
-      if (!doctorId) return [];
-      
-      const { data, error } = await db
-        .from('doctor_availability')
-        .select('date, time_slots')
-        .eq('doctor_id', doctorId)
-        .gte('date', new Date().toISOString().split('T')[0])
-        .order('date', { ascending: true });
-      
-      if (error) {
-        console.error('Error loading availability with time', error);
-        return [];
-      }
-      
-      return data || [];
-    }
-
-    // Check if time slot matches doctor's availability
-    function checkTimeSlotMatch(appointment, doctorAvailability) {
-      if (!appointment.requested_time || !doctorAvailability) return null;
-      
-      const appointmentDate = new Date(appointment.requested_date).toISOString().split('T')[0];
-      const availabilityForDate = doctorAvailability.find(a => a.date === appointmentDate);
-      
-      if (!availabilityForDate || !availabilityForDate.time_slots) return false;
-      
-      return availabilityForDate.time_slots.includes(appointment.requested_time);
-    }
-
-    // ==============================
-    // EVENT LISTENERS BARU
-    // ==============================
-
-    // Show doctor time preferences
-    if (showDoctorTimeSlots) {
-      showDoctorTimeSlots.addEventListener('click', async () => {
-        const doctorId = doctorSelect.value;
-        if (!doctorId) {
-          alert('Sila pilih doktor dahulu');
-          return;
-        }
-        
-        const fixedTimes = await loadDoctorFixedTimes(doctorId);
-        const availability = await loadDoctorAvailabilityWithTime(doctorId);
-        
-        let html = '<div class="doctor-time-preference">';
-        
-        if (fixedTimes.length > 0) {
-          html += '<div class="font-semibold mb-1">Masa Tetap Doktor:</div>';
-          fixedTimes.forEach(ft => {
-            const dayNames = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-            html += `<div class="text-sm">${dayNames[ft.day_of_week]}: ${formatTimeTo12h(ft.start_time)} - ${formatTimeTo12h(ft.end_time)} ${ft.note ? `(${ft.note})` : ''}</div>`;
-          });
-        }
-        
-        if (availability.length > 0) {
-          const selectedDate = requestedDate.value;
-          if (selectedDate) {
-            const availabilityForDate = availability.find(a => a.date === selectedDate);
-            if (availabilityForDate && availabilityForDate.time_slots) {
-              html += '<div class="font-semibold mt-2 mb-1">Masa Available pada ' + selectedDate + ':</div>';
-              html += '<div class="flex flex-wrap gap-1">';
-              availabilityForDate.time_slots.forEach(time => {
-                html += `<span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs">${formatTimeTo12h(time)}</span>`;
-              });
-              html += '</div>';
-            }
-          }
-        }
-        
-        if (fixedTimes.length === 0 && availability.length === 0) {
-          html = '<div class="doctor-time-preference">Doktor belum tetapkan masa tetap. Sila pilih masa yang sesuai.</div>';
-        }
-        
-        doctorTimePreferences.innerHTML = html;
-        doctorTimePreferences.classList.remove('hidden');
-      });
-    }
-
-    // Doctor select change untuk load time preferences
-    if (doctorSelect) {
-      doctorSelect.addEventListener('change', async () => {
-        const doctorId = doctorSelect.value;
-        if (!doctorId) {
-          doctorTimePreferences.classList.add('hidden');
-          return;
-        }
-        
-        const fixedTimes = await loadDoctorFixedTimes(doctorId);
-        if (fixedTimes.length > 0) {
-          let html = '<div class="doctor-time-preference">';
-          html += '<div class="font-semibold mb-1">Masa Tetap Doktor:</div>';
-          fixedTimes.forEach(ft => {
-            const dayNames = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-            html += `<div class="text-sm">${dayNames[ft.day_of_week]}: ${formatTimeTo12h(ft.start_time)} - ${formatTimeTo12h(ft.end_time)} ${ft.note ? `(${ft.note})` : ''}</div>`;
-          });
-          html += '</div>';
-          doctorTimePreferences.innerHTML = html;
-          doctorTimePreferences.classList.remove('hidden');
-        } else {
-          doctorTimePreferences.classList.add('hidden');
-        }
-      });
-    }
-
-    // ==============================
-    // MODAL MASA TETAP
-    // ==============================
-
-    // Open fixed time modal
-    if (setFixedTimeBtn) {
-      setFixedTimeBtn.addEventListener('click', () => {
-        if (!currentProfile || (currentProfile.role !== 'doctor' && currentProfile.role !== 'ma')) {
-          alert('Hanya doktor dan MA boleh tetapkan masa tetap');
-          return;
-        }
-        fixedTimeModal.style.display = 'flex';
-      });
-    }
-
-    // Close fixed time modal
-    if (closeFixedTimeModal) {
-      closeFixedTimeModal.addEventListener('click', () => {
-        fixedTimeModal.style.display = 'none';
-      });
-    }
-
-    if (cancelFixedTime) {
-      cancelFixedTime.addEventListener('click', () => {
-        fixedTimeModal.style.display = 'none';
-      });
-    }
-
-    // Save fixed time
-    if (saveFixedTime) {
-      saveFixedTime.addEventListener('click', async () => {
-        if (!currentProfile) return;
-        
-        const payload = {
-          doctor_id: currentProfile.id,
-          day_of_week: parseInt(fixedDay.value),
-          start_time: fixedStartTime.value,
-          end_time: fixedEndTime.value,
-          status: fixedStatus.value,
-          note: fixedNote.value.trim() || null,
-          is_active: true
-        };
-        
-        const { error } = await db
-          .from('doctor_fixed_times')
-          .insert(payload);
-        
-        if (error) {
-          console.error('Error saving fixed time', error);
-          alert('Gagal menyimpan masa tetap');
-          return;
-        }
-        
-        alert('Masa tetap berjaya disimpan');
-        fixedTimeModal.style.display = 'none';
-        
-        // Reset form
-        fixedStartTime.value = '';
-        fixedEndTime.value = '';
-        fixedNote.value = '';
-      });
-    }
-
-    // ==============================
-    // BATCH ACTIONS
-    // ==============================
-
-    // Toggle batch selection
-    function toggleBatchSelection(appointmentId) {
-      if (selectedAppointments.has(appointmentId)) {
-        selectedAppointments.delete(appointmentId);
-      } else {
-        selectedAppointments.add(appointmentId);
-      }
-      
-      updateBatchActionBar();
-    }
-
-    // Update batch action bar
-    function updateBatchActionBar() {
-      const count = selectedAppointments.size;
-      batchSelectionCount.textContent = `${count} item dipilih`;
-      
-      if (count > 0) {
-        batchActionBar.classList.add('show');
-        
-        // Update select all checkbox
-        const allCheckboxes = document.querySelectorAll('.appointment-checkbox');
-        const allChecked = allCheckboxes.length === document.querySelectorAll('.appointment-checkbox:checked').length;
-        selectAllBatch.checked = allChecked;
-      } else {
-        batchActionBar.classList.remove('show');
-      }
-    }
-
-    // Select all appointments
-    if (selectAllBatch) {
-      selectAllBatch.addEventListener('change', (e) => {
-        const checkboxes = document.querySelectorAll('.appointment-checkbox');
-        checkboxes.forEach(cb => {
-          cb.checked = e.target.checked;
-          const appointmentId = cb.value;
-          if (e.target.checked) {
-            selectedAppointments.add(appointmentId);
-          } else {
-            selectedAppointments.delete(appointmentId);
-          }
-        });
-        updateBatchActionBar();
-      });
-    }
-
-    // Cancel batch selection
-    if (cancelBatchBtn) {
-      cancelBatchBtn.addEventListener('click', () => {
-        selectedAppointments.clear();
-        const checkboxes = document.querySelectorAll('.appointment-checkbox');
-        checkboxes.forEach(cb => cb.checked = false);
-        updateBatchActionBar();
-      });
-    }
-
-    // Batch approve
-    if (batchApproveBtn) {
-      batchApproveBtn.addEventListener('click', async () => {
-        if (selectedAppointments.size === 0) {
-          alert('Sila pilih sekurang-kurangnya satu temujanji');
-          return;
-        }
-        
-        const date = prompt('Masukkan tarikh untuk approve semua (YYYY-MM-DD):');
-        const time = prompt('Masukkan masa untuk approve semua (HH:MM):');
-        
-        if (!date || !time) return;
-        
-        // Validate date format
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        const timeRegex = /^\d{2}:\d{2}$/;
-        
-        if (!dateRegex.test(date)) {
-          alert('Format tarikh tidak betul. Gunakan format YYYY-MM-DD');
-          return;
-        }
-        
-        if (!timeRegex.test(time)) {
-          alert('Format masa tidak betul. Gunakan format HH:MM');
-          return;
-        }
-        
-        try {
-          const { error } = await db
-            .from('appointments')
-            .update({
-              status: 'approved',
-              doctor_selected_date: date,
-              doctor_selected_time: time,
-              updated_at: new Date().toISOString()
-            })
-            .in('id', Array.from(selectedAppointments));
-          
-          if (error) throw error;
-          
-          // Generate WhatsApp message
-          const appointments = staffAppointmentsCache.filter(a => selectedAppointments.has(a.id));
-          const clinicPhone = await fetchClinicWhatsapp();
-          
-          let message = "Assalamualaikum / Salam sejahtera,\n\n";
-          message += "Saya telah approve temujanji berikut:\n\n";
-          
-          appointments.forEach((a, index) => {
-            const serviceName = servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
-            message += `${index + 1}. ${a.patient_name} - ${serviceName}\n`;
-            message += `   Tarikh & Masa: ${date} ${formatTimeTo12h(time)}\n`;
-            if (a.complaint) {
-              message += `   Complaint: ${a.complaint}\n`;
-            }
-            message += "\n";
-          });
-          
-          message += "Sila maklumkan kepada pesakit.\n";
-          message += `Link sistem: ${APP_URL}`;
-          
-          const waUrl = buildWhatsAppLink(clinicPhone || "", message);
-          window.open(waUrl, "_blank");
-          
-          alert(`${selectedAppointments.size} temujanji berjaya diapprove`);
-          selectedAppointments.clear();
-          updateBatchActionBar();
-          
-          // Refresh list
-          await refreshDoctorAppointmentsList();
-          
-        } catch (error) {
-          console.error('Error batch approve', error);
-          alert('Gagal approve temujanji');
-        }
-      });
-    }
-
-    // Batch reject
-    if (batchRejectBtn) {
-      batchRejectBtn.addEventListener('click', async () => {
-        if (selectedAppointments.size === 0) {
-          alert('Sila pilih sekurang-kurangnya satu temujanji');
-          return;
-        }
-        
-        const altDate1 = prompt('Masukkan tarikh cadangan pertama (YYYY-MM-DD):');
-        const altTime1 = prompt('Masukkan masa cadangan pertama (HH:MM):');
-        const altDate2 = prompt('Masukkan tarikh cadangan kedua (YYYY-MM-DD):');
-        const altTime2 = prompt('Masukkan masa cadangan kedua (HH:MM):');
-        
-        if (!altDate1 || !altTime1 || !altDate2 || !altTime2) return;
-        
-        // Validate formats
-        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-        const timeRegex = /^\d{2}:\d{2}$/;
-        
-        if (!dateRegex.test(altDate1) || !dateRegex.test(altDate2)) {
-          alert('Format tarikh tidak betul. Gunakan format YYYY-MM-DD');
-          return;
-        }
-        
-        if (!timeRegex.test(altTime1) || !timeRegex.test(altTime2)) {
-          alert('Format masa tidak betul. Gunakan format HH:MM');
-          return;
-        }
-        
-        try {
-          // Update all selected appointments
-          const updates = Array.from(selectedAppointments).map(id => ({
-            id,
-            status: 'rejected',
-            doctor_alt_date1: altDate1,
-            doctor_alt_time1: altTime1,
-            doctor_alt_date2: altDate2,
-            doctor_alt_time2: altTime2,
-            updated_at: new Date().toISOString()
-          }));
-          
-          // Update one by one (Supabase doesn't support batch update with different data)
-          for (const update of updates) {
-            const { error } = await db
-              .from('appointments')
-              .update({
-                status: update.status,
-                doctor_alt_date1: update.doctor_alt_date1,
-                doctor_alt_time1: update.doctor_alt_time1,
-                doctor_alt_date2: update.doctor_alt_date2,
-                doctor_alt_time2: update.doctor_alt_time2,
-                updated_at: update.updated_at
-              })
-              .eq('id', update.id);
-            
-            if (error) throw error;
-          }
-          
-          // Generate WhatsApp message
-          const appointments = staffAppointmentsCache.filter(a => selectedAppointments.has(a.id));
-          const clinicPhone = await fetchClinicWhatsapp();
-          
-          let message = "Assalamualaikum / Salam sejahtera,\n\n";
-          message += "Saya TIDAK dapat hadir pada temujanji berikut:\n\n";
-          
-          appointments.forEach((a, index) => {
-            const serviceName = servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
-            message += `${index + 1}. ${a.patient_name} - ${serviceName}\n`;
-            message += `   Tarikh asal: ${formatDate(a.requested_date)} ${formatTimeTo12h(a.requested_time)}\n`;
-            message += "\n";
-          });
-          
-          message += "Cadangan tarikh & masa baharu:\n";
-          message += `1. ${altDate1} ${formatTimeTo12h(altTime1)}\n`;
-          message += `2. ${altDate2} ${formatTimeTo12h(altTime2)}\n\n`;
-          message += "Sila hubungi pesakit untuk maklumat lanjut.\n";
-          message += `Link sistem: ${APP_URL}`;
-          
-          const waUrl = buildWhatsAppLink(clinicPhone || "", message);
-          window.open(waUrl, "_blank");
-          
-          alert(`${selectedAppointments.size} temujanji berjaya direject`);
-          selectedAppointments.clear();
-          updateBatchActionBar();
-          
-          // Refresh list
-          await refreshDoctorAppointmentsList();
-          
-        } catch (error) {
-          console.error('Error batch reject', error);
-          alert('Gagal reject temujanji');
-        }
-      });
-    }
-
-    // ==============================
-    // MODIFIKASI FUNGSI CALENDAR UNTUK MASA
-    // ==============================
-
-    // Modified openAvailabilityCalendar function
-    function openAvailabilityCalendar() {
-      if (!currentProfile || (currentProfile.role !== 'doctor' && currentProfile.role !== 'ma')) return;
-      
-      selectedDates.clear();
-      selectedDatesWithTime = {};
-      availabilityCalendarModal.style.display = 'flex';
-      saveAvailability.classList.add('hidden');
-      timeSlotsSection.classList.add('hidden');
-      
-      currentCalendarMonth = new Date().getMonth();
-      currentCalendarYear = new Date().getFullYear();
-      
-      renderCalendar();
-      loadDoctorAvailabilityWithTimeForCalendar();
-    }
-
-    // Modified load doctor availability for calendar
-    async function loadDoctorAvailabilityWithTimeForCalendar() {
-      if (!currentProfile) return;
-      
-      const { data, error } = await db
-        .from('doctor_availability')
-        .select('date, time_slots')
-        .eq('doctor_id', currentProfile.id)
-        .gte('date', new Date().toISOString().split('T')[0]);
-      
-      if (error) {
-        console.error('Error loading availability', error);
-        return;
-      }
-      
-      if (data) {
-        data.forEach(item => {
-          selectedDates.add(item.date);
-          selectedDatesWithTime[item.date] = {
-            time_slots: item.time_slots || []
-          };
-        });
-        renderCalendar();
-        
-        if (selectedDates.size > 0) {
-          saveAvailability.classList.remove('hidden');
-        }
-      }
-    }
-
-    // Modified calendar day click handler
-    function handleCalendarDayClick(dateStr, element) {
-      if (selectedDates.has(dateStr)) {
-        // Show time slots for this date
-        currentSelectedDateForTime = dateStr;
-        selectedDateTitle.textContent = formatDate(dateStr);
-        
-        // Load time slots for this date
-        const timeSlots = selectedDatesWithTime[dateStr]?.time_slots || [];
-        timeSlotsContainer.innerHTML = generateTimeSlotHTML(dateStr, timeSlots);
-        
-        // Add event listeners to time slots
-        timeSlotsContainer.querySelectorAll('.time-slot').forEach(slot => {
-          slot.addEventListener('click', function() {
-            if (this.classList.contains('disabled')) return;
-            
-            this.classList.toggle('selected');
-          });
-        });
-        
-        timeSlotsSection.classList.remove('hidden');
-      } else {
-        // Select date first
-        selectedDates.add(dateStr);
-        element.classList.add('selected');
-        selectedDatesWithTime[dateStr] = { time_slots: [] };
-        
-        // Then show time slots
-        currentSelectedDateForTime = dateStr;
-        selectedDateTitle.textContent = formatDate(dateStr);
-        timeSlotsContainer.innerHTML = generateTimeSlotHTML(dateStr, []);
-        
-        // Add event listeners to time slots
-        timeSlotsContainer.querySelectorAll('.time-slot').forEach(slot => {
-          slot.addEventListener('click', function() {
-            if (this.classList.contains('disabled')) return;
-            
-            this.classList.toggle('selected');
-          });
-        });
-        
-        timeSlotsSection.classList.remove('hidden');
-      }
-      
-      if (selectedDates.size > 0) {
-        saveAvailability.classList.remove('hidden');
-      }
-    }
-
-    // Save time slots for a date
-    if (saveTimeSlots) {
-      saveTimeSlots.addEventListener('click', () => {
-        if (!currentSelectedDateForTime) return;
-        
-        const selectedTimeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot.selected'))
-          .map(slot => slot.dataset.time);
-        
-        selectedDatesWithTime[currentSelectedDateForTime] = {
-          time_slots: selectedTimeSlots
-        };
-        
-        // Update calendar display
-        const dayElement = document.querySelector(`.calendar-day[data-date="${currentSelectedDateForTime}"]`);
-        if (dayElement) {
-          if (selectedTimeSlots.length > 0) {
-            dayElement.title = `${selectedTimeSlots.length} masa available dipilih`;
-          }
-        }
-        
-        timeSlotsSection.classList.add('hidden');
-      });
-    }
-
-    // Modified save availability with time slots
-    async function saveAvailabilityDates() {
-      if (!currentProfile || selectedDates.size === 0) return;
-
-      try {
-        // Delete existing availability
-        const { error: delErr } = await db
-          .from("doctor_availability")
-          .delete()
-          .eq("doctor_id", currentProfile.id);
-
-        if (delErr) throw delErr;
-
-        // Prepare data with time slots
-        const availabilityData = [];
-        selectedDates.forEach(date => {
-          const timeSlots = selectedDatesWithTime[date]?.time_slots || [];
-          if (timeSlots.length > 0) {
-            availabilityData.push({
-              doctor_id: currentProfile.id,
-              date: date,
-              day_of_week: getDayOfWeekNumber(date),
-              time_slots: timeSlots,
-              status: "available"
-            });
-          }
-        });
-
-        if (availabilityData.length > 0) {
-          const { error: insErr } = await db
-            .from("doctor_availability")
-            .insert(availabilityData);
-
-          if (insErr) throw insErr;
-        }
-
-        alert("Tarikh & masa available berjaya disimpan!");
-        closeAvailabilityCalendar();
-      } catch (error) {
-        console.error("Error saving availability", error);
-        alert("Gagal menyimpan tarikh & masa available. Sila cuba lagi.");
-      }
-    }
-
-    // Modified load doctor availability for staff
-    async function loadDoctorAvailabilityForStaff(doctorId) {
-      if (!doctorId) return;
-      
-      const { data, error } = await db
-        .from('doctor_availability')
-        .select('date, time_slots')
-        .eq('doctor_id', doctorId)
-        .gte('date', new Date().toISOString().split('T')[0])
-        .order('date', { ascending: true });
-      
-      if (error) {
-        console.error('Error loading availability for staff', error);
-        availabilityTableView.innerHTML = '<p class="p-4 text-slate-500">Gagal memuatkan tarikh & masa available.</p>';
-        return;
-      }
-      
-      renderAvailabilityView(data || []);
-    }
-
-    // Modified render availability view
-    function renderAvailabilityView(availabilityData) {
-      if (currentAvailabilityView === 'list') {
-        renderAvailabilityList(availabilityData);
-      } else {
-        renderAvailabilityCalendar(availabilityData);
-      }
-    }
-
-    // Modified render availability list with time
-    function renderAvailabilityList(availabilityData) {
-      if (!availabilityData.length) {
-        availabilityTableView.innerHTML = `
-          <div class="p-4 text-center text-slate-500">
-            Doktor belum memasukkan tarikh & masa available.
-          </div>
-        `;
-        return;
-      }
-      
-      let html = '<div class="divide-y divide-slate-100">';
-      
-      availabilityData.forEach(item => {
-        const date = new Date(item.date);
-        const dateStr = date.toLocaleDateString('ms-MY', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-        
-        // Display time slots if available
-        let timeSlotsHTML = '';
-        if (item.time_slots && item.time_slots.length > 0) {
-          timeSlotsHTML = `
-            <div class="mt-2">
-              <div class="text-xs text-slate-500 mb-1">Masa Available:</div>
-              <div class="flex flex-wrap gap-1">
-                ${item.time_slots.map(time => `
-                  <button class="select-time-btn px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs hover:bg-emerald-200"
-                          data-date="${item.date}" data-time="${time}">
-                    ${formatTimeTo12h(time)}
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-          `;
-        }
-        
-        html += `
-          <div class="availability-date-item">
-            <div class="flex-1">
-              <div class="font-medium text-slate-800">${dateStr}</div>
-              <div class="text-xs text-slate-500">${formatDate(item.date)}</div>
-              ${timeSlotsHTML}
-            </div>
-            <div class="flex flex-col gap-2">
-              <button class="select-date-btn px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm rounded-lg transition-colors"
-                      data-date="${item.date}">
-                Pilih Tarikh
-              </button>
-              ${item.time_slots && item.time_slots.length > 0 ? `
-                <button class="show-time-slots-btn px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-colors"
-                        data-date="${item.date}">
-                  Lihat Masa
-                </button>
-              ` : ''}
-            </div>
-          </div>
-        `;
-      });
-      
-      html += '</div>';
-      availabilityTableView.innerHTML = html;
-      
-      // Add event listeners
-      availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const date = btn.dataset.date;
-          requestedDate.value = date;
-          hideAvailabilityTable();
-        });
-      });
-      
-      availabilityTableView.querySelectorAll('.select-time-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const date = btn.dataset.date;
-          const time = btn.dataset.time;
-          requestedDate.value = date;
-          requestedTime.value = time;
-          hideAvailabilityTable();
-        });
-      });
-    }
-
-    // ==============================
-    // MODIFIKASI STAFF APPOINTMENT FORM
-    // ==============================
-
-    // Modified appointment form submit (Desktop)
-    if (appointmentForm) {
-      appointmentForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        appointmentError.classList.add("hidden");
-        appointmentMessage.classList.add("hidden");
-        staffWhatsappBox.classList.add("hidden");
-        lastCreatedAppointment = null;
-
-        if (!currentProfile || currentProfile.role !== "staff") {
-          showMessage(appointmentError, "Hanya staff boleh cipta temujanji.", true);
-          return;
-        }
-
-        const serviceId = serviceSelect.value || null;
-        const doctorId = doctorSelect.value || null;
-        if (!serviceId || !doctorId) {
-          showMessage(appointmentError, "Sila pilih servis dan doktor.", true);
-          return;
-        }
-
-        // NEW: Include time and duration
-        const payload = {
-          service_id: serviceId,
-          doctor_id: doctorId,
-          patient_name: patientName.value.trim(),
-          patient_ic: patientIC.value.trim(),
-          patient_phone: patientPhone.value.trim(),
-          complaint: complaint.value.trim() || null,
-          requested_date: requestedDate.value,
-          requested_time: requestedTime.value, // NEW
-          appointment_duration: appointmentDuration.value, // NEW
-          status: "pending"
-        };
-
-        const { data: insertResult, error } = await db
-          .from("appointments")
-          .insert(payload)
-          .select("*")
-          .single();
-
-        if (error) {
-          console.error("Error insert appointment", error);
-          showMessage(appointmentError, error.message || "Gagal simpan temujanji.", true);
-          return;
-        }
-
-        const appointmentId = insertResult.id;
-        lastCreatedAppointment = insertResult;
-
-        // Simpan custom field values
-        const fieldInputs = customFieldsContainer.querySelectorAll("input[data-field-id]");
-        const valuesPayload = [];
-        fieldInputs.forEach(input => {
-          if (!input.value) return;
-          valuesPayload.push({
-            appointment_id: appointmentId,
-            field_id: input.dataset.fieldId,
-            value_text: input.value
-          });
-        });
-
-        if (valuesPayload.length > 0) {
-          const { error: vErr } = await db.from("appointment_field_values").insert(valuesPayload);
-          if (vErr) console.error("Error insert field values", vErr);
-        }
-
-        showMessage(appointmentMessage, "Temujanji berjaya disimpan.", false);
-
-        // Clear input including time
-        patientName.value = "";
-        patientIC.value = "";
-        patientPhone.value = "";
-        complaint.value = "";
-        requestedDate.value = "";
-        requestedTime.value = "";
-        appointmentDuration.value = "30";
-        customFieldsContainer.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
-
-        await refreshStaffAppointmentsList();
-        buildStaffWhatsappLink(insertResult);
-      });
-    }
-
-    // Modified appointment form submit (Mobile)
-    if (appointmentFormMobile) {
-      appointmentFormMobile.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        appointmentErrorMobile.classList.add("hidden");
-        appointmentMessageMobile.classList.add("hidden");
-        staffWhatsappBoxMobile.classList.add("hidden");
-        lastCreatedAppointment = null;
-
-        if (!currentProfile || currentProfile.role !== "staff") {
-          showMessage(appointmentErrorMobile, "Hanya staff boleh cipta temujanji.", true);
-          return;
-        }
-
-        const serviceId = serviceSelectMobile.value || null;
-        const doctorId = doctorSelectMobile.value || null;
-        if (!serviceId || !doctorId) {
-          showMessage(appointmentErrorMobile, "Sila pilih servis dan doktor.", true);
-          return;
-        }
-
-        // NEW: Include time and duration
-        const payload = {
-          service_id: serviceId,
-          doctor_id: doctorId,
-          patient_name: patientNameMobile.value.trim(),
-          patient_ic: patientICMobile.value.trim(),
-          patient_phone: patientPhoneMobile.value.trim(),
-          complaint: complaintMobile.value.trim() || null,
-          requested_date: requestedDateMobile.value,
-          requested_time: requestedTimeMobile.value, // NEW
-          appointment_duration: appointmentDurationMobile.value, // NEW
-          status: "pending"
-        };
-
-        const { data: insertResult, error } = await db
-          .from("appointments")
-          .insert(payload)
-          .select("*")
-          .single();
-
-        if (error) {
-          console.error("Error insert appointment", error);
-          showMessage(appointmentErrorMobile, error.message || "Gagal simpan temujanji.", true);
-          return;
-        }
-
-        const appointmentId = insertResult.id;
-        lastCreatedAppointment = insertResult;
-
-        // Simpan custom field values
-        const fieldInputs = customFieldsContainerMobile.querySelectorAll("input[data-field-id]");
-        const valuesPayload = [];
-        fieldInputs.forEach(input => {
-          if (!input.value) return;
-          valuesPayload.push({
-            appointment_id: appointmentId,
-            field_id: input.dataset.fieldId,
-            value_text: input.value
-          });
-        });
-
-        if (valuesPayload.length > 0) {
-          const { error: vErr } = await db.from("appointment_field_values").insert(valuesPayload);
-          if (vErr) console.error("Error insert field values", vErr);
-        }
-
-        showMessage(appointmentMessageMobile, "Temujanji berjaya disimpan.", false);
-
-        // Clear input including time
-        patientNameMobile.value = "";
-        patientICMobile.value = "";
-        patientPhoneMobile.value = "";
-        complaintMobile.value = "";
-        requestedDateMobile.value = "";
-        requestedTimeMobile.value = "";
-        appointmentDurationMobile.value = "30";
-        customFieldsContainerMobile.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
-
-        await refreshStaffAppointmentsList();
-        buildStaffWhatsappLinkMobile(insertResult);
-      });
-    }
-
-    // ==============================
-    // MODIFIKASI STAFF APPOINTMENT DISPLAY
-    // ==============================
-
-    // Modified render staff appointment card with time
-    function renderStaffAppointmentCard(a, isMobile = false) {
-      const doctor = doctorsCache.find(d => d.id === a.doctor_id);
-      const doctorName = doctor?.full_name || "Doktor Tidak Dikenali";
-      const service = servicesCache.find(s => s.id === a.service_id);
-      const serviceName = service?.name || "Servis Tidak Dikenali";
-      const serviceColor = getServiceColor(a.service_id);
-      
-      // Status badge
-      let statusColor = "";
-      let statusText = "";
-      if (a.status === "pending") {
-        statusColor = "bg-amber-50 text-amber-700 border-amber-200";
-        statusText = "Menunggu";
-      } else if (a.status === "approved") {
-        statusColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
-        statusText = "Diluluskan";
-      } else if (a.status === "rejected") {
-        statusColor = "bg-rose-50 text-rose-700 border-rose-200";
-        statusText = "Ditolak";
-      }
-      
-      // Format date and time
-      const requestedDateTime = a.requested_time ? 
-        `${formatDate(a.requested_date)} ${formatTimeTo12h(a.requested_time)}` : 
-        formatDate(a.requested_date);
-      
-      const doctorSelectedDateTime = a.doctor_selected_date && a.doctor_selected_time ?
-        `${formatDate(a.doctor_selected_date)} ${formatTimeTo12h(a.doctor_selected_time)}` :
-        (a.doctor_selected_date ? formatDate(a.doctor_selected_date) : '');
-      
-      // NEW: Remark badge based on time slot match
-      let remarkHTML = '';
-      if (a.status === 'approved' && a.requested_time && a.doctor_selected_time) {
-        const timeMatch = a.requested_time === a.doctor_selected_time;
-        remarkHTML = `
-          <span class="remark-badge ${timeMatch ? 'remark-match' : 'remark-mismatch'}">
-            ${timeMatch ? '✓ Masa match' : '✗ Masa berubah'}
-          </span>
-        `;
-      }
-      
-      const card = document.createElement("div");
-      card.className = isMobile ? 
-        "border border-slate-200 bg-white rounded-xl p-3 relative appointment-card mb-3" :
-        "border border-slate-200 bg-white rounded-xl p-4 relative appointment-card card-hover hover:border-slate-300 transition-all duration-200";
-      
-      card.dataset.appointmentId = a.id;
-      
-      card.innerHTML = `
-        <div class="flex justify-between items-start mb-2">
-          <div class="flex-1">
-            <h3 class="${isMobile ? 'text-sm' : 'text-base'} font-bold text-slate-900 truncate">${a.patient_name}</h3>
-            <p class="${isMobile ? 'text-xs' : 'text-sm'} text-slate-500 mt-1">${doctorName} • ${serviceName}</p>
-            ${a.complaint ? `<p class="${isMobile ? 'text-xs' : 'text-sm'} text-slate-600 mt-1 ${isMobile ? 'truncate' : ''}">${a.complaint}</p>` : ''}
-          </div>
-          <div class="flex flex-col items-end gap-1">
-            <div class="flex items-center gap-1">
-              <span class="status-badge ${statusColor} ${isMobile ? 'text-xs' : ''}">${statusText}</span>
-              ${remarkHTML}
-            </div>
-            <button class="delete-btn text-rose-500 hover:text-rose-700 transition-opacity ${isMobile ? 'text-xs' : ''}"
-                    title="Padam temujanji">
-              <svg xmlns="http://www.w3.org/2000/svg" class="${isMobile ? 'h-3 w-3' : 'h-4 w-4'}" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="space-y-1 ${isMobile ? 'text-xs' : 'text-sm'}">
-          <div class="flex items-center text-slate-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="${isMobile ? 'h-3 w-3' : 'h-4 w-4'} mr-1 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>Diminta: ${requestedDateTime}</span>
-          </div>
-          ${a.doctor_selected_date ? `
-            <div class="flex items-center text-slate-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="${isMobile ? 'h-3 w-3' : 'h-4 w-4'} mr-1 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Disahkan: ${doctorSelectedDateTime}</span>
-            </div>
-          ` : ''}
-          ${a.duration ? `
-            <div class="flex items-center text-slate-600">
-              <svg xmlns="http://www.w3.org/2000/svg" class="${isMobile ? 'h-3 w-3' : 'h-4 w-4'} mr-1 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Tempoh: ${a.duration} minit</span>
-            </div>
-          ` : ''}
-        </div>
-      `;
-      
-      return card;
-    }
-
-    // ==============================
-    // MODIFIKASI DOCTOR APPOINTMENT DISPLAY
-    // ==============================
-
-    // Modified render doctor appointments with batch selection
-    async function refreshDoctorAppointmentsList() {
-      if (!currentProfile || (currentProfile.role !== "doctor" && currentProfile.role !== "ma")) return;
-      
-      let query = db
-        .from("appointments")
-        .select("id, patient_name, patient_ic, patient_phone, complaint, requested_date, requested_time, appointment_duration, status, doctor_selected_date, doctor_selected_time, doctor_alt_date1, doctor_alt_time1, doctor_alt_date2, doctor_alt_time2, service_id, doctor_id")
-        .eq("doctor_id", currentProfile.id);
-
-      if (activeDoctorTab === "pending") {
-        query = query.in("status", ["pending", "reschedule_pending"]);
-        doctorTabDescription.innerHTML = `
-          Senarai temujanji yang menunggu tindakan. Gunakan checkbox untuk pilih multiple dan lakukan batch action.
-        `;
-      } else if (activeDoctorTab === "approved") {
-        query = query.eq("status", "approved");
-        doctorTabDescription.innerHTML = `
-          Senarai temujanji yang telah diluluskan dengan remark masa.
-        `;
-      } else if (activeDoctorTab === "rejected") {
-        query = query.eq("status", "rejected");
-        doctorTabDescription.innerHTML = `
-          Senarai temujanji yang telah ditolak dengan cadangan tarikh & masa alternatif.
-        `;
-      }
-
-      query = query.order("created_at", { ascending: false }).limit(50);
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error("Error load doctor appointments", error);
-        doctorAppointmentsList.innerHTML =
-          '<p class="text-base text-rose-500">Gagal load temujanji.</p>';
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        let message = "";
-        if (activeDoctorTab === "pending") message = "Belum ada temujanji yang menunggu tindakan.";
-        else if (activeDoctorTab === "approved") message = "Belum ada temujanji yang telah diluluskan.";
-        else if (activeDoctorTab === "rejected") message = "Belum ada temujanji yang ditolak.";
-        
-        doctorAppointmentsList.innerHTML =
-          `<p class="text-base text-slate-500">${message}</p>`;
-        return;
-      }
-
-      doctorAppointmentsList.innerHTML = "";
-      
-      // Load doctor availability for remark checking
-      const doctorAvailability = await loadDoctorAvailabilityWithTime(currentProfile.id);
-      
-      data.forEach(a => {
-        const card = document.createElement("div");
-        card.className = "border border-slate-200 rounded-xl px-4 py-3 space-y-3 bg-white shadow-sm card-hover";
-
-        const serviceName = servicesCache.find(s => s.id === a.service_id)?.name || "Servis Klinik";
-
-        const statusBadge = (() => {
-          let cls = "bg-slate-100 text-slate-600";
-          if (a.status === "pending") cls = "bg-amber-50 text-amber-700";
-          if (a.status === "reschedule_pending") cls = "bg-emerald-50 text-emerald-700";
-          if (a.status === "approved") cls = "bg-emerald-50 text-emerald-700";
-          if (a.status === "rejected") cls = "bg-rose-50 text-rose-700";
-          return `<span class="inline-flex px-3 py-1.5 rounded-full text-sm ${cls} border border-current">${a.status}</span>`;
-        })();
-        
-        // NEW: Check time slot match for remark
-        const timeMatch = checkTimeSlotMatch(a, doctorAvailability);
-        let remarkHTML = '';
-        if (a.status === 'approved' && timeMatch !== null) {
-          remarkHTML = `
-            <span class="remark-badge ${timeMatch ? 'remark-match' : 'remark-mismatch'}">
-              ${timeMatch ? '✓ Masa match dengan availability' : '✗ Masa tidak match'}
-            </span>
-          `;
-        }
-
-        // Format date and time for display
-        const requestedDateTime = a.requested_time ? 
-          `${formatDate(a.requested_date)} ${formatTimeTo12h(a.requested_time)}` : 
-          formatDate(a.requested_date);
-        
-        const doctorSelectedDateTime = a.doctor_selected_date && a.doctor_selected_time ?
-          `${formatDate(a.doctor_selected_date)} ${formatTimeTo12h(a.doctor_selected_time)}` :
-          (a.doctor_selected_date ? formatDate(a.doctor_selected_date) : '');
-
-        card.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              ${activeDoctorTab === "pending" ? `
-                <div class="flex items-center gap-2 mb-2">
-                  <input type="checkbox" class="appointment-checkbox" value="${a.id}" 
-                         ${selectedAppointments.has(a.id) ? 'checked' : ''}>
-                  <div class="text-base md:text-lg font-bold text-slate-900">${a.patient_name}</div>
-                </div>
-              ` : `
-                <div class="text-base md:text-lg font-bold text-slate-900">${a.patient_name}</div>
-              `}
-              <div class="text-sm text-slate-500">${serviceName}</div>
-              <div class="text-sm text-slate-400">
-                IC: ${a.patient_ic} • Tel: ${a.patient_phone}
-              </div>
-              ${a.complaint ? `<div class="text-sm text-slate-600 mt-2">Complaint: ${a.complaint}</div>` : ''}
-            </div>
-            <div class="text-right text-sm text-slate-500">
-              <div>Diminta: ${requestedDateTime}</div>
-              ${a.doctor_selected_date ? `<div>Dipilih: ${doctorSelectedDateTime}</div>` : ""}
-              <div class="flex items-center justify-end gap-1 mt-1">
-                ${statusBadge}
-                ${remarkHTML}
-              </div>
-            </div>
-          </div>
-        `;
-
-        // Action row untuk pending tab
-        if (activeDoctorTab === "pending") {
-          const actionRow = document.createElement("div");
-          actionRow.className = "mt-4 grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] gap-4";
-
-          // Approve section
-          const approveDiv = document.createElement("div");
-          approveDiv.className = "space-y-3";
-          
-          // Date and time inputs for approval
-          const approveDateInput = document.createElement("input");
-          approveDateInput.type = "date";
-          approveDateInput.value = a.doctor_selected_date || a.requested_date || "";
-          approveDateInput.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mb-2";
-          
-          const approveTimeInput = document.createElement("select");
-          approveTimeInput.className = "w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm";
-          approveTimeInput.innerHTML = `
-            <option value="">Pilih masa...</option>
-            ${getStandardTimeSlots().map(time => `
-              <option value="${time}" ${a.doctor_selected_time === time ? 'selected' : ''}>
-                ${formatTimeTo12h(time)}
-              </option>
-            `).join('')}
-          `;
-
-          const approveBtn = document.createElement("button");
-          approveBtn.textContent = "Approve";
-          approveBtn.className = "w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
-
-          const approveWhatsappBtn = document.createElement("button");
-          approveWhatsappBtn.textContent = "Approve & WhatsApp Klinik";
-          approveWhatsappBtn.className = "w-full rounded-lg bg-green-500 hover:bg-green-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
-
-          approveDiv.appendChild(approveDateInput);
-          approveDiv.appendChild(approveTimeInput);
-          approveDiv.appendChild(approveBtn);
-          approveDiv.appendChild(approveWhatsappBtn);
-
-          // Reject section
-          const rejectWrapper = document.createElement("div");
-          rejectWrapper.className = "space-y-3";
-
-          const rejectBtn = document.createElement("button");
-          rejectBtn.textContent = "Reject";
-          rejectBtn.className = "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl";
-
-          const rejectPanel = document.createElement("div");
-          rejectPanel.className = "mt-3 space-y-3 hidden";
-
-          // Alternative date 1 with time
-          const alt1Div = document.createElement("div");
-          alt1Div.className = "space-y-2";
-          alt1Div.innerHTML = `
-            <label class="block text-sm text-slate-700">Tarikh cadangan 1</label>
-            <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
-            <label class="block text-sm text-slate-700 mt-2">Masa cadangan 1</label>
-            <select class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm">
-              <option value="">Pilih masa...</option>
-              ${getStandardTimeSlots().map(time => `
-                <option value="${time}">${formatTimeTo12h(time)}</option>
-              `).join('')}
-            </select>
-          `;
-
-          // Alternative date 2 with time
-          const alt2Div = document.createElement("div");
-          alt2Div.className = "space-y-2";
-          alt2Div.innerHTML = `
-            <label class="block text-sm text-slate-700">Tarikh cadangan 2</label>
-            <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
-            <label class="block text-sm text-slate-700 mt-2">Masa cadangan 2</label>
-            <select class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm">
-              <option value="">Pilih masa...</option>
-              ${getStandardTimeSlots().map(time => `
-                <option value="${time}">${formatTimeTo12h(time)}</option>
-              `).join('')}
-            </select>
-          `;
-
-          const rejectConfirmBtn = document.createElement("button");
-          rejectConfirmBtn.textContent = "Reject dengan Cadangan";
-          rejectConfirmBtn.className = "w-full rounded-lg bg-rose-600 hover:bg-rose-700 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
-
-          const rejectWhatsappBtn = document.createElement("button");
-          rejectWhatsappBtn.textContent = "Reject & WhatsApp Klinik";
-          rejectWhatsappBtn.className = "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
-
-          rejectPanel.appendChild(alt1Div);
-          rejectPanel.appendChild(alt2Div);
-          rejectPanel.appendChild(rejectConfirmBtn);
-          rejectPanel.appendChild(rejectWhatsappBtn);
-
-          rejectWrapper.appendChild(rejectBtn);
-          rejectWrapper.appendChild(rejectPanel);
-
-          actionRow.appendChild(approveDiv);
-          actionRow.appendChild(rejectWrapper);
-
-          card.appendChild(actionRow);
-
-          // Event listeners untuk checkbox
-          const checkbox = card.querySelector('.appointment-checkbox');
-          if (checkbox) {
-            checkbox.addEventListener('change', (e) => {
-              toggleBatchSelection(a.id);
-            });
-          }
-
-          // Handlers untuk Approve
-          approveBtn.addEventListener("click", async () => {
-            const date = approveDateInput.value;
-            const time = approveTimeInput.value;
-            if (!date || !time) {
-              alert("Sila pilih tarikh dan masa yang dipersetujui.");
-              return;
-            }
-            const { error } = await db
-              .from("appointments")
-              .update({ 
-                status: "approved", 
-                doctor_selected_date: date,
-                doctor_selected_time: time 
-              })
-              .eq("id", a.id);
-            if (error) {
-              console.error("Error approve", error);
-              alert("Gagal update status.");
-              return;
-            }
-            alert("Temujanji telah diluluskan.");
-            await refreshDoctorAppointmentsList();
-          });
-
-          approveWhatsappBtn.addEventListener("click", async () => {
-            const date = approveDateInput.value;
-            const time = approveTimeInput.value;
-            if (!date || !time) {
-              alert("Sila pilih tarikh dan masa yang dipersetujui.");
-              return;
-            }
-            const { error } = await db
-              .from("appointments")
-              .update({ 
-                status: "approved", 
-                doctor_selected_date: date,
-                doctor_selected_time: time 
-              })
-              .eq("id", a.id);
-            if (error) {
-              console.error("Error approve", error);
-              alert("Gagal update status.");
-              return;
-            }
-            
-            // WhatsApp ke staff
-            const clinicPhone = await fetchClinicWhatsapp();
-            const msg = [
-              "Assalamualaikum / Salam sejahtera,",
-              "",
-              "Saya setuju untuk temujanji pesakit berikut:",
-              `Servis: ${serviceName}`,
-              `Nama: ${a.patient_name}`,
-              `Complaint: ${a.complaint || "Tiada complaint dinyatakan"}`,
-              `Tarikh & Masa: ${date} ${formatTimeTo12h(time)}`,
-              "",
-              "Sila maklumkan kepada pesakit."
-            ].join("\n");
-            
-            const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
-            window.open(waUrl, "_blank");
-            await refreshDoctorAppointmentsList();
-          });
-
-          // Handlers untuk Reject
-          rejectBtn.addEventListener("click", () => {
-            rejectPanel.classList.toggle("hidden");
-          });
-
-          rejectConfirmBtn.addEventListener("click", async () => {
-            const date1 = rejectPanel.querySelector('input[type="date"]:nth-of-type(1)').value;
-            const time1 = rejectPanel.querySelector('select:nth-of-type(1)').value;
-            const date2 = rejectPanel.querySelector('input[type="date"]:nth-of-type(2)').value;
-            const time2 = rejectPanel.querySelector('select:nth-of-type(2)').value;
-            
-            if (!date1 || !time1 || !date2 || !time2) {
-              alert("Sila isi semua tarikh dan masa cadangan.");
-              return;
-            }
-            
-            const { error } = await db
-              .from("appointments")
-              .update({
-                status: "rejected",
-                doctor_alt_date1: date1,
-                doctor_alt_time1: time1,
-                doctor_alt_date2: date2,
-                doctor_alt_time2: time2
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error reject", error);
-              alert("Gagal update status.");
-              return;
-            }
-            
-            alert("Temujanji telah ditolak dengan cadangan tarikh & masa alternatif.");
-            await refreshDoctorAppointmentsList();
-          });
-
-          rejectWhatsappBtn.addEventListener("click", async () => {
-            const date1 = rejectPanel.querySelector('input[type="date"]:nth-of-type(1)').value;
-            const time1 = rejectPanel.querySelector('select:nth-of-type(1)').value;
-            const date2 = rejectPanel.querySelector('input[type="date"]:nth-of-type(2)').value;
-            const time2 = rejectPanel.querySelector('select:nth-of-type(2)').value;
-            
-            if (!date1 || !time1 || !date2 || !time2) {
-              alert("Sila isi semua tarikh dan masa cadangan.");
-              return;
-            }
-            
-            const { error } = await db
-              .from("appointments")
-              .update({
-                status: "rejected",
-                doctor_alt_date1: date1,
-                doctor_alt_time1: time1,
-                doctor_alt_date2: date2,
-                doctor_alt_time2: time2
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error reject", error);
-              alert("Gagal update status.");
-              return;
-            }
-            
-            // WhatsApp ke staff
-            const clinicPhone = await fetchClinicWhatsapp();
-            const msg = [
-              "Assalamualaikum / Salam sejahtera,",
-              "",
-              "Saya TIDAK dapat hadir pada tarikh temujanji asal untuk pesakit berikut:",
-              `Servis: ${serviceName}`,
-              `Nama: ${a.patient_name}`,
-              `Complaint: ${a.complaint || "Tiada complaint dinyatakan"}`,
-              `Tarikh & Masa asal: ${formatDate(a.requested_date)} ${formatTimeTo12h(a.requested_time)}`,
-              "",
-              "Cadangan tarikh & masa baharu:",
-              `1) ${date1} ${formatTimeTo12h(time1)}`,
-              `2) ${date2} ${formatTimeTo12h(time2)}`,
-              "",
-              "Sila hubungi pesakit untuk maklumat lanjut."
-            ].join("\n");
-            
-            const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
-            window.open(waUrl, "_blank");
-            await refreshDoctorAppointmentsList();
-          });
-        } else if (activeDoctorTab === "rejected") {
-          // Untuk rejected tab, show suggested dates with times
-          if (a.doctor_alt_date1 || a.doctor_alt_date2) {
-            const datesDiv = document.createElement("div");
-            datesDiv.className = "mt-3 text-sm text-slate-600";
-            
-            const dates = [];
-            if (a.doctor_alt_date1 && a.doctor_alt_time1) {
-              dates.push(`${formatDate(a.doctor_alt_date1)} ${formatTimeTo12h(a.doctor_alt_time1)}`);
-            }
-            if (a.doctor_alt_date2 && a.doctor_alt_time2) {
-              dates.push(`${formatDate(a.doctor_alt_date2)} ${formatTimeTo12h(a.doctor_alt_time2)}`);
-            }
-            
-            datesDiv.textContent = `Cadangan: ${dates.join(', ')}`;
-            card.appendChild(datesDiv);
-            
-            const note = document.createElement("div");
-            note.className = "mt-2 text-sm text-slate-500";
-            note.textContent = "Menunggu staff klinik hubungi pesakit untuk pilih tarikh & masa baharu.";
-            card.appendChild(note);
-          }
-        }
-
-        doctorAppointmentsList.appendChild(card);
-      });
-    }
-
-    // ==============================
-    // FUNGSI-FUNGSI LAIN YANG PERLU DIMODIFIKASI
-    // ==============================
-
-    // Modified fetchExportData untuk include time
-    async function fetchExportData() {
-      exportLoading.classList.remove("hidden");
-      exportPreview.classList.add("hidden");
-      
-      const doctorId = exportDoctor.value;
-      const month = exportMonth.value;
-      const year = exportYear.value;
-      
-      let query = db
-        .from("appointments")
-        .select(`
-          id,
-          patient_name,
-          patient_ic,
-          patient_phone,
-          complaint,
-          requested_date,
-          requested_time,
-          appointment_duration,
-          status,
-          doctor_selected_date,
-          doctor_selected_time,
-          doctor_alt_date1,
-          doctor_alt_time1,
-          doctor_alt_date2,
-          doctor_alt_time2,
-          created_at,
-          service_id,
-          doctor_id,
-          services(name),
-          profiles!appointments_doctor_id_fkey(full_name)
-        `)
-        .order("created_at", { ascending: false });
-
-      // ... (filter logic sama seperti asal)
-      
-      // Return data dengan time
-    }
-
-    // Modified buildStaffWhatsappLink untuk include time
-    function buildStaffWhatsappLink(appointment) {
-      if (!appointment || !staffWhatsappLink || !staffWhatsappBox) return;
-      const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
-      const doctorName = doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
-
-      const message = [
-        "Assalamualaikum / Salam sejahtera Dr,",
-        "",
-        "Ada permohonan temujanji baru:",
-        `Servis: ${serviceName}`,
-        `Nama pesakit: ${appointment.patient_name}`,
-        `IC: ${appointment.patient_ic}`,
-        `No. Telefon: ${appointment.patient_phone}`,
-        `Tarikh & Masa dicadangkan: ${formatDate(appointment.requested_date)} ${formatTimeTo12h(appointment.requested_time)}`,
-        `Tempoh: ${appointment.appointment_duration} minit`,
-        `Complaint: ${appointment.complaint || "Tiada complaint dinyatakan"}`,
-        "",
-        `Sila buka sistem untuk approve / reject: ${APP_URL}`
-      ]
-        .filter(Boolean)
-        .join("\n");
-
-      staffWhatsappBox.classList.remove("hidden");
-      fetchDoctorWhatsapp(appointment.doctor_id).then(phone => {
-        const phoneToUse = phone || "";
-        staffWhatsappLink.href = buildWhatsAppLink(phoneToUse, message);
-      });
-    }
-
-    // Modified loadSession untuk handle MA role
-    async function loadSession() {
-      const { data, error } = await db.auth.getUser();
-      if (error || !data.user) {
-        // ... (sama seperti asal)
-      }
-
-      currentUser = data.user;
-
-      const { data: profile, error: pErr } = await db
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .maybeSingle();
-
-      if (pErr || !profile) {
-        // ... (sama seperti asal)
-      }
-
-      currentProfile = profile;
-      const roleLabel = profile.role === "staff" ? "Staff Klinik" : 
-                       profile.role === "doctor" ? "Doktor" : 
-                       profile.role === "ma" ? "Medical Assistant" : "Pengguna";
-      userInfoEl.textContent = `${profile.full_name} (${roleLabel})`;
-      logoutBtn.classList.remove("hidden");
-
-      // Show tabs ikut role
-      navTabs.classList.remove("hidden");
-      if (profile.role === "staff") {
-        btnStaff.classList.remove("hidden");
-        btnExport.classList.remove("hidden");
-        btnSettings.classList.remove("hidden");
-        btnDoctor.classList.add("hidden");
-      } else if (profile.role === "doctor" || profile.role === "ma") {
-        // MA dan Doktor share panel yang sama
-        btnStaff.classList.add("hidden");
-        btnExport.classList.add("hidden");
-        btnSettings.classList.add("hidden");
-        btnDoctor.classList.remove("hidden");
-      }
-
-      await Promise.all([loadDoctors(), loadServices(), loadCustomFields()]);
-
-      setupRealtimeSubscription();
-
-      if (profile.role === "staff") {
-        setActiveTab("tab-staff");
-        await refreshStaffAppointmentsList();
-      } else if (profile.role === "doctor" || profile.role === "ma") {
-        setActiveTab("tab-doctor");
-        await refreshDoctorAppointmentsList();
-      }
-    }
-
-    // ==============================
-    // INITIALIZATION
-    // ==============================
-    document.addEventListener("DOMContentLoaded", () => {
-      setActiveTab("tab-login");
-      loadSession();
-      populateYearDropdown();
-      renderStaffFilterTabs();
-      
-      // Set default active doctor tab button
-      doctorTabButtons.forEach(btn => {
-        if (btn.dataset.tab === "pending") {
-          btn.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
-        }
-      });
-      
-      if (todayActionsListEl) {
-        todayActionsListEl.innerHTML =
-          '<p class="text-base text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
-      }
-      
-      // Set default values for time inputs
-      if (fixedStartTime) fixedStartTime.value = "18:00";
-      if (fixedEndTime) fixedEndTime.value = "20:00";
-      
-      // Add event listener untuk close calendar when clicking outside
-      document.addEventListener('click', (e) => {
-        if (availabilityTableContainer && !availabilityTableContainer.contains(e.target) && 
-            e.target !== doctorSelect && 
-            !doctorSelect.contains(e.target)) {
-          hideAvailabilityTable();
-        }
-      });
-    });
     // ==============================
     // KONFIGURASI SUPABASE & APP
     // ==============================
