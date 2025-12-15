@@ -194,7 +194,7 @@
       background: #f8fafc;
     }
     
-    /* STYLE UNTUK TABLE TERAPUNG YANG LEBIH KEMAS */
+    /* STYLE UNTUK TABLE TERAPUNG YANG LEBIH KEMAS - DIUBAH KE KANAN ATAS */
     #availabilityTableContainer {
       position: fixed;
       z-index: 1000;
@@ -206,9 +206,10 @@
       width: 450px;
       overflow-y: auto;
       display: none;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 100px;
+      left: auto;
+      right: 20px;
+      transform: none;
     }
     
     .availability-table-header {
@@ -430,6 +431,19 @@
     .staff-fixed-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 10px 10px -5px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* STYLE UNTUK BUTANG WHATSAPP PADA STAFF LIST */
+    .whatsapp-pending-btn {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: white;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .whatsapp-pending-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(37, 211, 102, 0.4), 0 10px 10px -5px rgba(18, 140, 126, 0.1);
     }
   </style>
 </head>
@@ -723,7 +737,7 @@
                               class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
-                      <!-- TABLE TERAPUNG AKAN MUNCUL DI TENGAH SCREEN -->
+                      <!-- TABLE TERAPUNG AKAN MUNCUL DI KANAN ATAS -->
                       <div id="availabilityTableContainer">
                         <button class="close-availability-btn" id="closeAvailabilityTable">×</button>
                         <div class="availability-table-header">
@@ -1470,6 +1484,7 @@
     // State untuk temujanji tetap
     let selectedDays = new Set();
     let fixedAppointmentsCache = [];
+    let doctorFixedTimes = new Map(); // Untuk menyimpan masa tetap doktor
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -1789,6 +1804,96 @@
       ];
       const index = serviceId ? parseInt(serviceId, 36) % colors.length : 0;
       return colors[index];
+    }
+
+    // ==============================
+    // FUNGSI BARU: LOAD MASA TETAP DOKTOR
+    // ==============================
+    async function loadDoctorFixedTime(doctorId) {
+      if (!doctorId) return;
+      
+      try {
+        const { data, error } = await db
+          .from('doctor_fixed_appointments')
+          .select('day_of_week, start_time, end_time, duration')
+          .eq('doctor_id', doctorId)
+          .order('day_of_week', { ascending: true });
+        
+        if (error) {
+          console.error('Error loading doctor fixed time', error);
+          return;
+        }
+        
+        // Simpan dalam map
+        doctorFixedTimes.clear();
+        if (data && data.length > 0) {
+          data.forEach(item => {
+            doctorFixedTimes.set(item.day_of_week, {
+              start_time: item.start_time,
+              end_time: item.end_time,
+              duration: item.duration
+            });
+          });
+        }
+        
+        return data;
+      } catch (error) {
+        console.error('Error in loadDoctorFixedTime', error);
+        return null;
+      }
+    }
+
+    // ==============================
+    // FUNGSI BARU: CHECK MASA DEFAULT UNTUK TARIKH
+    // ==============================
+    async function checkAndSetDefaultTimeForDate(doctorId, dateStr) {
+      if (!doctorId || !dateStr) return;
+      
+      // Load fixed time untuk doktor ini
+      await loadDoctorFixedTime(doctorId);
+      
+      // Dapatkan hari dalam seminggu (0 = Ahad, 1 = Isnin, ...)
+      const dateObj = new Date(dateStr);
+      const dayOfWeek = dateObj.getDay(); // 0-6
+      
+      // Check jika doktor ada setting masa untuk hari ini
+      const fixedTime = doctorFixedTimes.get(dayOfWeek);
+      
+      if (fixedTime && fixedTime.start_time) {
+        // Ada setting masa tetap untuk hari ini
+        if (appointmentTime) {
+          appointmentTime.value = fixedTime.start_time;
+        }
+        if (appointmentTimeMobile) {
+          appointmentTimeMobile.value = fixedTime.start_time;
+        }
+        if (appointmentDuration) {
+          appointmentDuration.value = fixedTime.duration || "60";
+        }
+        if (appointmentDurationMobile) {
+          appointmentDurationMobile.value = fixedTime.duration || "60";
+        }
+        
+        return {
+          hasFixedTime: true,
+          time: fixedTime.start_time,
+          duration: fixedTime.duration || "60"
+        };
+      } else {
+        // Tiada setting masa tetap untuk hari ini
+        if (appointmentTime) {
+          appointmentTime.value = "";
+        }
+        if (appointmentTimeMobile) {
+          appointmentTimeMobile.value = "";
+        }
+        
+        return {
+          hasFixedTime: false,
+          time: null,
+          duration: null
+        };
+      }
     }
 
     // ==============================
@@ -2460,7 +2565,7 @@
     }
 
     // ==============================
-    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS
+    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS - POSISI DIKANAN ATAS
     // ==============================
     function showAvailabilityTable(doctorId, doctorName) {
       if (!doctorId) return;
@@ -2468,11 +2573,10 @@
       currentSelectedDoctorId = doctorId;
       tableDoctorName.textContent = doctorName;
       
-      // Tampilkan di tengah screen dengan animasi
+      // Tampilkan di kanan atas dengan animasi
       availabilityTableContainer.style.display = 'block';
       setTimeout(() => {
         availabilityTableContainer.style.opacity = '1';
-        availabilityTableContainer.style.transform = 'translate(-50%, -50%) scale(1)';
       }, 10);
       
       loadDoctorAvailabilityForStaff(doctorId);
@@ -2480,7 +2584,6 @@
 
     function hideAvailabilityTable() {
       availabilityTableContainer.style.opacity = '0';
-      availabilityTableContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
       setTimeout(() => {
         availabilityTableContainer.style.display = 'none';
       }, 200);
@@ -2567,6 +2670,11 @@
           const availabilityItem = availabilityData.find(item => item.date === date);
           if (availabilityItem && availabilityItem.start_time) {
             appointmentTime.value = availabilityItem.start_time;
+          } else {
+            // Check for doctor's fixed time for this date
+            if (doctorSelect.value) {
+              checkAndSetDefaultTimeForDate(doctorSelect.value, date);
+            }
           }
           
           hideAvailabilityTable();
@@ -2689,6 +2797,11 @@
           const availabilityItem = availabilityData.find(item => item.date === date);
           if (availabilityItem && availabilityItem.start_time) {
             appointmentTime.value = availabilityItem.start_time;
+          } else {
+            // Check for doctor's fixed time for this date
+            if (doctorSelect.value) {
+              checkAndSetDefaultTimeForDate(doctorSelect.value, date);
+            }
           }
           
           hideAvailabilityTable();
@@ -3289,6 +3402,30 @@
         await refreshStaffAppointmentsList();
         buildStaffWhatsappLink(insertResult);
       });
+      
+      // Event listener untuk tarikh - check masa default doktor
+      if (requestedDate) {
+        requestedDate.addEventListener('change', async () => {
+          const doctorId = doctorSelect.value;
+          const dateStr = requestedDate.value;
+          
+          if (doctorId && dateStr) {
+            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+          }
+        });
+      }
+      
+      // Event listener untuk doktor - check masa default untuk tarikh yang telah dipilih
+      if (doctorSelect) {
+        doctorSelect.addEventListener('change', async () => {
+          const doctorId = doctorSelect.value;
+          const dateStr = requestedDate.value;
+          
+          if (doctorId && dateStr) {
+            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+          }
+        });
+      }
     }
 
     if (appointmentFormMobile) {
@@ -3376,6 +3513,30 @@
         await refreshStaffAppointmentsList();
         buildStaffWhatsappLinkMobile(insertResult);
       });
+      
+      // Event listener untuk tarikh mobile - check masa default doktor
+      if (requestedDateMobile) {
+        requestedDateMobile.addEventListener('change', async () => {
+          const doctorId = doctorSelectMobile.value;
+          const dateStr = requestedDateMobile.value;
+          
+          if (doctorId && dateStr) {
+            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+          }
+        });
+      }
+      
+      // Event listener untuk doktor mobile - check masa default untuk tarikh yang telah dipilih
+      if (doctorSelectMobile) {
+        doctorSelectMobile.addEventListener('change', async () => {
+          const doctorId = doctorSelectMobile.value;
+          const dateStr = requestedDateMobile.value;
+          
+          if (doctorId && dateStr) {
+            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+          }
+        });
+      }
     }
 
     async function fetchDoctorWhatsapp(doctorId) {
@@ -3843,6 +4004,24 @@
           const actionContainer = document.createElement("div");
           actionContainer.className = "mt-4 pt-3 border-t border-slate-100";
 
+          if (a.status === "pending") {
+            // BUTANG WHATSAPP BARU UNTUK STATUS PENDING
+            actionContainer.innerHTML = `
+              <button class="w-full whatsapp-pending-btn text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                WhatsApp Doktor
+              </button>
+              <p class="text-xs text-slate-500 mt-1 text-center">Hantar notifikasi kepada doktor</p>
+            `;
+            
+            const whatsappBtn = actionContainer.querySelector("button");
+            whatsappBtn.addEventListener("click", () => {
+              sendWhatsAppToDoctorForPendingAppointment(a);
+            });
+          }
+
           if (a.status === "approved") {
             const approvedDate = a.doctor_selected_date || a.requested_date;
             const timeInfoApproved = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
@@ -4006,6 +4185,24 @@
           const actionContainer = document.createElement("div");
           actionContainer.className = "mt-3 pt-2 border-t border-slate-100";
 
+          if (a.status === "pending") {
+            // BUTANG WHATSAPP BARU UNTUK STATUS PENDING (MOBILE)
+            actionContainer.innerHTML = `
+              <button class="w-full whatsapp-pending-btn text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                WhatsApp Doktor
+              </button>
+              <p class="text-xs text-slate-500 mt-1 text-center">Hantar notifikasi</p>
+            `;
+            
+            const whatsappBtn = actionContainer.querySelector("button");
+            whatsappBtn.addEventListener("click", () => {
+              sendWhatsAppToDoctorForPendingAppointment(a);
+            });
+          }
+
           if (a.status === "approved") {
             const approvedDate = a.doctor_selected_date || a.requested_date;
             const timeInfoApproved = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
@@ -4069,6 +4266,38 @@
           listEl.appendChild(card);
         });
       });
+    }
+
+    // ==============================
+    // FUNGSI BARU: WHATSAPP DOKTOR UNTUK APPOINTMENT PENDING
+    // ==============================
+    async function sendWhatsAppToDoctorForPendingAppointment(appointment) {
+      const doctorPhone = await fetchDoctorWhatsapp(appointment.doctor_id);
+      const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
+      
+      const timeInfo = appointment.appointment_time ? 
+        `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : 
+        '';
+
+      const msg = [
+        "Assalamualaikum / Salam sejahtera Dr,",
+        "",
+        "Ada permohonan temujanji baru:",
+        `Servis: ${serviceName}`,
+        `Nama pesakit: ${appointment.patient_name}`,
+        `IC: ${appointment.patient_ic}`,
+        `No. Telefon: ${appointment.patient_phone}`,
+        `Tarikh dicadangkan pesakit: ${formatDate(appointment.requested_date)}`,
+        `${timeInfo}`,
+        `Complaint: ${appointment.complaint || "Tiada complaint dinyatakan"}`,
+        "",
+        `Sila buka sistem untuk approve / reject: ${APP_URL}`
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      const waUrl = buildWhatsAppLink(doctorPhone || "", msg);
+      window.open(waUrl, "_blank");
     }
 
     function sendWhatsAppToPatientApproved(appointment) {
@@ -4990,8 +5219,7 @@
       // Set initial style untuk availability table
       if (availabilityTableContainer) {
         availabilityTableContainer.style.opacity = '0';
-        availabilityTableContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
-        availabilityTableContainer.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+        availabilityTableContainer.style.transition = 'opacity 0.2s ease';
       }
     });
   </script>
