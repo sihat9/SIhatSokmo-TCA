@@ -102,99 +102,7 @@
       box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.4), 0 10px 10px -5px rgba(5, 150, 105, 0.1);
     }
     
-    /* STYLE UNTUK FULLSCREEN CALENDAR */
-    #availabilityCalendarModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: white;
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-    }
-    
-    .calendar-header {
-      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-      color: white;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      padding: 20px;
-      flex: 1;
-      overflow-y: auto;
-    }
-    
-    .calendar-day {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-      font-size: 14px;
-    }
-    
-    .calendar-day:hover:not(.disabled) {
-      background-color: #f0fdf4;
-      transform: scale(1.05);
-    }
-    
-    .calendar-day.selected {
-      background-color: #10b981;
-      color: white;
-      font-weight: bold;
-    }
-    
-    .calendar-day.disabled {
-      color: #cbd5e1;
-      cursor: not-allowed;
-      background-color: #f8fafc;
-    }
-    
-    .calendar-day.holiday {
-      background-color: #fee2e2;
-      color: #dc2626;
-      position: relative;
-    }
-    
-    .calendar-day.holiday::after {
-      content: attr(data-holiday);
-      position: absolute;
-      bottom: 2px;
-      font-size: 8px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 100%;
-      text-align: center;
-      padding: 0 2px;
-    }
-    
-    .calendar-day.holiday.selected {
-      background-color: #10b981;
-      color: white;
-    }
-    
-    .calendar-day-header {
-      text-align: center;
-      padding: 10px 0;
-      font-weight: 600;
-      color: #64748b;
-      background: #f8fafc;
-    }
-    
-    /* STYLE UNTUK TABLE TERAPUNG YANG LEBIH KEMAS - DIUBAH KE KANAN ATAS */
+    /* STYLE UNTUK KALENDAR DOKTOR TERSEDIA DI KANAN TENGAH */
     #availabilityTableContainer {
       position: fixed;
       z-index: 1000;
@@ -206,10 +114,10 @@
       width: 450px;
       overflow-y: auto;
       display: none;
-      top: 100px;
+      top: 50%;
       left: auto;
       right: 20px;
-      transform: none;
+      transform: translateY(-50%);
     }
     
     .availability-table-header {
@@ -316,6 +224,98 @@
       font-size: 16px;
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    }
+    
+    /* STYLE UNTUK FULLSCREEN CALENDAR (DOKTOR) */
+    #availabilityCalendarModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+    }
+    
+    .calendar-header {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      padding: 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      font-size: 14px;
+    }
+    
+    .calendar-day:hover:not(.disabled) {
+      background-color: #f0fdf4;
+      transform: scale(1.05);
+    }
+    
+    .calendar-day.selected {
+      background-color: #10b981;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .calendar-day.disabled {
+      color: #cbd5e1;
+      cursor: not-allowed;
+      background-color: #f8fafc;
+    }
+    
+    .calendar-day.holiday {
+      background-color: #fee2e2;
+      color: #dc2626;
+      position: relative;
+    }
+    
+    .calendar-day.holiday::after {
+      content: attr(data-holiday);
+      position: absolute;
+      bottom: 2px;
+      font-size: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      text-align: center;
+      padding: 0 2px;
+    }
+    
+    .calendar-day.holiday.selected {
+      background-color: #10b981;
+      color: white;
+    }
+    
+    .calendar-day-header {
+      text-align: center;
+      padding: 10px 0;
+      font-weight: 600;
+      color: #64748b;
+      background: #f8fafc;
     }
     
     /* Cuti indicator */
@@ -737,7 +737,7 @@
                               class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
-                      <!-- TABLE TERAPUNG AKAN MUNCUL DI KANAN ATAS -->
+                      <!-- TABLE TERAPUNG AKAN MUNCUL DI KANAN TENGAH -->
                       <div id="availabilityTableContainer">
                         <button class="close-availability-btn" id="closeAvailabilityTable">×</button>
                         <div class="availability-table-header">
@@ -1861,6 +1861,10 @@
       
       if (fixedTime && fixedTime.start_time) {
         // Ada setting masa tetap untuk hari ini
+        // Update dropdown masa dengan pilihan dalam range masa doktor
+        await updateTimeDropdownWithDoctorRange(fixedTime.start_time, fixedTime.end_time, doctorId);
+        
+        // Set masa default
         if (appointmentTime) {
           appointmentTime.value = fixedTime.start_time;
         }
@@ -1880,11 +1884,34 @@
           duration: fixedTime.duration || "60"
         };
       } else {
-        // Tiada setting masa tetap untuk hari ini
+        // Tiada setting masa tetap untuk hari ini - kosongkan dropdown
         if (appointmentTime) {
+          appointmentTime.innerHTML = '<option value="">Pilih masa...</option>';
+          // Tambah pilihan standard
+          const standardTimes = [
+            '08:00', '09:00', '10:00', '11:00', '12:00',
+            '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+          ];
+          standardTimes.forEach(time => {
+            const option = document.createElement('option');
+            option.value = time;
+            option.textContent = formatTime(time);
+            appointmentTime.appendChild(option);
+          });
           appointmentTime.value = "";
         }
         if (appointmentTimeMobile) {
+          appointmentTimeMobile.innerHTML = '<option value="">Pilih masa...</option>';
+          const standardTimes = [
+            '08:00', '09:00', '10:00', '11:00', '12:00',
+            '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+          ];
+          standardTimes.forEach(time => {
+            const option = document.createElement('option');
+            option.value = time;
+            option.textContent = formatTime(time);
+            appointmentTimeMobile.appendChild(option);
+          });
           appointmentTimeMobile.value = "";
         }
         
@@ -1893,6 +1920,56 @@
           time: null,
           duration: null
         };
+      }
+    }
+
+    // ==============================
+    // FUNGSI BARU: UPDATE DROPDOWN MASA DENGAN RANGE DOKTOR
+    // ==============================
+    async function updateTimeDropdownWithDoctorRange(startTime, endTime, doctorId) {
+      if (!startTime || !endTime) return;
+      
+      // Convert time to minutes
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      const [endHour, endMinute] = endTime.split(':').map(Number);
+      
+      const startTotal = startHour * 60 + startMinute;
+      const endTotal = endHour * 60 + endMinute;
+      
+      if (endTotal <= startTotal) return;
+      
+      // Create time slots every 30 minutes
+      const timeSlots = [];
+      let current = startTotal;
+      
+      while (current < endTotal) {
+        const hour = Math.floor(current / 60);
+        const minute = current % 60;
+        const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        timeSlots.push(timeStr);
+        current += 30; // 30 minute intervals
+      }
+      
+      // Update desktop dropdown
+      if (appointmentTime) {
+        appointmentTime.innerHTML = '<option value="">Pilih masa...</option>';
+        timeSlots.forEach(time => {
+          const option = document.createElement('option');
+          option.value = time;
+          option.textContent = formatTime(time);
+          appointmentTime.appendChild(option);
+        });
+      }
+      
+      // Update mobile dropdown
+      if (appointmentTimeMobile) {
+        appointmentTimeMobile.innerHTML = '<option value="">Pilih masa...</option>';
+        timeSlots.forEach(time => {
+          const option = document.createElement('option');
+          option.value = time;
+          option.textContent = formatTime(time);
+          appointmentTimeMobile.appendChild(option);
+        });
       }
     }
 
@@ -2565,7 +2642,7 @@
     }
 
     // ==============================
-    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS - POSISI DIKANAN ATAS
+    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS - POSISI DIKANAN TENGAH
     // ==============================
     function showAvailabilityTable(doctorId, doctorName) {
       if (!doctorId) return;
@@ -2573,7 +2650,7 @@
       currentSelectedDoctorId = doctorId;
       tableDoctorName.textContent = doctorName;
       
-      // Tampilkan di kanan atas dengan animasi
+      // Tampilkan di kanan tengah dengan animasi
       availabilityTableContainer.style.display = 'block';
       setTimeout(() => {
         availabilityTableContainer.style.opacity = '1';
@@ -3559,13 +3636,16 @@
         `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : 
         '';
 
+      // PERBAIKAN: Gunakan appointment.patient_ic secara langsung, bukan dari undefined
+      const patientICValue = appointment.patient_ic || "Tiada IC";
+
       const message = [
         "Assalamualaikum / Salam sejahtera Dr,",
         "",
         "Ada permohonan temujanji baru:",
         `Servis: ${serviceName}`,
         `Nama pesakit: ${appointment.patient_name}`,
-        `IC: ${appointment.patient_ic}`,
+        `IC: ${patientICValue}`,
         `No. Telefon: ${appointment.patient_phone}`,
         `Tarikh dicadangkan pesakit: ${formatDate(appointment.requested_date)}`,
         `${timeInfo}`,
@@ -3593,13 +3673,16 @@
         `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : 
         '';
 
+      // PERBAIKAN: Gunakan appointment.patient_ic secara langsung, bukan dari undefined
+      const patientICValue = appointment.patient_ic || "Tiada IC";
+
       const message = [
         "Assalamualaikum / Salam sejahtera Dr,",
         "",
         "Ada permohonan temujanji baru:",
         `Servis: ${serviceName}`,
         `Nama pesakit: ${appointment.patient_name}`,
-        `IC: ${appointment.patient_ic}`,
+        `IC: ${patientICValue}`,
         `No. Telefon: ${appointment.patient_phone}`,
         `Tarikh dicadangkan pesakit: ${formatDate(appointment.requested_date)}`,
         `${timeInfo}`,
@@ -3624,7 +3707,7 @@
       if (!currentProfile || currentProfile.role !== "staff") return;
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, complaint, created_at")
+        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, complaint, created_at")
         .order("created_at", { ascending: false })
         .limit(30);
 
@@ -3653,7 +3736,7 @@
       
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at")
+        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at")
         .order("created_at", { ascending: false })
         .limit(50);
 
@@ -4279,13 +4362,16 @@
         `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : 
         '';
 
+      // PERBAIKAN: Gunakan appointment.patient_ic secara langsung
+      const patientICValue = appointment.patient_ic || "Tiada IC";
+
       const msg = [
         "Assalamualaikum / Salam sejahtera Dr,",
         "",
         "Ada permohonan temujanji baru:",
         `Servis: ${serviceName}`,
         `Nama pesakit: ${appointment.patient_name}`,
-        `IC: ${appointment.patient_ic}`,
+        `IC: ${patientICValue}`,
         `No. Telefon: ${appointment.patient_phone}`,
         `Tarikh dicadangkan pesakit: ${formatDate(appointment.requested_date)}`,
         `${timeInfo}`,
