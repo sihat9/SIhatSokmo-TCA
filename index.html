@@ -431,64 +431,6 @@
       transform: translateY(-2px);
       box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 10px 10px -5px rgba(59, 130, 246, 0.1);
     }
-
-    /* STYLE UNTUK QUICK ACTIONS */
-    .quick-action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      border-radius: 12px;
-      background: white;
-      border: 1px solid #e2e8f0;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-    
-    .quick-action-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-      border-color: #10b981;
-    }
-    
-    .quick-action-btn .icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
-      font-size: 20px;
-    }
-    
-    .priority-indicator {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 20px;
-      height: 20px;
-      background: #ef4444;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-    }
-    
-    .today-priority {
-      border-left: 4px solid #ef4444;
-      background: linear-gradient(to right, #fef2f2, white);
-    }
-    
-    .upcoming-card {
-      border-left: 4px solid #10b981;
-      background: linear-gradient(to right, #f0fdf4, white);
-    }
   </style>
 </head>
 <body class="text-slate-900">
@@ -713,124 +655,57 @@
           </div>
         </section>
 
-        <!-- STAFF PANEL (DENGAN INPUT MASA) - DIKEMASKINI -->
+        <!-- STAFF PANEL (DENGAN INPUT MASA) -->
         <section id="tab-staff" class="tab-hidden">
           <div class="space-y-6">
-            <!-- Quick Actions dan Today's Priority -->
-            <div class="grid lg:grid-cols-3 gap-6">
-              <!-- Quick Actions -->
-              <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6">
-                <div class="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 class="text-xl md:text-2xl font-bold text-slate-900">
-                      Quick Actions
-                    </h2>
-                    <p class="text-sm md:text-base text-slate-500 mt-1">
-                      Tindakan pantas untuk kerja harian anda
-                    </p>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-sm text-emerald-600 font-medium">Online</span>
-                  </div>
+            <!-- Tindakan Hari Ini -->
+            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 md:p-8">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 class="text-xl md:text-2xl font-bold text-slate-900">
+                    Tindakan Hari Ini
+                  </h2>
+                  <p class="text-sm md:text-base text-slate-500 mt-2">
+                    Ringkasan temujanji yang perlu diberi perhatian hari ini, diasingkan mengikut servis atau prosedur.
+                  </p>
                 </div>
-                
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <button class="quick-action-btn" onclick="document.getElementById('serviceSelect').focus()">
-                    <div class="icon bg-emerald-100 text-emerald-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                      </svg>
-                    </div>
-                    <span class="text-sm font-medium text-slate-700">Daftar Baru</span>
-                    <span class="text-xs text-slate-500 mt-1">Temujanji</span>
-                  </button>
-                  
-                  <button class="quick-action-btn relative" onclick="activeStaffFilter = 'pending'; renderStaffFilterTabs(); renderStaffAppointmentsList(); renderStaffAppointmentsListMobile();">
-                    <div class="priority-indicator" id="pendingBadge">0</div>
-                    <div class="icon bg-amber-100 text-amber-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <span class="text-sm font-medium text-slate-700">Pending</span>
-                    <span class="text-xs text-slate-500 mt-1">Perlu Tindakan</span>
-                  </button>
-                  
-                  <button class="quick-action-btn" onclick="activeStaffFilter = 'approved'; renderStaffFilterTabs(); renderStaffAppointmentsList(); renderStaffAppointmentsListMobile();">
-                    <div class="icon bg-emerald-100 text-emerald-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="text-sm font-medium text-slate-700">Approved</span>
-                    <span class="text-xs text-slate-500 mt-1">Disahkan</span>
-                  </button>
-                  
-                  <button class="quick-action-btn" onclick="activeStaffFilter = 'rejected'; renderStaffFilterTabs(); renderStaffAppointmentsList(); renderStaffAppointmentsListMobile();">
-                    <div class="icon bg-rose-100 text-rose-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </div>
-                    <span class="text-sm font-medium text-slate-700">Rejected</span>
-                    <span class="text-xs text-slate-500 mt-1">Perlu Follow-up</span>
-                  </button>
+                <div class="flex flex-wrap gap-3 text-sm md:text-base">
+                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                    <span>Pending</span>
+                    <span class="font-bold text-slate-900" id="todayPendingCount">0</span>
+                  </div>
+                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                    <span>Approved (hari ini)</span>
+                    <span class="font-bold text-slate-900" id="todayApprovedCount">0</span>
+                  </div>
+                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+                    <span>Perlu follow-up</span>
+                    <span class="font-bold text-slate-900" id="todayRejectedCount">0</span>
+                  </div>
                 </div>
               </div>
-              
-              <!-- Today's Priority -->
-              <div class="today-priority border border-slate-200 rounded-2xl p-6">
-                <div class="flex items-center gap-3 mb-4">
-                  <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="text-lg font-bold text-slate-900">Today's Priority</h3>
-                    <p class="text-sm text-slate-500">Perkara penting hari ini</p>
-                  </div>
-                </div>
-                
-                <div class="space-y-3">
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-slate-600">Pending Approval</span>
-                    <span class="font-bold text-amber-600" id="todayPendingCount">0</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-slate-600">Approved (Today)</span>
-                    <span class="font-bold text-emerald-600" id="todayApprovedCount">0</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-sm text-slate-600">Need Follow-up</span>
-                    <span class="font-bold text-rose-600" id="todayRejectedCount">0</span>
-                  </div>
-                </div>
-                
-                <div class="mt-4 pt-4 border-t border-slate-100">
-                  <button onclick="refreshTodayActions(); refreshStaffAppointmentsList();" class="w-full text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 rounded-lg flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Refresh Data
-                  </button>
-                </div>
+              <div id="todayActionsList" class="mt-6 space-y-4 text-sm md:text-base text-slate-700">
+                <!-- auto render -->
               </div>
             </div>
-            
+
             <!-- Borang & Senarai - Layout untuk desktop -->
-            <div class="hidden lg:grid lg:grid-cols-3 gap-6">
+            <div class="hidden lg:grid lg:grid-cols-2 gap-6">
               <!-- Left Column - Daftar Temujanji Baru -->
-              <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <h2 class="text-xl md:text-2xl font-bold text-slate-900">Daftar Temujanji Baru</h2>
-                    <span class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">Staff Klinik</span>
+                    <span class="text-sm text-slate-500">Staff klinik</span>
                   </div>
-                  <div class="text-sm text-slate-500">
-                    <span class="font-medium text-emerald-600">●</span> Semua maklumat wajib diisi
-                  </div>
+                  <button id="staffFixedAppointmentBtn"
+                          class="staff-fixed-btn inline-flex items-center gap-2 text-sm md:text-base px-4 py-2 rounded-lg">
+                    <span>⏰</span>
+                    Setting Temujanji Tetap
+                  </button>
                 </div>
 
                 <form id="appointmentForm" class="space-y-4 text-sm md:text-base">
@@ -939,19 +814,10 @@
                     <!-- auto inject -->
                   </div>
 
-                  <div class="flex gap-4">
-                    <button type="submit"
-                            class="flex-1 inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-base md:text-lg font-semibold text-white px-6 py-3 mt-4 shadow-lg hover:shadow-xl">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Simpan Temujanji
-                    </button>
-                    <button type="reset"
-                            class="px-6 py-3 mt-4 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50">
-                      Reset
-                    </button>
-                  </div>
+                  <button type="submit"
+                          class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-base md:text-lg font-semibold text-white px-6 py-3 mt-4 shadow-lg hover:shadow-xl">
+                    Simpan temujanji
+                  </button>
 
                   <p id="appointmentMessage" class="text-sm md:text-base mt-2 text-emerald-700 hidden"></p>
                   <p id="appointmentError" class="text-sm md:text-base mt-2 text-rose-500 hidden"></p>
@@ -964,29 +830,43 @@
                      class="inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-green-500 hover:bg-green-600 text-base md:text-lg font-semibold text-white shadow-lg hover:shadow-xl"
                      href="#"
                      target="_blank">
-                    📱 Hantar Notifikasi kepada Doktor
+                    Hantar Notifikasi kepada Doktor
                   </a>
                 </div>
               </div>
 
-              <!-- Right Column - Upcoming Appointments -->
-              <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
-                <div class="flex items-center justify-between">
+              <!-- Right Column - Senarai Temujanji -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 class="text-xl font-bold text-slate-900">Upcoming Appointments</h2>
-                    <p class="text-sm text-slate-500">7 hari akan datang</p>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-900">Senarai Temujanji (Disusun Mengikut Servis)</h2>
+                    <p class="text-sm md:text-base text-slate-500">
+                      30 rekod terkini, diasingkan mengikut servis untuk pantauan mudah.
+                    </p>
                   </div>
-                  <span class="text-xs text-slate-400">Minggu ini</span>
+                  <div class="flex items-center gap-3">
+                    <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                              data-status="pending">
+                        Pending
+                      </button>
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                              data-status="approved">
+                        Approved
+                      </button>
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                              data-status="rejected">
+                        Rejected
+                      </button>
+                    </div>
+                    <button id="refreshStaffAppointments"
+                            class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
+                      Refresh
+                    </button>
+                  </div>
                 </div>
-                
-                <div id="upcomingAppointments" class="space-y-3 max-h-[500px] overflow-auto scrollbar-thin">
-                  <!-- Upcoming appointments akan diisi oleh JavaScript -->
-                  <div class="text-center py-8 text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p>Tiada temujanji akan datang</p>
-                  </div>
+                <div id="staffAppointmentsList" class="space-y-6 text-sm md:text-base max-h-[600px] overflow-auto scrollbar-thin">
+                  <!-- render -->
                 </div>
               </div>
             </div>
@@ -994,11 +874,15 @@
             <!-- Layout untuk mobile -->
             <div class="lg:hidden space-y-6">
               <!-- Daftar Temujanji Baru (Mobile) -->
-              <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
                 <div class="flex flex-col gap-4">
                   <div>
                     <h2 class="text-xl font-bold text-slate-900">Daftar Temujanji Baru</h2>
-                    <p class="text-sm text-slate-500 mt-1">Isi maklumat pesakit untuk temujanji baru</p>
+                    <button id="staffFixedAppointmentBtnMobile"
+                            class="staff-fixed-btn w-full inline-flex items-center justify-center gap-2 text-sm px-4 py-3 rounded-lg mt-2">
+                      <span>⏰</span>
+                      Setting Temujanji Tetap (Staff)
+                    </button>
                   </div>
 
                   <form id="appointmentFormMobile" class="space-y-4 text-sm">
@@ -1106,14 +990,14 @@
                        class="inline-flex items-center justify-center gap-3 px-5 py-3 rounded-lg bg-green-500 hover:bg-green-600 text-base font-semibold text-white shadow-lg hover:shadow-xl w-full"
                        href="#"
                        target="_blank">
-                      📱 Hantar Notifikasi kepada Doktor
+                      Hantar Notifikasi kepada Doktor
                     </a>
                   </div>
                 </div>
               </div>
 
               <!-- Senarai Temujanji (Mobile) -->
-              <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
                 <div class="flex flex-col gap-4">
                   <div>
                     <h2 class="text-xl font-bold text-slate-900">Senarai Temujanji</h2>
@@ -1147,47 +1031,12 @@
                 </div>
               </div>
             </div>
-            
-            <!-- Senarai Temujanji Desktop -->
-            <div class="hidden lg:block bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
-              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 class="text-xl md:text-2xl font-bold text-slate-900">Senarai Temujanji (Disusun Mengikut Servis)</h2>
-                  <p class="text-sm md:text-base text-slate-500">
-                    30 rekod terkini, diasingkan mengikut servis untuk pantauan mudah.
-                  </p>
-                </div>
-                <div class="flex items-center gap-3">
-                  <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
-                    <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
-                            data-status="pending">
-                      Pending
-                    </button>
-                    <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
-                            data-status="approved">
-                      Approved
-                    </button>
-                    <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
-                            data-status="rejected">
-                      Rejected
-                    </button>
-                  </div>
-                  <button id="refreshStaffAppointments"
-                          class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
-                    Refresh
-                  </button>
-                </div>
-              </div>
-              <div id="staffAppointmentsList" class="space-y-6 text-sm md:text-base max-h-[600px] overflow-auto scrollbar-thin">
-                <!-- render -->
-              </div>
-            </div>
           </div>
         </section>
 
         <!-- EXPORT PANEL (TIDAK BERUBAH) -->
         <section id="tab-export" class="tab-hidden">
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div>
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Export Data Temujanji ke Excel</h2>
               <p class="text-sm md:text-base text-slate-500 mt-2">
@@ -1264,7 +1113,7 @@
 
             <div id="exportPreview" class="mt-6 space-y-4 hidden">
               <h3 class="text-lg md:text-xl font-semibold text-slate-900">Preview Data</h3>
-              <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+              <div class="bg-white border border-slate-200 rounded-xl p-4">
                 <div id="exportStats" class="text-sm md:text-base text-slate-600 mb-4"></div>
                 <div id="exportPreviewTable" class="overflow-auto max-h-80 scrollbar-thin">
                   <!-- Preview table akan diisi di sini -->
@@ -1281,7 +1130,7 @@
 
         <!-- DOCTOR PANEL (DENGAN SETTING TEMUJANJI TETAP) -->
         <section id="tab-doctor" class="tab-hidden">
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 space-y-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Panel Doktor</h2>
               <div class="flex flex-wrap items-center gap-3">
@@ -1326,11 +1175,11 @@
           </div>
         </section>
 
-        <!-- SETTINGS PANEL (DENGAN SETTING TEMUJANJI TETAP) -->
+        <!-- SETTINGS PANEL (TIDAK BERUBAH) -->
         <section id="tab-settings" class="tab-hidden">
-          <div class="grid lg:grid-cols-3 gap-8 text-sm md:text-base">
+          <div class="grid lg:grid-cols-2 gap-8 text-sm md:text-base">
             <!-- Services -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Servis Klinik</h2>
 
               <form id="serviceForm" class="space-y-4">
@@ -1377,7 +1226,7 @@
             </div>
 
             <!-- Custom Fields -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-4">
               <h2 class="text-xl md:text-2xl font-bold text-slate-900">Kolom Tambahan (Custom Fields)</h2>
 
               <form id="fieldForm" class="space-y-4">
@@ -1425,90 +1274,6 @@
                 </div>
                 <div id="fieldList" class="space-y-3 max-h-72 overflow-auto scrollbar-thin">
                   <!-- senarai fields -->
-                </div>
-              </div>
-            </div>
-
-            <!-- Setting Temujanji Tetap (Staff Klinik) -->
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 class="text-xl md:text-2xl font-bold text-slate-900">Setting Temujanji Tetap</h2>
-                  <p class="text-sm text-slate-500">Staff Klinik</p>
-                </div>
-              </div>
-              
-              <div class="p-4 bg-blue-50 rounded-lg border border-blue-100 mb-4">
-                <p class="text-sm text-blue-700">
-                  <span class="font-semibold">Fungsi:</span> Tetapkan masa temujanji tetap untuk setiap doktor pada hari-hari tertentu dalam seminggu.
-                </p>
-              </div>
-
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">Pilih Doktor</label>
-                  <select id="fixedAppointmentDoctorSelect" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
-                    <option value="">Pilih doktor...</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">Hari dalam seminggu:</label>
-                  <div class="grid grid-cols-4 gap-2">
-                    <button class="day-selector px-3 py-2 border rounded-lg text-sm" data-day="0">Ahad</button>
-                    <button class="day-selector px-3 py-2 border rounded-lg text-sm" data-day="1">Isnin</button>
-                    <button class="day-selector px-3 py-2 border rounded-lg text-sm" data-day="2">Selasa</button>
-                    <button class="day-selector px-3 py-2 border rounded-lg text-sm" data-day="3">Rabu</button>
-                    <button class="day-selector px-3 py-2 border rounded-lg text-sm" data-day="4">Khamis</button>
-                    <button class="day-selector px-3 py-2 border rounded-lg text-sm" data-day="5">Jumaat</button>
-                    <button class="day-selector px-3 py-2 border rounded-lg text-sm" data-day="6">Sabtu</button>
-                  </div>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">Masa temujanji:</label>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div>
-                      <input type="time" id="fixedStartTime" class="time-input w-full" value="18:00">
-                      <div class="text-xs text-slate-500 mt-1">Mula</div>
-                    </div>
-                    <div>
-                      <input type="time" id="fixedEndTime" class="time-input w-full" value="20:00">
-                      <div class="text-xs text-slate-500 mt-1">Tamat</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">Tempoh setiap temujanji (minit):</label>
-                  <select id="fixedDuration" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
-                    <option value="30">30 minit</option>
-                    <option value="45">45 minit</option>
-                    <option value="60" selected>60 minit</option>
-                    <option value="90">90 minit</option>
-                    <option value="120">120 minit</option>
-                  </select>
-                </div>
-                
-                <button id="saveFixedAppointment"
-                        class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-base font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Simpan Setting
-                </button>
-                
-                <div class="mt-6">
-                  <h4 class="text-sm font-medium text-slate-700 mb-2">Senarai Temujanji Tetap Aktif:</h4>
-                  <div id="fixedAppointmentsList" class="space-y-2 max-h-40 overflow-auto">
-                    <!-- List akan diisi oleh JavaScript -->
-                    <p class="text-sm text-slate-500 text-center py-4">Pilih doktor untuk lihat setting semasa.</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -1587,6 +1352,86 @@
     </div>
   </div>
 
+  <!-- MODAL UNTUK SETTING TEMUJANJI TETAP (UNTUK STAFF DAN DOKTOR) -->
+  <div id="fixedAppointmentModal" class="time-modal">
+    <div class="time-modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-slate-900">Setting Temujanji Tetap</h3>
+        <button id="closeFixedModal" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <p class="text-sm text-slate-600 mb-4">Tetapkan masa temujanji tetap untuk hari-hari tertentu dalam seminggu.</p>
+      
+      <!-- Pilihan doktor untuk staff -->
+      <div id="staffDoctorSelection" class="mb-4 hidden">
+        <label class="block text-sm font-medium text-slate-700 mb-2">Pilih Doktor</label>
+        <select id="fixedAppointmentDoctorSelect" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+          <option value="">Pilih doktor...</option>
+        </select>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Hari dalam seminggu:</label>
+          <div class="flex flex-wrap gap-2">
+            <button class="day-selector px-3 py-2 border rounded-lg" data-day="0">Ahad</button>
+            <button class="day-selector px-3 py-2 border rounded-lg" data-day="1">Isnin</button>
+            <button class="day-selector px-3 py-2 border rounded-lg" data-day="2">Selasa</button>
+            <button class="day-selector px-3 py-2 border rounded-lg" data-day="3">Rabu</button>
+            <button class="day-selector px-3 py-2 border rounded-lg" data-day="4">Khamis</button>
+            <button class="day-selector px-3 py-2 border rounded-lg" data-day="5">Jumaat</button>
+            <button class="day-selector px-3 py-2 border rounded-lg" data-day="6">Sabtu</button>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Masa temujanji:</label>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <input type="time" id="fixedStartTime" class="time-input w-full" value="18:00">
+              <div class="text-xs text-slate-500 mt-1">Mula</div>
+            </div>
+            <div>
+              <input type="time" id="fixedEndTime" class="time-input w-full" value="20:00">
+              <div class="text-xs text-slate-500 mt-1">Tamat</div>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Tempoh setiap temujanji (minit):</label>
+          <select id="fixedDuration" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+            <option value="30">30 minit</option>
+            <option value="45">45 minit</option>
+            <option value="60" selected>60 minit</option>
+            <option value="90">90 minit</option>
+            <option value="120">120 minit</option>
+          </select>
+        </div>
+        
+        <div class="mt-6">
+          <h4 class="text-sm font-medium text-slate-700 mb-2">Senarai Temujanji Tetap Aktif:</h4>
+          <div id="fixedAppointmentsList" class="space-y-2 max-h-40 overflow-auto">
+            <!-- List akan diisi oleh JavaScript -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-6">
+        <button id="cancelFixedSetting" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50">
+          Batal
+        </button>
+        <button id="saveFixedAppointment" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          Simpan Setting
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ==============================
     // KONFIGURASI SUPABASE & APP
@@ -1625,9 +1470,6 @@
     // State untuk temujanji tetap
     let selectedDays = new Set();
     let fixedAppointmentsCache = [];
-
-    // State untuk upcoming appointments
-    let upcomingAppointmentsCache = [];
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -1672,9 +1514,9 @@
     const refreshStaffAppointments = document.getElementById("refreshStaffAppointments");
     const staffFilterButtons = document.querySelectorAll(".staff-filter-btn");
     
-    // Upcoming appointments
-    const upcomingAppointments = document.getElementById("upcomingAppointments");
-    const pendingBadge = document.getElementById("pendingBadge");
+    // Butang baru untuk staff
+    const staffFixedAppointmentBtn = document.getElementById("staffFixedAppointmentBtn");
+    const staffFixedAppointmentBtnMobile = document.getElementById("staffFixedAppointmentBtnMobile");
 
     // Staff form elements (Mobile)
     const serviceSelectMobile = document.getElementById("serviceSelectMobile");
@@ -1700,6 +1542,7 @@
     const todayPendingCountEl = document.getElementById("todayPendingCount");
     const todayApprovedCountEl = document.getElementById("todayApprovedCount");
     const todayRejectedCountEl = document.getElementById("todayRejectedCount");
+    const todayActionsListEl = document.getElementById("todayActionsList");
 
     // Export elements
     const exportDoctor = document.getElementById("exportDoctor");
@@ -1740,15 +1583,6 @@
     const fieldMessage = document.getElementById("fieldMessage");
     const fieldList = document.getElementById("fieldList");
 
-    // Setting Temujanji Tetap elements (dipindahkan ke Settings)
-    const fixedAppointmentDoctorSelect = document.getElementById("fixedAppointmentDoctorSelect");
-    const daySelectors = document.querySelectorAll(".day-selector");
-    const fixedStartTime = document.getElementById("fixedStartTime");
-    const fixedEndTime = document.getElementById("fixedEndTime");
-    const fixedDuration = document.getElementById("fixedDuration");
-    const fixedAppointmentsList = document.getElementById("fixedAppointmentsList");
-    const saveFixedAppointment = document.getElementById("saveFixedAppointment");
-
     // Availability elements
     const availabilityCalendarModal = document.getElementById("availabilityCalendarModal");
     const backFromCalendar = document.getElementById("backFromCalendar");
@@ -1768,6 +1602,99 @@
     const customEndTime = document.getElementById("customEndTime");
     const cancelTimeSelection = document.getElementById("cancelTimeSelection");
     const saveTimeSelection = document.getElementById("saveTimeSelection");
+
+    // Fixed appointment modal elements
+    const fixedAppointmentModal = document.getElementById("fixedAppointmentModal");
+    const closeFixedModal = document.getElementById("closeFixedModal");
+    const daySelectors = document.querySelectorAll(".day-selector");
+    const fixedStartTime = document.getElementById("fixedStartTime");
+    const fixedEndTime = document.getElementById("fixedEndTime");
+    const fixedDuration = document.getElementById("fixedDuration");
+    const fixedAppointmentsList = document.getElementById("fixedAppointmentsList");
+    const cancelFixedSetting = document.getElementById("cancelFixedSetting");
+    const saveFixedAppointment = document.getElementById("saveFixedAppointment");
+    
+    // Element tambahan untuk staff
+    const staffDoctorSelection = document.getElementById("staffDoctorSelection");
+    const fixedAppointmentDoctorSelect = document.getElementById("fixedAppointmentDoctorSelect");
+
+    // ==============================
+    // CUTI UMUM MALAYSIA - DINAMIK UNTUK TAHUN SEMASA
+    // ==============================
+    function getMalaysiaHolidays(year) {
+      const holidays = [
+        { date: year + "-01-01", name: 'Tahun Baru' },
+        { date: year + "-05-01", name: 'Hari Pekerja' },
+        { date: year + "-06-03", name: 'Hari Keputeraan DYMM Yang di-Pertuan Agong' },
+        { date: year + "-08-31", name: 'Hari Kebangsaan' },
+        { date: year + "-09-16", name: 'Hari Malaysia' },
+        { date: year + "-12-25", name: 'Hari Krismas' },
+      ];
+      
+      // Tahun Baru Cina
+      const chineseNewYear1 = getChineseNewYearDate(year);
+      const chineseNewYear2 = new Date(chineseNewYear1);
+      chineseNewYear2.setDate(chineseNewYear2.getDate() + 1);
+      
+      holidays.push(
+        { date: chineseNewYear1.toISOString().split('T')[0], name: 'Tahun Baru Cina' },
+        { date: chineseNewYear2.toISOString().split('T')[0], name: 'Tahun Baru Cina (Hari 2)' }
+      );
+      
+      // Hari Raya Aidilfitri
+      const aidilfitri1 = getIslamicHolidayDate(year, 'aidilfitri', 1);
+      const aidilfitri2 = getIslamicHolidayDate(year, 'aidilfitri', 2);
+      
+      if (aidilfitri1) holidays.push({ date: aidilfitri1, name: 'Hari Raya Aidilfitri' });
+      if (aidilfitri2) holidays.push({ date: aidilfitri2, name: 'Hari Raya Aidilfitri (Hari 2)' });
+      
+      // Hari Wesak
+      const wesakDate = getWesakDate(year);
+      if (wesakDate) holidays.push({ date: wesakDate, name: 'Hari Wesak' });
+      
+      // Hari Raya Haji
+      const hajiDate = getIslamicHolidayDate(year, 'haji', 1);
+      if (hajiDate) holidays.push({ date: hajiDate, name: 'Hari Raya Haji' });
+      
+      // Deepavali
+      const deepavaliDate = getDeepavaliDate(year);
+      if (deepavaliDate) holidays.push({ date: deepavaliDate, name: 'Deepavali' });
+      
+      // Cuti Negeri Terengganu
+      const terengganuHolidays = getTerengganuHolidays(year);
+      holidays.push(...terengganuHolidays);
+      
+      return holidays;
+    }
+    
+    function getChineseNewYearDate(year) {
+      const baseDate = new Date(year, 0, 21);
+      return baseDate;
+    }
+    
+    function getIslamicHolidayDate(year, holiday, day) {
+      if (holiday === 'aidilfitri') {
+        return year + "-04-" + (10 + day).toString().padStart(2, '0');
+      } else if (holiday === 'haji') {
+        return year + "-06-" + (17 + day).toString().padStart(2, '0');
+      }
+      return null;
+    }
+    
+    function getWesakDate(year) {
+      return year + "-05-22";
+    }
+    
+    function getDeepavaliDate(year) {
+      return year + "-10-31";
+    }
+    
+    function getTerengganuHolidays(year) {
+      return [
+        { date: year + "-03-04", name: 'Hari Ulang Tahun Keputeraan Sultan Terengganu' },
+        { date: year + "-07-20", name: 'Hari Keputeraan Sultan Terengganu' },
+      ];
+    }
 
     // ==============================
     // UTILITI UI
@@ -1835,6 +1762,7 @@
 
     function formatTime(timeStr) {
       if (!timeStr) return "";
+      // Format HH:MM to HH:MM AM/PM
       const [hours, minutes] = timeStr.split(':');
       const hour = parseInt(hours);
       const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -1864,9 +1792,921 @@
     }
 
     // ==============================
+    // FEATURE AVAILABILITY DOKTOR DENGAN MASA
+    // ==============================
+    function openAvailabilityCalendar() {
+      if (!currentProfile || currentProfile.role !== 'doctor') return;
+      
+      selectedDates.clear();
+      dateTimeMap.clear();
+      availabilityCalendarModal.style.display = 'flex';
+      saveAvailability.classList.add('hidden');
+      
+      currentCalendarMonth = new Date().getMonth();
+      currentCalendarYear = new Date().getFullYear();
+      
+      renderCalendar();
+      loadDoctorAvailability();
+    }
+
+    function closeAvailabilityCalendar() {
+      availabilityCalendarModal.style.display = 'none';
+      selectedDates.clear();
+      dateTimeMap.clear();
+    }
+
+    async function loadDoctorAvailability() {
+      if (!currentProfile) return;
+      
+      const { data, error } = await db
+        .from('doctor_availability')
+        .select('date, start_time, end_time, duration')
+        .eq('doctor_id', currentProfile.id)
+        .gte('date', new Date().toISOString().split('T')[0]);
+      
+      if (error) {
+        console.error('Error loading availability', error);
+        return;
+      }
+      
+      if (data) {
+        data.forEach(item => {
+          selectedDates.add(item.date);
+          if (item.start_time && item.end_time) {
+            dateTimeMap.set(item.date, {
+              start_time: item.start_time,
+              end_time: item.end_time,
+              duration: item.duration || 60
+            });
+          }
+        });
+        renderCalendar();
+        
+        if (selectedDates.size > 0) {
+          saveAvailability.classList.remove('hidden');
+        }
+      }
+    }
+
+    function openTimeSelectionModal(dateStr) {
+      if (!dateStr) return;
+      
+      currentSelectedDateForTime = dateStr;
+      const dateObj = new Date(dateStr);
+      const dateFormatted = dateObj.toLocaleDateString('ms-MY', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      timeModalDate.textContent = dateFormatted;
+      timeSlotsContainer.innerHTML = '';
+      
+      // Add predefined time slots
+      const timeSlots = [
+        '08:00', '09:00', '10:00', '11:00', '12:00',
+        '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+      ];
+      
+      timeSlots.forEach(slot => {
+        const timeSlotEl = document.createElement('div');
+        timeSlotEl.className = 'time-slot';
+        timeSlotEl.textContent = formatTime(slot);
+        timeSlotEl.dataset.time = slot;
+        
+        // Check if this time is already selected for this date
+        const existingTime = dateTimeMap.get(dateStr);
+        if (existingTime && existingTime.start_time === slot) {
+          timeSlotEl.classList.add('selected');
+        }
+        
+        timeSlotEl.addEventListener('click', () => {
+          document.querySelectorAll('.time-slot').forEach(ts => {
+            ts.classList.remove('selected');
+          });
+          timeSlotEl.classList.add('selected');
+          customStartTime.value = slot;
+          
+          // Auto-set end time (1 hour later)
+          const [hours, minutes] = slot.split(':');
+          const endHour = (parseInt(hours) + 1).toString().padStart(2, '0');
+          customEndTime.value = `${endHour}:${minutes}`;
+        });
+        
+        timeSlotsContainer.appendChild(timeSlotEl);
+      });
+      
+      // Set custom time inputs if already have data
+      const existingTime = dateTimeMap.get(dateStr);
+      if (existingTime) {
+        customStartTime.value = existingTime.start_time;
+        customEndTime.value = existingTime.end_time;
+      } else {
+        customStartTime.value = '09:00';
+        customEndTime.value = '10:00';
+      }
+      
+      timeSelectionModal.style.display = 'flex';
+    }
+
+    function closeTimeSelectionModal() {
+      timeSelectionModal.style.display = 'none';
+      currentSelectedDateForTime = null;
+    }
+
+    function saveTimeForDate() {
+      if (!currentSelectedDateForTime) return;
+      
+      const startTime = customStartTime.value;
+      const endTime = customEndTime.value;
+      
+      if (!startTime || !endTime) {
+        alert('Sila isi masa mula dan masa tamat.');
+        return;
+      }
+      
+      // Calculate duration in minutes
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      const [endHour, endMinute] = endTime.split(':').map(Number);
+      
+      const startTotal = startHour * 60 + startMinute;
+      const endTotal = endHour * 60 + endMinute;
+      
+      if (endTotal <= startTotal) {
+        alert('Masa tamat mesti selepas masa mula.');
+        return;
+      }
+      
+      const duration = endTotal - startTotal;
+      
+      // Save to map
+      dateTimeMap.set(currentSelectedDateForTime, {
+        start_time: startTime,
+        end_time: endTime,
+        duration: duration
+      });
+      
+      // Update calendar display
+      renderCalendar();
+      closeTimeSelectionModal();
+      
+      // Show save button
+      saveAvailability.classList.remove('hidden');
+    }
+
+    function renderCalendar() {
+      const monthNames = [
+        'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
+        'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
+      ];
+      
+      const dayNames = ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'];
+      
+      calendarContainer.innerHTML = '';
+      
+      // Navigation header
+      const navHeader = document.createElement('div');
+      navHeader.className = 'flex justify-between items-center mb-4 px-4';
+      navHeader.innerHTML = `
+        <button id="prevMonth" class="p-2 rounded-lg hover:bg-slate-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div class="text-center">
+          <h3 class="text-lg font-semibold text-slate-800">${monthNames[currentCalendarMonth]} ${currentCalendarYear}</h3>
+          <div class="text-sm text-slate-500">Klik pada tarikh untuk pilih/buang</div>
+          <div class="text-xs text-slate-500 mt-1">Klik 2 kali untuk tetapkan masa</div>
+          <div class="text-xs text-rose-500 mt-1">🟥 = Cuti Umum</div>
+        </div>
+        <button id="nextMonth" class="p-2 rounded-lg hover:bg-slate-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      `;
+      calendarContainer.appendChild(navHeader);
+      
+      const holidays = getMalaysiaHolidays(currentCalendarYear);
+      
+      const calendarGrid = document.createElement('div');
+      calendarGrid.className = 'calendar-grid';
+      
+      dayNames.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+      });
+      
+      const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
+      const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
+      const today = new Date();
+      
+      for (let i = 0; i < firstDay.getDay(); i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-day disabled';
+        emptyCell.textContent = '';
+        calendarGrid.appendChild(emptyCell);
+      }
+      
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(currentCalendarYear, currentCalendarMonth, day);
+        const dateStr = date.toISOString().split('T')[0];
+        const dateObj = new Date(dateStr);
+        
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = day;
+        
+        // Check if today
+        if (dateObj.toDateString() === today.toDateString()) {
+          dayElement.classList.add('border-2', 'border-emerald-500', 'font-bold');
+          dayElement.title = 'Hari ini';
+        }
+        
+        // Check if holiday
+        const holiday = holidays.find(h => h.date === dateStr);
+        if (holiday) {
+          dayElement.classList.add('holiday');
+          dayElement.dataset.holiday = holiday.name;
+          dayElement.title = holiday.name + ' - Cuti (boleh dipilih)';
+          
+          const holidayIndicator = document.createElement('div');
+          holidayIndicator.className = 'holiday-indicator';
+          dayElement.appendChild(holidayIndicator);
+          
+          if (selectedDates.has(dateStr)) {
+            dayElement.classList.add('selected');
+            dayElement.title = holiday.name + ' - Cuti (sudah dipilih)';
+          }
+        } else {
+          dayElement.title = 'Klik untuk pilih tarikh available. Klik 2 kali untuk tetapkan masa.';
+        }
+        
+        // Check if past date
+        if (dateObj < today && dateObj.toDateString() !== today.toDateString()) {
+          dayElement.classList.add('disabled');
+          dayElement.title = 'Tarikh telah berlalu';
+        }
+        
+        // Check if selected
+        if (selectedDates.has(dateStr)) {
+          dayElement.classList.add('selected');
+          if (holiday) {
+            dayElement.title = holiday.name + ' - Cuti (sudah dipilih)';
+          } else {
+            dayElement.title = 'Tarikh available (sudah dipilih)';
+          }
+          
+          // Add time badge if time is set
+          const timeData = dateTimeMap.get(dateStr);
+          if (timeData) {
+            const timeBadge = document.createElement('div');
+            timeBadge.className = 'time-badge';
+            timeBadge.textContent = `${formatTime(timeData.start_time)}-${formatTime(timeData.end_time)}`;
+            dayElement.appendChild(timeBadge);
+            dayElement.title += `\nMasa: ${formatTime(timeData.start_time)}-${formatTime(timeData.end_time)}`;
+          }
+        } else if (holiday) {
+          dayElement.title = holiday.name + ' - Cuti (boleh dipilih)';
+        } else if (dateObj.toDateString() === today.toDateString()) {
+          dayElement.title = 'Hari ini (boleh dipilih)';
+        }
+        
+        // Add click events
+        if (dateObj >= today) {
+          // Single click to select/unselect
+          dayElement.addEventListener('click', (e) => {
+            if (e.detail === 1) {
+              toggleDateSelection(dateStr, dayElement);
+            }
+          });
+          
+          // Double click to set time
+          dayElement.addEventListener('dblclick', () => {
+            if (!selectedDates.has(dateStr)) {
+              // First select the date
+              selectedDates.add(dateStr);
+              dayElement.classList.add('selected');
+              saveAvailability.classList.remove('hidden');
+            }
+            openTimeSelectionModal(dateStr);
+          });
+        } else {
+          dayElement.style.cursor = 'not-allowed';
+        }
+        
+        calendarGrid.appendChild(dayElement);
+      }
+      
+      calendarContainer.appendChild(calendarGrid);
+      
+      const prevMonthBtn = document.getElementById('prevMonth');
+      const nextMonthBtn = document.getElementById('nextMonth');
+      
+      if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+          if (currentCalendarMonth === 0) {
+            currentCalendarMonth = 11;
+            currentCalendarYear--;
+          } else {
+            currentCalendarMonth--;
+          }
+          renderCalendar();
+        });
+      }
+      
+      if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+          if (currentCalendarMonth === 11) {
+            currentCalendarMonth = 0;
+            currentCalendarYear++;
+          } else {
+            currentCalendarMonth++;
+          }
+          renderCalendar();
+        });
+      }
+    }
+
+    function toggleDateSelection(dateStr, element) {
+      if (selectedDates.has(dateStr)) {
+        selectedDates.delete(dateStr);
+        dateTimeMap.delete(dateStr);
+        element.classList.remove('selected');
+        
+        const holidayName = element.dataset.holiday;
+        if (holidayName) {
+          element.title = holidayName + ' - Cuti (boleh dipilih)';
+        } else {
+          element.title = 'Klik untuk pilih tarikh available. Klik 2 kali untuk tetapkan masa.';
+        }
+        
+        // Remove time badge if exists
+        const timeBadge = element.querySelector('.time-badge');
+        if (timeBadge) {
+          timeBadge.remove();
+        }
+      } else {
+        selectedDates.add(dateStr);
+        element.classList.add('selected');
+        
+        const holidayName = element.dataset.holiday;
+        if (holidayName) {
+          element.title = holidayName + ' - Cuti (sudah dipilih)';
+        } else {
+          element.title = 'Tarikh available (sudah dipilih)\nKlik 2 kali untuk tetapkan masa.';
+        }
+      }
+      
+      if (selectedDates.size > 0) {
+        saveAvailability.classList.remove('hidden');
+      } else {
+        saveAvailability.classList.add('hidden');
+      }
+    }
+
+    function getDayOfWeekNumber(dateStr) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const localDate = new Date(y, m - 1, d);
+      return localDate.getDay();
+    }
+
+    async function saveAvailabilityDates() {
+      if (!currentProfile || selectedDates.size === 0) return;
+
+      try {
+        // Delete existing availability
+        const { error: delErr } = await db
+          .from("doctor_availability")
+          .delete()
+          .eq("doctor_id", currentProfile.id);
+
+        if (delErr) throw delErr;
+
+        // Prepare data with times
+        const availabilityData = Array.from(selectedDates).map((date) => {
+          const timeData = dateTimeMap.get(date);
+          return {
+            doctor_id: currentProfile.id,
+            date: date,
+            day_of_week: getDayOfWeekNumber(date),
+            start_time: timeData ? timeData.start_time : null,
+            end_time: timeData ? timeData.end_time : null,
+            duration: timeData ? timeData.duration : 60,
+            status: "available",
+          };
+        });
+
+        const { error: insErr } = await db
+          .from("doctor_availability")
+          .insert(availabilityData);
+
+        if (insErr) throw insErr;
+
+        alert("Tarikh available berjaya disimpan!");
+        closeAvailabilityCalendar();
+      } catch (error) {
+        console.error("Error saving availability", error);
+        alert("Gagal menyimpan tarikh available. Sila cuba lagi.");
+      }
+    }
+
+    // ==============================
+    // FEATURE TEMUJANJI TETAP UNTUK STAFF DAN DOKTOR
+    // ==============================
+    function openFixedAppointmentModalForStaff() {
+      if (!currentProfile || currentProfile.role !== 'staff') {
+        alert('Hanya staff boleh akses ini.');
+        return;
+      }
+      
+      // Tampilkan dropdown pemilihan doktor
+      staffDoctorSelection.classList.remove('hidden');
+      
+      // Isi dropdown doktor
+      fixedAppointmentDoctorSelect.innerHTML = '<option value="">Pilih doktor...</option>';
+      doctorsCache.forEach(d => {
+        const option = document.createElement('option');
+        option.value = d.id;
+        option.textContent = d.full_name;
+        fixedAppointmentDoctorSelect.appendChild(option);
+      });
+      
+      // Reset selection days
+      selectedDays.clear();
+      daySelectors.forEach(btn => {
+        btn.classList.remove('bg-blue-500', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+      });
+      
+      // Set default times
+      fixedStartTime.value = '18:00';
+      fixedEndTime.value = '20:00';
+      fixedDuration.value = '60';
+      
+      // Kosongkan senarai sehingga doktor dipilih
+      fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500">Pilih doktor untuk lihat setting semasa.</p>';
+      
+      // Tampilkan modal
+      fixedAppointmentModal.style.display = 'flex';
+    }
+
+    function openFixedAppointmentModalForDoctor() {
+      if (!currentProfile || currentProfile.role !== 'doctor') {
+        alert('Hanya doktor boleh akses ini.');
+        return;
+      }
+      
+      // Sembunyikan dropdown doktor
+      staffDoctorSelection.classList.add('hidden');
+      
+      // Reset selection days
+      selectedDays.clear();
+      daySelectors.forEach(btn => {
+        btn.classList.remove('bg-blue-500', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+      });
+      
+      // Set default times
+      fixedStartTime.value = '18:00';
+      fixedEndTime.value = '20:00';
+      fixedDuration.value = '60';
+      
+      // Load existing fixed appointments untuk doktor ini
+      loadFixedAppointments(currentProfile.id);
+      
+      // Tampilkan modal
+      fixedAppointmentModal.style.display = 'flex';
+    }
+
+    function closeFixedAppointmentModal() {
+      fixedAppointmentModal.style.display = 'none';
+      selectedDays.clear();
+    }
+
+    async function loadFixedAppointments(doctorId = null) {
+      let query = db
+        .from('doctor_fixed_appointments')
+        .select('*');
+        
+      if (doctorId) {
+        query = query.eq('doctor_id', doctorId);
+      } else if (currentProfile && currentProfile.role === 'doctor') {
+        query = query.eq('doctor_id', currentProfile.id);
+      } else {
+        // Jika staff tetapi tidak memilih doktor, tidak tunjuk apa-apa
+        fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500">Pilih doktor untuk lihat setting semasa.</p>';
+        return;
+      }
+      
+      query = query.order('day_of_week', { ascending: true });
+      
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Error loading fixed appointments', error);
+        return;
+      }
+      
+      fixedAppointmentsCache = data || [];
+      renderFixedAppointmentsList();
+    }
+
+    function renderFixedAppointmentsList() {
+      fixedAppointmentsList.innerHTML = '';
+      
+      if (fixedAppointmentsCache.length === 0) {
+        fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500">Tiada temujanji tetap ditetapkan.</p>';
+        return;
+      }
+      
+      const dayNames = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+      
+      fixedAppointmentsCache.forEach(appointment => {
+        const item = document.createElement('div');
+        item.className = 'flex justify-between items-center p-3 bg-slate-50 rounded-lg';
+        item.innerHTML = `
+          <div>
+            <div class="font-medium text-slate-800">${dayNames[appointment.day_of_week]}</div>
+            <div class="text-sm text-slate-600">${formatTime(appointment.start_time)} - ${formatTime(appointment.end_time)} (${appointment.duration} minit)</div>
+          </div>
+          <button class="delete-fixed-btn text-rose-500 hover:text-rose-700 p-1" data-id="${appointment.id}">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        `;
+        
+        fixedAppointmentsList.appendChild(item);
+      });
+      
+      // Add delete event listeners
+      fixedAppointmentsList.querySelectorAll('.delete-fixed-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = btn.dataset.id;
+          if (confirm('Adakah anda pasti mahu memadam temujanji tetap ini?')) {
+            await deleteFixedAppointment(id);
+          }
+        });
+      });
+    }
+
+    async function deleteFixedAppointment(id) {
+      try {
+        const { error } = await db
+          .from('doctor_fixed_appointments')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        // Reload list berdasarkan siapa yang sedang login
+        if (currentProfile.role === 'doctor') {
+          await loadFixedAppointments(currentProfile.id);
+        } else if (currentProfile.role === 'staff') {
+          const doctorId = fixedAppointmentDoctorSelect.value;
+          if (doctorId) {
+            await loadFixedAppointments(doctorId);
+          }
+        }
+      } catch (error) {
+        console.error('Error deleting fixed appointment', error);
+        alert('Gagal memadam temujanji tetap.');
+      }
+    }
+
+    async function saveFixedAppointmentSetting() {
+      let doctorId;
+      
+      if (currentProfile.role === 'staff') {
+        doctorId = fixedAppointmentDoctorSelect.value;
+        if (!doctorId) {
+          alert('Sila pilih doktor.');
+          return;
+        }
+      } else if (currentProfile.role === 'doctor') {
+        doctorId = currentProfile.id;
+      } else {
+        alert('Akses tidak dibenarkan.');
+        return;
+      }
+      
+      if (selectedDays.size === 0) {
+        alert('Sila pilih hari.');
+        return;
+      }
+      
+      const startTime = fixedStartTime.value;
+      const endTime = fixedEndTime.value;
+      const duration = parseInt(fixedDuration.value);
+      
+      if (!startTime || !endTime) {
+        alert('Sila isi masa mula dan masa tamat.');
+        return;
+      }
+      
+      // Calculate if end time is after start time
+      const [startHour, startMinute] = startTime.split(':').map(Number);
+      const [endHour, endMinute] = endTime.split(':').map(Number);
+      
+      const startTotal = startHour * 60 + startMinute;
+      const endTotal = endHour * 60 + endMinute;
+      
+      if (endTotal <= startTotal) {
+        alert('Masa tamat mesti selepas masa mula.');
+        return;
+      }
+      
+      try {
+        // Delete existing appointments for selected days
+        const { error: delError } = await db
+          .from('doctor_fixed_appointments')
+          .delete()
+          .eq('doctor_id', doctorId)
+          .in('day_of_week', Array.from(selectedDays).map(day => parseInt(day)));
+        
+        if (delError) throw delError;
+        
+        const appointmentsData = Array.from(selectedDays).map(day => ({
+          doctor_id: doctorId,
+          day_of_week: parseInt(day),
+          start_time: startTime,
+          end_time: endTime,
+          duration: duration
+        }));
+        
+        const { error } = await db
+          .from('doctor_fixed_appointments')
+          .insert(appointmentsData);
+        
+        if (error) throw error;
+        
+        alert('Temujanji tetap berjaya disimpan!');
+        await loadFixedAppointments(doctorId);
+        
+        // Clear selection
+        selectedDays.clear();
+        daySelectors.forEach(btn => {
+          btn.classList.remove('bg-blue-500', 'text-white');
+          btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+        });
+      } catch (error) {
+        console.error('Error saving fixed appointments', error);
+        alert('Gagal menyimpan temujanji tetap.');
+      }
+    }
+
+    // ==============================
+    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS
+    // ==============================
+    function showAvailabilityTable(doctorId, doctorName) {
+      if (!doctorId) return;
+      
+      currentSelectedDoctorId = doctorId;
+      tableDoctorName.textContent = doctorName;
+      
+      // Tampilkan di tengah screen dengan animasi
+      availabilityTableContainer.style.display = 'block';
+      setTimeout(() => {
+        availabilityTableContainer.style.opacity = '1';
+        availabilityTableContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+      }, 10);
+      
+      loadDoctorAvailabilityForStaff(doctorId);
+    }
+
+    function hideAvailabilityTable() {
+      availabilityTableContainer.style.opacity = '0';
+      availabilityTableContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
+      setTimeout(() => {
+        availabilityTableContainer.style.display = 'none';
+      }, 200);
+    }
+
+    async function loadDoctorAvailabilityForStaff(doctorId) {
+      if (!doctorId) return;
+      
+      const { data, error } = await db
+        .from('doctor_availability')
+        .select('date, start_time, end_time')
+        .eq('doctor_id', doctorId)
+        .gte('date', new Date().toISOString().split('T')[0])
+        .order('date', { ascending: true });
+      
+      if (error) {
+        console.error('Error loading availability for staff', error);
+        availabilityTableView.innerHTML = '<div class="p-8 text-center"><p class="text-slate-500 text-lg">❌ Gagal memuatkan tarikh available.</p></div>';
+        return;
+      }
+      
+      renderAvailabilityView(data || []);
+    }
+
+    function renderAvailabilityView(availabilityData) {
+      if (currentAvailabilityView === 'list') {
+        renderAvailabilityList(availabilityData);
+      } else {
+        renderAvailabilityCalendar(availabilityData);
+      }
+    }
+
+    function renderAvailabilityList(availabilityData) {
+      if (!availabilityData.length) {
+        availabilityTableView.innerHTML = `
+          <div class="p-8 text-center">
+            <div class="text-5xl mb-4">📅</div>
+            <p class="text-slate-500 text-lg font-medium">Doktor belum memasukkan tarikh available.</p>
+            <p class="text-slate-400 text-sm mt-2">Sila hubungi doktor untuk maklumat lanjut.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '<div class="divide-y divide-slate-100">';
+      
+      availabilityData.forEach(item => {
+        const date = new Date(item.date);
+        const dateStr = date.toLocaleDateString('ms-MY', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        const timeInfo = item.start_time ? 
+          `<div class="text-sm font-medium text-emerald-600 mt-1">⏰ ${formatTime(item.start_time)} - ${formatTime(item.end_time)}</div>` : 
+          '<div class="text-sm text-slate-400 mt-1">⏰ Masa belum ditetapkan</div>';
+        
+        html += `
+          <div class="availability-date-item">
+            <div class="flex-1">
+              <div class="font-bold text-slate-800 text-lg">${dateStr}</div>
+              <div class="text-sm text-slate-500">${formatDate(item.date)}</div>
+              ${timeInfo}
+            </div>
+            <button class="select-date-btn px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+                    data-date="${item.date}">
+              Pilih Tarikh
+            </button>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      availabilityTableView.innerHTML = html;
+      
+      availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const date = btn.dataset.date;
+          requestedDate.value = date;
+          
+          // Also try to set time if available
+          const availabilityItem = availabilityData.find(item => item.date === date);
+          if (availabilityItem && availabilityItem.start_time) {
+            appointmentTime.value = availabilityItem.start_time;
+          }
+          
+          hideAvailabilityTable();
+          
+          // Tampilkan notifikasi
+          showMessage(appointmentMessage, `Tarikh ${formatDate(date)} telah dipilih.`, false);
+          setTimeout(() => {
+            appointmentMessage.classList.add('hidden');
+          }, 3000);
+        });
+      });
+    }
+
+    function renderAvailabilityCalendar(availabilityData) {
+      const today = new Date();
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      const monthNames = [
+        'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
+        'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
+      ];
+      
+      const availableDates = availabilityData
+        .filter(item => {
+          const date = new Date(item.date);
+          return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+        })
+        .map(item => ({
+          day: new Date(item.date).getDate(),
+          date: item.date,
+          time: item.start_time ? `${formatTime(item.start_time)}-${formatTime(item.end_time)}` : null
+        }));
+      
+      let html = `
+        <div class="p-4">
+          <div class="text-center mb-6">
+            <h3 class="text-lg font-bold text-slate-800">${monthNames[currentMonth]} ${currentYear}</h3>
+            <p class="text-sm text-slate-500">Kalendar bulanan dengan tarikh available</p>
+          </div>
+          <div class="availability-mini-calendar">
+      `;
+      
+      const days = ['A', 'I', 'S', 'R', 'K', 'J', 'S'];
+      days.forEach(day => {
+        html += `<div class="availability-mini-day text-sm font-medium text-slate-500">${day}</div>`;
+      });
+      
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      
+      for (let i = 0; i < firstDay; i++) {
+        html += '<div class="availability-mini-day"></div>';
+      }
+      
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const isToday = day === today.getDate() && currentMonth === today.getMonth();
+        const availableDate = availableDates.find(d => d.day === day);
+        const isAvailable = !!availableDate;
+        
+        let dayClass = 'availability-mini-day';
+        if (isToday) dayClass += ' today';
+        if (isAvailable) dayClass += ' available';
+        
+        html += `<div class="${dayClass}" data-date="${availableDate ? availableDate.date : ''}">${day}</div>`;
+      }
+      
+      html += '</div>';
+      
+      // Add available dates list
+      html += '<div class="mt-8 p-4 border-t border-slate-100 bg-slate-50 rounded-xl">';
+      html += '<p class="text-sm font-bold text-slate-700 mb-3">📋 Tarikh Available Bulan Ini:</p>';
+      
+      if (availableDates.length > 0) {
+        html += '<div class="space-y-3">';
+        availableDates.forEach(item => {
+          const date = new Date(item.date);
+          const dateStr = date.toLocaleDateString('ms-MY', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'short'
+          });
+          
+          const timeInfo = item.time ? `<span class="text-xs font-medium text-emerald-600 ml-2">${item.time}</span>` : '';
+          
+          html += `
+            <button class="w-full text-left p-3 text-sm text-slate-700 hover:bg-white rounded-lg select-date-btn flex items-center justify-between transition-all duration-200"
+                    data-date="${item.date}">
+              <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mr-3">
+                  <span class="text-emerald-600 font-bold">${item.day}</span>
+                </div>
+                <span>${dateStr}</span>
+              </div>
+              ${timeInfo}
+            </button>
+          `;
+        });
+        html += '</div>';
+      } else {
+        html += '<div class="text-center py-6">';
+        html += '<div class="text-4xl mb-3">📅</div>';
+        html += '<p class="text-slate-500">Tiada tarikh available untuk bulan ini.</p>';
+        html += '</div>';
+      }
+      
+      html += '</div></div>';
+      
+      availabilityTableView.innerHTML = html;
+      
+      availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const date = btn.dataset.date;
+          if (!date) return;
+          
+          requestedDate.value = date;
+          
+          // Try to find time info from availabilityData
+          const availabilityItem = availabilityData.find(item => item.date === date);
+          if (availabilityItem && availabilityItem.start_time) {
+            appointmentTime.value = availabilityItem.start_time;
+          }
+          
+          hideAvailabilityTable();
+          
+          // Tampilkan notifikasi
+          showMessage(appointmentMessage, `Tarikh ${formatDate(date)} telah dipilih.`, false);
+          setTimeout(() => {
+            appointmentMessage.classList.add('hidden');
+          }, 3000);
+        });
+      });
+    }
+
+    // ==============================
     // REAL-TIME SUBSCRIPTION (FIXED)
     // ==============================
     function setupRealtimeSubscription() {
+      // Unsubscribe if exists
       if (realtimeSubscription) {
         db.removeChannel(realtimeSubscription);
       }
@@ -1887,7 +2727,6 @@
               if (currentProfile.role === 'staff') {
                 await refreshStaffAppointmentsList();
                 await refreshTodayActions();
-                await loadUpcomingAppointments();
               } else if (currentProfile.role === 'doctor') {
                 await refreshDoctorAppointmentsList();
               }
@@ -1996,7 +2835,6 @@
       if (profile.role === "staff") {
         setActiveTab("tab-staff");
         await refreshStaffAppointmentsList();
-        await loadUpcomingAppointments();
       } else {
         setActiveTab("tab-doctor");
         await refreshDoctorAppointmentsList();
@@ -2111,16 +2949,6 @@
           opt.value = d.id;
           opt.textContent = d.full_name;
           exportDoctor.appendChild(opt);
-        });
-      }
-
-      if (fixedAppointmentDoctorSelect) {
-        fixedAppointmentDoctorSelect.innerHTML = '<option value="">Pilih doktor...</option>';
-        doctorsCache.forEach(d => {
-          const opt = document.createElement("option");
-          opt.value = d.id;
-          opt.textContent = d.full_name;
-          fixedAppointmentDoctorSelect.appendChild(opt);
         });
       }
     }
@@ -2459,7 +3287,6 @@
         customFieldsContainer.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
 
         await refreshStaffAppointmentsList();
-        await loadUpcomingAppointments();
         buildStaffWhatsappLink(insertResult);
       });
     }
@@ -2547,7 +3374,6 @@
         customFieldsContainerMobile.querySelectorAll("input[data-field-id]").forEach(i => (i.value = ""));
 
         await refreshStaffAppointmentsList();
-        await loadUpcomingAppointments();
         buildStaffWhatsappLinkMobile(insertResult);
       });
     }
@@ -2569,7 +3395,8 @@
       const doctorName = doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
 
       const timeInfo = appointment.appointment_time ? 
-        `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : '';
+        `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : 
+        '';
 
       const message = [
         "Assalamualaikum / Salam sejahtera Dr,",
@@ -2602,7 +3429,8 @@
       const doctorName = doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
 
       const timeInfo = appointment.appointment_time ? 
-        `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : '';
+        `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : 
+        '';
 
       const message = [
         "Assalamualaikum / Salam sejahtera Dr,",
@@ -2626,35 +3454,6 @@
         const phoneToUse = phone || "";
         staffWhatsappLinkMobile.href = buildWhatsAppLink(phoneToUse, message);
       });
-    }
-
-    // ==============================
-    // FUNGSI WHATSAPP DOKTOR UNTUK APPOINTMENT PENDING
-    // ==============================
-    function buildWhatsappMessageForPendingAppointment(appointment) {
-      const serviceName =
-        servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
-      const doctorName = doctorsCache.find(d => d.id === appointment.doctor_id)?.full_name || "Doktor";
-
-      const timeInfo = appointment.appointment_time ? 
-        `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : '';
-
-      return [
-        "Assalamualaikum / Salam sejahtera Dr,",
-        "",
-        "Ada permohonan temujanji baru:",
-        `Servis: ${serviceName}`,
-        `Nama pesakit: ${appointment.patient_name}`,
-        `IC: ${appointment.patient_ic}`,
-        `No. Telefon: ${appointment.patient_phone}`,
-        `Tarikh dicadangkan pesakit: ${formatDate(appointment.requested_date)}`,
-        `${timeInfo}`,
-        `Complaint: ${appointment.complaint || "Tiada complaint dinyatakan"}`,
-        "",
-        `Sila buka sistem untuk approve / reject: ${APP_URL}`
-      ]
-        .filter(Boolean)
-        .join("\n");
     }
 
     // ==============================
@@ -2712,101 +3511,163 @@
       todayPendingCountEl.textContent = pendingList.length;
       todayRejectedCountEl.textContent = rejectedList.length;
       todayApprovedCountEl.textContent = approvedToday.length;
-      
-      if (pendingBadge) {
-        pendingBadge.textContent = pendingList.length;
-      }
-    }
 
-    async function loadUpcomingAppointments() {
-      if (!currentProfile || currentProfile.role !== "staff") return;
-      
-      const today = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(today.getDate() + 7);
-      
-      const { data, error } = await db
-        .from("appointments")
-        .select("id, patient_name, requested_date, appointment_time, status, service_id, doctor_id, doctor_selected_date")
-        .or(`and(status.eq.approved,doctor_selected_date.gte.${today.toISOString().split('T')[0]},doctor_selected_date.lte.${nextWeek.toISOString().split('T')[0]}),and(status.eq.pending,requested_date.gte.${today.toISOString().split('T')[0]},requested_date.lte.${nextWeek.toISOString().split('T')[0]})`)
-        .order("doctor_selected_date", { ascending: true })
-        .order("requested_date", { ascending: true })
-        .limit(10);
+      todayActionsListEl.innerHTML = "";
 
-      if (error || !data || data.length === 0) {
-        if (upcomingAppointments) {
-          upcomingAppointments.innerHTML = `
-            <div class="text-center py-8 text-slate-400">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p>Tiada temujanji akan datang</p>
-            </div>
-          `;
-        }
+      if (!pendingList.length && !rejectedList.length && !approvedToday.length) {
+        todayActionsListEl.innerHTML =
+          '<p class="text-base text-slate-500">Tiada tindakan kritikal untuk hari ini. Boleh semak semula kemudian 🙂</p>';
         return;
       }
 
-      upcomingAppointmentsCache = data || [];
-
-      if (upcomingAppointments) {
-        upcomingAppointments.innerHTML = "";
-        
-        upcomingAppointmentsCache.forEach(appointment => {
-          const isApproved = appointment.status === "approved";
-          const appointmentDate = isApproved ? appointment.doctor_selected_date : appointment.requested_date;
-          const date = new Date(appointmentDate);
-          const dayName = date.toLocaleDateString('ms-MY', { weekday: 'short' });
-          const dayNumber = date.getDate();
-          const month = date.toLocaleDateString('ms-MY', { month: 'short' });
-          
-          const service = servicesCache.find(s => s.id === appointment.service_id);
-          const serviceName = service?.name || "Servis";
-          const serviceColor = getServiceColor(appointment.service_id);
-          
-          const card = document.createElement("div");
-          card.className = `upcoming-card border border-slate-200 rounded-lg p-4 ${isApproved ? 'border-emerald-200' : 'border-amber-200'}`;
-          
-          card.innerHTML = `
-            <div class="flex items-start justify-between">
-              <div class="flex items-start gap-3">
-                <div class="text-center">
-                  <div class="text-sm font-bold text-slate-900">${dayNumber}</div>
-                  <div class="text-xs text-slate-500">${dayName}</div>
-                  <div class="text-xs text-slate-400">${month}</div>
-                </div>
-                <div>
-                  <div class="font-medium text-slate-900">${appointment.patient_name}</div>
-                  <div class="flex items-center gap-2 mt-1">
-                    <span class="service-tag ${serviceColor} text-xs">${serviceName}</span>
-                    <span class="text-xs ${isApproved ? 'text-emerald-600' : 'text-amber-600'}">${isApproved ? 'Approved' : 'Pending'}</span>
-                  </div>
-                  ${appointment.appointment_time ? `<div class="text-xs text-slate-600 mt-1">${formatTime(appointment.appointment_time)}</div>` : ''}
-                </div>
-              </div>
-              ${!isApproved ? `
-                <button class="whatsapp-pending-btn text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg"
-                        data-appointment-id="${appointment.id}">
-                  WhatsApp
-                </button>
-              ` : ''}
-            </div>
-          `;
-          
-          upcomingAppointments.appendChild(card);
+      if (approvedToday.length) {
+        const approvedByService = {};
+        approvedToday.forEach(a => {
+          const serviceId = a.service_id;
+          if (!approvedByService[serviceId]) {
+            approvedByService[serviceId] = [];
+          }
+          approvedByService[serviceId].push(a);
         });
-        
-        upcomingAppointments.querySelectorAll('.whatsapp-pending-btn').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const appointmentId = btn.dataset.appointmentId;
-            const appointment = upcomingAppointmentsCache.find(a => a.id === appointmentId);
-            if (appointment) {
-              const doctorPhone = await fetchDoctorWhatsapp(appointment.doctor_id);
-              const message = buildWhatsappMessageForPendingAppointment(appointment);
-              const waUrl = buildWhatsAppLink(doctorPhone || "", message);
-              window.open(waUrl, "_blank");
-            }
+
+        Object.keys(approvedByService).forEach(serviceId => {
+          const serviceAppointments = approvedByService[serviceId];
+          const service = servicesCache.find(s => s.id === serviceId);
+          const serviceName = service?.name || "Servis Tidak Dikenali";
+          const serviceColor = getServiceColor(serviceId);
+
+          const block = document.createElement("div");
+          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
+          
+          const serviceHeader = document.createElement("div");
+          serviceHeader.className = "flex items-center gap-3 mb-3";
+          serviceHeader.innerHTML = `
+            <span class="service-tag ${serviceColor}">${serviceName}</span>
+            <span class="text-sm font-bold text-emerald-600">TINDAKAN: Temujanji Berlangsung Hari Ini</span>
+          `;
+          block.appendChild(serviceHeader);
+
+          serviceAppointments.forEach(a => {
+            const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
+            const line = document.createElement("div");
+            line.className = "text-sm text-slate-700 ml-4";
+            line.textContent = `• ${a.patient_name} - ${formatDate(
+              a.doctor_selected_date || a.requested_date
+            )}${timeInfo}`;
+            block.appendChild(line);
           });
+          
+          const instruction = document.createElement("div");
+          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
+          instruction.textContent = "Pesakit perlu dihadiri di klinik pada tarikh yang ditetapkan.";
+          block.appendChild(instruction);
+          
+          todayActionsListEl.appendChild(block);
+        });
+      }
+
+      if (pendingList.length) {
+        const pendingByService = {};
+        pendingList.forEach(a => {
+          const serviceId = a.service_id;
+          if (!pendingByService[serviceId]) {
+            pendingByService[serviceId] = [];
+          }
+          pendingByService[serviceId].push(a);
+        });
+
+        Object.keys(pendingByService).forEach(serviceId => {
+          const serviceAppointments = pendingByService[serviceId];
+          const service = servicesCache.find(s => s.id === serviceId);
+          const serviceName = service?.name || "Servis Tidak Dikenali";
+          const serviceColor = getServiceColor(serviceId);
+
+          const block = document.createElement("div");
+          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
+          
+          const serviceHeader = document.createElement("div");
+          serviceHeader.className = "flex items-center gap-3 mb-3";
+          serviceHeader.innerHTML = `
+            <span class="service-tag ${serviceColor}">${serviceName}</span>
+            <span class="text-sm font-bold text-amber-600">TINDAKAN: Perlu Follow-up Dengan Doktor</span>
+          `;
+          block.appendChild(serviceHeader);
+
+          serviceAppointments.slice(0, 3).forEach(a => {
+            const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
+            const line = document.createElement("div");
+            line.className = "text-sm text-slate-700 ml-4";
+            line.textContent = `• ${a.patient_name} - diminta untuk ${formatDate(a.requested_date)}${timeInfo}`;
+            block.appendChild(line);
+          });
+          
+          if (serviceAppointments.length > 3) {
+            const more = document.createElement("div");
+            more.className = "text-sm text-slate-500 ml-4";
+            more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
+            block.appendChild(more);
+          }
+          
+          const instruction = document.createElement("div");
+          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
+          instruction.textContent = "Sila pastikan doktor approve/reject temujanji ini secepat mungkin.";
+          block.appendChild(instruction);
+          
+          todayActionsListEl.appendChild(block);
+        });
+      }
+
+      if (rejectedList.length) {
+        const rejectedByService = {};
+        rejectedList.forEach(a => {
+          const serviceId = a.service_id;
+          if (!rejectedByService[serviceId]) {
+            rejectedByService[serviceId] = [];
+          }
+          rejectedByService[serviceId].push(a);
+        });
+
+        Object.keys(rejectedByService).forEach(serviceId => {
+          const serviceAppointments = rejectedByService[serviceId];
+          const service = servicesCache.find(s => s.id === serviceId);
+          const serviceName = service?.name || "Servis Tidak Dikenali";
+          const serviceColor = getServiceColor(serviceId);
+
+          const block = document.createElement("div");
+          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
+          
+          const serviceHeader = document.createElement("div");
+          serviceHeader.className = "flex items-center gap-3 mb-3";
+          serviceHeader.innerHTML = `
+            <span class="service-tag ${serviceColor}">${serviceName}</span>
+            <span class="text-sm font-bold text-rose-600">TINDAKAN: Hubungi Pesakit Untuk Tarikh Baharu</span>
+          `;
+          block.appendChild(serviceHeader);
+
+          serviceAppointments.slice(0, 3).forEach(a => {
+            const line = document.createElement("div");
+            line.className = "text-sm text-slate-700 ml-4";
+            const dates = [
+              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
+              a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
+            ].filter(Boolean).join(' atau ');
+            line.textContent = `• ${a.patient_name} - cadangan: ${dates}`;
+            block.appendChild(line);
+          });
+          
+          if (serviceAppointments.length > 3) {
+            const more = document.createElement("div");
+            more.className = "text-sm text-slate-500 ml-4";
+            more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
+            block.appendChild(more);
+          }
+          
+          const instruction = document.createElement("div");
+          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
+          instruction.textContent = "Sila hubungi pesakit untuk memilih salah satu tarikh cadangan doktor.";
+          block.appendChild(instruction);
+          
+          todayActionsListEl.appendChild(block);
         });
       }
     }
@@ -2862,7 +3723,6 @@
         renderStaffAppointmentsList();
         renderStaffAppointmentsListMobile();
         await refreshTodayActions();
-        await loadUpcomingAppointments();
 
         alert("Temujanji berjaya dipadam.");
       } catch (error) {
@@ -2983,37 +3843,6 @@
           const actionContainer = document.createElement("div");
           actionContainer.className = "mt-4 pt-3 border-t border-slate-100";
 
-          if (a.status === "pending") {
-            actionContainer.innerHTML = `
-              <div class="flex gap-2">
-                <button class="whatsapp-doktor-btn flex-1 bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-                        data-appointment-id="${a.id}">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
-                  WhatsApp Doktor
-                </button>
-                <button class="delete-appointment-btn px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-sm"
-                        data-appointment-id="${a.id}">
-                  Padam
-                </button>
-              </div>
-            `;
-            
-            const whatsappBtn = actionContainer.querySelector(".whatsapp-doktor-btn");
-            whatsappBtn.addEventListener("click", async () => {
-              const doctorPhone = await fetchDoctorWhatsapp(a.doctor_id);
-              const message = buildWhatsappMessageForPendingAppointment(a);
-              const waUrl = buildWhatsAppLink(doctorPhone || "", message);
-              window.open(waUrl, "_blank");
-            });
-            
-            const deleteBtn = actionContainer.querySelector(".delete-appointment-btn");
-            deleteBtn.addEventListener("click", () => {
-              deleteAppointmentFromUI(a.id);
-            });
-          }
-
           if (a.status === "approved") {
             const approvedDate = a.doctor_selected_date || a.requested_date;
             const timeInfoApproved = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
@@ -3043,10 +3872,7 @@
               <div class="text-xs text-rose-600 mb-2 font-medium">Cadangan tarikh doktor:</div>
               <div class="space-y-2">
                 ${dates.map(date => `
-                  <button
-                    class="select-alt-date-btn w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-                    data-appointment-id="${a.id}"
-                    data-date="${date}">
+                  <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2" data-date="${date}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -3054,36 +3880,13 @@
                   </button>
                 `).join('')}
               </div>
-              <p class="text-xs text-slate-500 mt-2 text-center">
-                Pilih tarikh setelah pesakit setuju.
-              </p>
+              <p class="text-xs text-slate-500 mt-2 text-center">Pilih tarikh setelah pesakit setuju</p>
             `;
 
-            actionContainer.querySelectorAll(".select-alt-date-btn").forEach(btn => {
-              btn.addEventListener("click", async () => {
-                const chosenDate = btn.dataset.date;
-
-                // (Optional tapi biasanya perlu) simpan tarikh dipilih dalam DB
-                const { error: upErr } = await db
-                  .from("appointments")
-                  .update({ doctor_selected_date: chosenDate })
-                  .eq("id", a.id);
-
-                if (upErr) console.error("Update chosen date error:", upErr);
-
-                const doctorPhone = await fetchDoctorWhatsapp(a.doctor_id);
-                const msg = [
-                  "Assalamualaikum / Salam sejahtera Dr,",
-                  "",
-                  "Staff dah dapat persetujuan pesakit untuk tarikh cadangan doktor:",
-                  `Nama pesakit: ${a.patient_name}`,
-                  `Tarikh dipilih: ${chosenDate}`,
-                  a.appointment_time ? `Masa: ${formatTime(a.appointment_time)} (${a.appointment_duration || 60} minit)` : "",
-                  "",
-                  `Sila semak dalam sistem: ${APP_URL}`
-                ].filter(Boolean).join("\n");
-
-                window.open(buildWhatsAppLink(doctorPhone || "", msg), "_blank");
+            actionContainer.querySelectorAll("button[data-date]").forEach(btn => {
+              btn.addEventListener("click", () => {
+                const selectedDate = btn.dataset.date;
+                handleStaffChooseNewDate(a, selectedDate);
               });
             });
           }
@@ -3203,35 +4006,6 @@
           const actionContainer = document.createElement("div");
           actionContainer.className = "mt-3 pt-2 border-t border-slate-100";
 
-          if (a.status === "pending") {
-            actionContainer.innerHTML = `
-              <button class="w-full whatsapp-doktor-btn-mobile bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1 mb-2"
-                      data-appointment-id="${a.id}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-                WhatsApp Doktor
-              </button>
-              <button class="w-full delete-appointment-btn-mobile border border-slate-300 text-slate-700 text-xs py-2 rounded-lg hover:bg-slate-50"
-                      data-appointment-id="${a.id}">
-                Padam Temujanji
-              </button>
-            `;
-            
-            const whatsappBtn = actionContainer.querySelector(".whatsapp-doktor-btn-mobile");
-            whatsappBtn.addEventListener("click", async () => {
-              const doctorPhone = await fetchDoctorWhatsapp(a.doctor_id);
-              const message = buildWhatsappMessageForPendingAppointment(a);
-              const waUrl = buildWhatsAppLink(doctorPhone || "", message);
-              window.open(waUrl, "_blank");
-            });
-            
-            const deleteBtn = actionContainer.querySelector(".delete-appointment-btn-mobile");
-            deleteBtn.addEventListener("click", () => {
-              deleteAppointmentFromUI(a.id);
-            });
-          }
-
           if (a.status === "approved") {
             const approvedDate = a.doctor_selected_date || a.requested_date;
             const timeInfoApproved = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
@@ -3262,7 +4036,7 @@
                 <div class="text-xs text-rose-600 mb-2 font-medium">Cadangan doktor:</div>
                 <div class="space-y-1">
                   ${dates.map(date => `
-                    <button class="w-full select-alt-date-btn-mobile bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1" data-appointment-id="${a.id}" data-date="${date}">
+                    <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1" data-date="${date}">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -3273,31 +4047,10 @@
                 <p class="text-xs text-slate-500 mt-1 text-center">Pilih setelah pesakit setuju</p>
               `;
 
-              actionContainer.querySelectorAll(".select-alt-date-btn-mobile").forEach(btn => {
-                btn.addEventListener("click", async () => {
-                  const chosenDate = btn.dataset.date;
-
-                  // (Optional tapi biasanya perlu) simpan tarikh dipilih dalam DB
-                  const { error: upErr } = await db
-                    .from("appointments")
-                    .update({ doctor_selected_date: chosenDate })
-                    .eq("id", a.id);
-
-                  if (upErr) console.error("Update chosen date error:", upErr);
-
-                  const doctorPhone = await fetchDoctorWhatsapp(a.doctor_id);
-                  const msg = [
-                    "Assalamualaikum / Salam sejahtera Dr,",
-                    "",
-                    "Staff dah dapat persetujuan pesakit untuk tarikh cadangan doktor:",
-                    `Nama pesakit: ${a.patient_name}`,
-                    `Tarikh dipilih: ${chosenDate}`,
-                    a.appointment_time ? `Masa: ${formatTime(a.appointment_time)} (${a.appointment_duration || 60} minit)` : "",
-                    "",
-                    `Sila semak dalam sistem: ${APP_URL}`
-                  ].filter(Boolean).join("\n");
-
-                  window.open(buildWhatsAppLink(doctorPhone || "", msg), "_blank");
+              actionContainer.querySelectorAll("button[data-date]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                  const selectedDate = btn.dataset.date;
+                  handleStaffChooseNewDate(a, selectedDate);
                 });
               });
             }
@@ -3338,6 +4091,42 @@
       ].join("\n");
 
       const waUrl = buildWhatsAppLink(appointment.patient_phone || "", msg);
+      window.open(waUrl, "_blank");
+    }
+
+    async function handleStaffChooseNewDate(appointment, chosenDate) {
+      const { error } = await db
+        .from("appointments")
+        .update({
+          status: "pending",
+          requested_date: chosenDate,
+          doctor_selected_date: null
+        })
+        .eq("id", appointment.id);
+
+      if (error) {
+        console.error("Error update reschedule", error);
+        alert("Gagal kemaskini tarikh baharu.");
+        return;
+      }
+
+      const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
+      const doctorPhone = await fetchDoctorWhatsapp(appointment.doctor_id);
+
+      const msg = [
+        "Assalamualaikum / Salam sejahtera Dr,",
+        "",
+        "Pesakit telah bersetuju dengan tarikh baharu:",
+        `Servis: ${serviceName}`,
+        `Nama pesakit: ${appointment.patient_name}`,
+        `Complaint: ${appointment.complaint || "Tiada complaint dinyatakan"}`,
+        `Tarikh baharu dipilih pesakit: ${formatDate(chosenDate)}`,
+        "",
+        "Sila semak & sahkan semula dalam sistem.",
+        `Link sistem: ${APP_URL}`
+      ].join("\n");
+
+      const waUrl = buildWhatsAppLink(doctorPhone || "", msg);
       window.open(waUrl, "_blank");
     }
 
@@ -4043,165 +4832,47 @@
     }
 
     // ==============================
-    // SETTING TEMUJANJI TETAP (STAFF)
+    // EVENT LISTENERS UNTUK FEATURE BARU
     // ==============================
-    async function loadFixedAppointments(doctorId = null) {
-      if (!doctorId) {
-        fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Pilih doktor untuk lihat setting semasa.</p>';
-        return;
-      }
-      
-      const { data, error } = await db
-        .from('doctor_fixed_appointments')
-        .select('*')
-        .eq('doctor_id', doctorId)
-        .order('day_of_week', { ascending: true });
-      
-      if (error) {
-        console.error('Error loading fixed appointments', error);
-        fixedAppointmentsList.innerHTML = '<p class="text-sm text-rose-500 text-center py-4">Gagal memuatkan data.</p>';
-        return;
-      }
-      
-      fixedAppointmentsCache = data || [];
-      renderFixedAppointmentsList();
+    
+    // Availability calendar untuk doktor
+    if (availabilityBtn) {
+      availabilityBtn.addEventListener('click', openAvailabilityCalendar);
     }
-
-    function renderFixedAppointmentsList() {
-      fixedAppointmentsList.innerHTML = '';
-      
-      if (fixedAppointmentsCache.length === 0) {
-        fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Tiada temujanji tetap ditetapkan.</p>';
-        return;
-      }
-      
-      const dayNames = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-      
-      fixedAppointmentsCache.forEach(appointment => {
-        const item = document.createElement("div");
-        item.className = 'flex justify-between items-center p-3 bg-slate-50 rounded-lg mb-2';
-        item.innerHTML = `
-          <div>
-            <div class="font-medium text-slate-800">${dayNames[appointment.day_of_week]}</div>
-            <div class="text-sm text-slate-600">${formatTime(appointment.start_time)} - ${formatTime(appointment.end_time)} (${appointment.duration} minit)</div>
-          </div>
-          <button class="delete-fixed-btn text-rose-500 hover:text-rose-700 p-1" data-id="${appointment.id}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-            </svg>
-          </button>
-        `;
-        
-        fixedAppointmentsList.appendChild(item);
-      });
-      
-      fixedAppointmentsList.querySelectorAll('.delete-fixed-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const id = btn.dataset.id;
-          if (confirm('Adakah anda pasti mahu memadam temujanji tetap ini?')) {
-            await deleteFixedAppointment(id);
-          }
-        });
-      });
+    
+    if (backFromCalendar) {
+      backFromCalendar.addEventListener('click', closeAvailabilityCalendar);
     }
-
-    async function deleteFixedAppointment(id) {
-      try {
-        const { error } = await db
-          .from('doctor_fixed_appointments')
-          .delete()
-          .eq('id', id);
-        
-        if (error) throw error;
-        
-        const doctorId = fixedAppointmentDoctorSelect.value;
-        if (doctorId) {
-          await loadFixedAppointments(doctorId);
-        }
-        
-        alert('Temujanji tetap berjaya dipadam.');
-      } catch (error) {
-        console.error('Error deleting fixed appointment', error);
-        alert('Gagal memadam temujanji tetap.');
-      }
+    
+    if (saveAvailability) {
+      saveAvailability.addEventListener('click', saveAvailabilityDates);
     }
-
+    
+    // Fixed appointment modal untuk staff dan doktor
+    if (staffFixedAppointmentBtn) {
+      staffFixedAppointmentBtn.addEventListener('click', openFixedAppointmentModalForStaff);
+    }
+    
+    if (staffFixedAppointmentBtnMobile) {
+      staffFixedAppointmentBtnMobile.addEventListener('click', openFixedAppointmentModalForStaff);
+    }
+    
+    if (fixedAppointmentBtn) {
+      fixedAppointmentBtn.addEventListener('click', openFixedAppointmentModalForDoctor);
+    }
+    
+    if (closeFixedModal) {
+      closeFixedModal.addEventListener('click', closeFixedAppointmentModal);
+    }
+    
+    if (cancelFixedSetting) {
+      cancelFixedSetting.addEventListener('click', closeFixedAppointmentModal);
+    }
+    
     if (saveFixedAppointment) {
-      saveFixedAppointment.addEventListener('click', async () => {
-        const doctorId = fixedAppointmentDoctorSelect.value;
-        if (!doctorId) {
-          alert('Sila pilih doktor.');
-          return;
-        }
-        
-        if (selectedDays.size === 0) {
-          alert('Sila pilih hari.');
-          return;
-        }
-        
-        const startTime = fixedStartTime.value;
-        const endTime = fixedEndTime.value;
-        const duration = parseInt(fixedDuration.value);
-        
-        if (!startTime || !endTime) {
-          alert('Sila isi masa mula dan masa tamat.');
-          return;
-        }
-        
-        const [startHour, startMinute] = startTime.split(':').map(Number);
-        const [endHour, endMinute] = endTime.split(':').map(Number);
-        
-        const startTotal = startHour * 60 + startMinute;
-        const endTotal = endHour * 60 + endMinute;
-        
-        if (endTotal <= startTotal) {
-          alert('Masa tamat mesti selepas masa mula.');
-          return;
-        }
-        
-        try {
-          const appointmentsData = Array.from(selectedDays).map(day => ({
-            doctor_id: doctorId,
-            day_of_week: parseInt(day),
-            start_time: startTime,
-            end_time: endTime,
-            duration: duration
-          }));
-          
-          const { error } = await db
-            .from('doctor_fixed_appointments')
-            .upsert(appointmentsData, {
-              onConflict: 'doctor_id,day_of_week'
-            });
-          
-          if (error) throw error;
-          
-          alert('Temujanji tetap berjaya disimpan!');
-          await loadFixedAppointments(doctorId);
-          
-          selectedDays.clear();
-          daySelectors.forEach(btn => {
-            btn.classList.remove('bg-blue-500', 'text-white');
-            btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
-          });
-        } catch (error) {
-          console.error('Error saving fixed appointments', error);
-          alert('Gagal menyimpan temujanji tetap.');
-        }
-      });
+      saveFixedAppointment.addEventListener('click', saveFixedAppointmentSetting);
     }
-
-    if (fixedAppointmentDoctorSelect) {
-      fixedAppointmentDoctorSelect.addEventListener('change', function() {
-        const doctorId = this.value;
-        if (doctorId) {
-          loadFixedAppointments(doctorId);
-        } else {
-          fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500 text-center py-4">Pilih doktor untuk lihat setting semasa.</p>';
-        }
-      });
-    }
-
+    
     // Day selectors for fixed appointments
     daySelectors.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -4216,524 +4887,9 @@
           btn.classList.add('bg-blue-500', 'text-white');
         }
       });
-    }
-
-    // ==============================
-    // FEATURE BARU: AVAILABILITY DOKTOR
-    // ==============================
-    if (availabilityBtn) {
-      availabilityBtn.addEventListener('click', openAvailabilityCalendar);
-    }
+    });
     
-    if (backFromCalendar) {
-      backFromCalendar.addEventListener('click', closeAvailabilityCalendar);
-    }
-    
-    if (saveAvailability) {
-      saveAvailability.addEventListener('click', saveAvailabilityDates);
-    }
-
-    // ==============================
-    // FEATURE BARU: SETTING TEMUJANJI TETAP (DOKTOR)
-    // ==============================
-    if (fixedAppointmentBtn) {
-      fixedAppointmentBtn.addEventListener('click', openFixedAppointmentModalForDoctor);
-    }
-
-    function openFixedAppointmentModalForDoctor() {
-      alert('Setting temujanji tetap untuk doktor akan datang dalam versi seterusnya.');
-    }
-
-    // ==============================
-    // FUNGSI BANTUAN AVAILABILITY
-    // ==============================
-    function showAvailabilityTable(doctorId, doctorName) {
-      if (!availabilityTableContainer) return;
-      
-      currentSelectedDoctorId = doctorId;
-      tableDoctorName.textContent = doctorName;
-      availabilityTableContainer.style.display = 'block';
-      availabilityTableContainer.style.opacity = '1';
-      availabilityTableContainer.style.transform = 'translate(-50%, -50%) scale(1)';
-      
-      loadDoctorAvailabilityForStaff(doctorId);
-    }
-
-    function hideAvailabilityTable() {
-      if (!availabilityTableContainer) return;
-      
-      availabilityTableContainer.style.opacity = '0';
-      availabilityTableContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
-      
-      setTimeout(() => {
-        availabilityTableContainer.style.display = 'none';
-      }, 200);
-    }
-
-    async function loadDoctorAvailabilityForStaff(doctorId) {
-      if (!availabilityTableView) return;
-      
-      availabilityTableView.innerHTML = '<div class="text-center py-8 text-slate-500">Memuatkan data...</div>';
-      
-      // Load available dates
-      const { data: availabilityData, error: availError } = await db
-        .from('doctor_availability')
-        .select('date, time_slots')
-        .eq('doctor_id', doctorId)
-        .gte('date', new Date().toISOString().split('T')[0])
-        .order('date', { ascending: true });
-      
-      if (availError) {
-        console.error('Error loading availability', availError);
-        availabilityTableView.innerHTML = '<div class="text-center py-8 text-rose-500">Gagal memuatkan data</div>';
-        return;
-      }
-      
-      // Load fixed appointments for this doctor
-      const { data: fixedData, error: fixedError } = await db
-        .from('doctor_fixed_appointments')
-        .select('*')
-        .eq('doctor_id', doctorId);
-      
-      let fixedAppointments = [];
-      if (!fixedError && fixedData) {
-        fixedAppointments = fixedData;
-      }
-      
-      if (currentAvailabilityView === 'list') {
-        renderAvailabilityListView(availabilityData, fixedAppointments);
-      } else {
-        renderAvailabilityCalendarView(availabilityData, fixedAppointments);
-      }
-    }
-
-    function renderAvailabilityListView(availabilityData, fixedAppointments) {
-      if (!availabilityTableView) return;
-      
-      if (!availabilityData || availabilityData.length === 0) {
-        availabilityTableView.innerHTML = `
-          <div class="p-6 text-center">
-            <div class="text-slate-400 mb-3">📅</div>
-            <p class="text-slate-600">Tiada tarikh available untuk doktor ini.</p>
-            <p class="text-sm text-slate-500 mt-2">Doktor perlu masukkan tarikh available melalui panel doktor.</p>
-          </div>
-        `;
-        return;
-      }
-      
-      let html = '';
-      
-      availabilityData.forEach(item => {
-        const date = new Date(item.date);
-        const formattedDate = date.toLocaleDateString('ms-MY', {
-          weekday: 'short',
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-        
-        let timeSlotsHtml = '';
-        if (item.time_slots && item.time_slots.length > 0) {
-          timeSlotsHtml = item.time_slots.map(slot => {
-            const startTime = slot.start ? formatTime(slot.start) : '';
-            const endTime = slot.end ? formatTime(slot.end) : '';
-            return `${startTime} - ${endTime}`;
-          }).join(', ');
-        }
-        
-        html += `
-          <div class="availability-date-item">
-            <div>
-              <div class="font-medium text-slate-900">${formattedDate}</div>
-              ${timeSlotsHtml ? `<div class="text-sm text-slate-600 mt-1">${timeSlotsHtml}</div>` : ''}
-            </div>
-            <button class="text-sm bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg select-date-btn" data-date="${item.date}">
-              Pilih
-            </button>
-          </div>
-        `;
-      });
-      
-      availabilityTableView.innerHTML = html;
-      
-      // Add event listeners to select date buttons
-      availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const selectedDate = btn.dataset.date;
-          if (requestedDate) {
-            requestedDate.value = selectedDate;
-            hideAvailabilityTable();
-            
-            // Also update mobile version if exists
-            if (requestedDateMobile) {
-              requestedDateMobile.value = selectedDate;
-            }
-          }
-        });
-      });
-    }
-
-    function renderAvailabilityCalendarView(availabilityData, fixedAppointments) {
-      if (!availabilityTableView) return;
-      
-      const today = new Date();
-      const currentMonth = today.getMonth();
-      const currentYear = today.getFullYear();
-      
-      // Create mini calendar
-      const firstDay = new Date(currentYear, currentMonth, 1);
-      const lastDay = new Date(currentYear, currentMonth + 1, 0);
-      const daysInMonth = lastDay.getDate();
-      const startingDay = firstDay.getDay();
-      
-      const monthNames = [
-        'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
-        'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
-      ];
-      
-      let calendarHtml = `
-        <div class="p-4">
-          <div class="text-center font-bold text-slate-800 mb-4">
-            ${monthNames[currentMonth]} ${currentYear}
-          </div>
-          <div class="availability-mini-calendar">
-      `;
-      
-      // Day headers
-      const dayHeaders = ['Ah', 'Is', 'Se', 'Ra', 'Kh', 'Ju', 'Sa'];
-      dayHeaders.forEach(day => {
-        calendarHtml += `<div class="text-center text-xs font-medium text-slate-500">${day}</div>`;
-      });
-      
-      // Empty cells before first day
-      for (let i = 0; i < startingDay; i++) {
-        calendarHtml += '<div></div>';
-      }
-      
-      // Days of the month
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
-        
-        // Check if this date is available
-        const isAvailable = availabilityData?.some(item => item.date === dateStr) || false;
-        
-        let dayClass = 'availability-mini-day';
-        if (isToday) dayClass += ' today';
-        if (isAvailable) dayClass += ' available';
-        
-        calendarHtml += `
-          <div class="${dayClass}" data-date="${dateStr}">
-            ${day}
-          </div>
-        `;
-      }
-      
-      calendarHtml += `
-          </div>
-          <div class="mt-4 text-sm text-slate-600">
-            <div class="flex items-center gap-2 mb-2">
-              <div class="availability-mini-day available w-4 h-4"></div>
-              <span>Tarikh Available</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <div class="availability-mini-day today w-4 h-4"></div>
-              <span>Hari Ini</span>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      availabilityTableView.innerHTML = calendarHtml;
-      
-      // Add event listeners to calendar days
-      availabilityTableView.querySelectorAll('.availability-mini-day[data-date]').forEach(dayEl => {
-        dayEl.addEventListener('click', () => {
-          const selectedDate = dayEl.dataset.date;
-          if (requestedDate) {
-            requestedDate.value = selectedDate;
-            hideAvailabilityTable();
-            
-            // Also update mobile version if exists
-            if (requestedDateMobile) {
-              requestedDateMobile.value = selectedDate;
-            }
-          }
-        });
-      });
-    }
-
-    function openAvailabilityCalendar() {
-      if (!availabilityCalendarModal) return;
-      
-      availabilityCalendarModal.style.display = 'flex';
-      renderCalendar();
-    }
-
-    function closeAvailabilityCalendar() {
-      if (!availabilityCalendarModal) return;
-      
-      availabilityCalendarModal.style.display = 'none';
-      selectedDates.clear();
-      dateTimeMap.clear();
-      saveAvailability.classList.add('hidden');
-    }
-
-    function renderCalendar() {
-      if (!calendarContainer) return;
-      
-      const today = new Date();
-      const month = currentCalendarMonth;
-      const year = currentCalendarYear;
-      
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      const daysInMonth = lastDay.getDate();
-      const startingDay = firstDay.getDay();
-      
-      const monthNames = [
-        'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
-        'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
-      ];
-      
-      // Navigation
-      let calendarHtml = `
-        <div class="flex justify-between items-center mb-6">
-          <button id="prevMonth" class="p-2 rounded-lg hover:bg-slate-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h3 class="text-xl font-bold text-slate-900">${monthNames[month]} ${year}</h3>
-          <button id="nextMonth" class="p-2 rounded-lg hover:bg-slate-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-        
-        <div class="calendar-grid mb-2">
-      `;
-      
-      // Day headers
-      const dayNames = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
-      dayNames.forEach(day => {
-        calendarHtml += `<div class="calendar-day-header">${day.charAt(0)}</div>`;
-      });
-      
-      // Empty cells before first day
-      for (let i = 0; i < startingDay; i++) {
-        calendarHtml += '<div class="calendar-day disabled"></div>';
-      }
-      
-      // Days of the month
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        const date = new Date(year, month, day);
-        const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-        const isPast = date < today && !isToday;
-        const isSelected = selectedDates.has(dateStr);
-        
-        let dayClass = 'calendar-day';
-        if (isPast) dayClass += ' disabled';
-        if (isToday) dayClass += ' today';
-        if (isSelected) dayClass += ' selected';
-        
-        // Check if it's a holiday (weekend)
-        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-        if (isWeekend) dayClass += ' holiday';
-        
-        calendarHtml += `
-          <div class="${dayClass}" data-date="${dateStr}" ${isWeekend ? 'data-holiday="Hujung Minggu"' : ''}>
-            ${day}
-            ${isWeekend ? '<div class="holiday-indicator"></div>' : ''}
-            ${dateTimeMap.has(dateStr) ? `<div class="time-badge">${dateTimeMap.get(dateStr)}</div>` : ''}
-          </div>
-        `;
-      }
-      
-      calendarHtml += '</div>';
-      
-      calendarContainer.innerHTML = calendarHtml;
-      
-      // Add event listeners
-      document.getElementById('prevMonth').addEventListener('click', () => {
-        currentCalendarMonth--;
-        if (currentCalendarMonth < 0) {
-          currentCalendarMonth = 11;
-          currentCalendarYear--;
-        }
-        renderCalendar();
-      });
-      
-      document.getElementById('nextMonth').addEventListener('click', () => {
-        currentCalendarMonth++;
-        if (currentCalendarMonth > 11) {
-          currentCalendarMonth = 0;
-          currentCalendarYear++;
-        }
-        renderCalendar();
-      });
-      
-      // Day selection
-      calendarContainer.querySelectorAll('.calendar-day:not(.disabled)').forEach(dayEl => {
-        dayEl.addEventListener('click', () => {
-          const date = dayEl.dataset.date;
-          if (selectedDates.has(date)) {
-            selectedDates.delete(date);
-            dateTimeMap.delete(date);
-            dayEl.classList.remove('selected');
-          } else {
-            selectedDates.add(date);
-            dayEl.classList.add('selected');
-            
-            // Open time selection modal
-            currentSelectedDateForTime = date;
-            openTimeSelectionModal(date);
-          }
-          
-          // Show/hide save button
-          if (selectedDates.size > 0) {
-            saveAvailability.classList.remove('hidden');
-          } else {
-            saveAvailability.classList.add('hidden');
-          }
-        });
-      });
-    }
-
-    function openTimeSelectionModal(date) {
-      if (!timeSelectionModal) return;
-      
-      const dateObj = new Date(date);
-      const formattedDate = dateObj.toLocaleDateString('ms-MY', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-      
-      timeModalDate.textContent = formattedDate;
-      
-      // Generate time slots (9am to 9pm, every hour)
-      let timeSlotsHtml = '';
-      for (let hour = 9; hour <= 21; hour++) {
-        const timeStr = `${hour.toString().padStart(2, '0')}:00`;
-        timeSlotsHtml += `
-          <div class="time-slot" data-time="${timeStr}">
-            ${formatTime(timeStr)}
-          </div>
-        `;
-      }
-      
-      timeSlotsContainer.innerHTML = timeSlotsHtml;
-      
-      // Set default custom times
-      customStartTime.value = '09:00';
-      customEndTime.value = '17:00';
-      
-      // Show modal
-      timeSelectionModal.style.display = 'flex';
-      
-      // Add event listeners to time slots
-      timeSlotsContainer.querySelectorAll('.time-slot').forEach(slot => {
-        slot.addEventListener('click', () => {
-          timeSlotsContainer.querySelectorAll('.time-slot').forEach(s => {
-            s.classList.remove('selected');
-          });
-          slot.classList.add('selected');
-        });
-      });
-    }
-
-    function closeTimeSelectionModal() {
-      if (!timeSelectionModal) return;
-      timeSelectionModal.style.display = 'none';
-    }
-
-    function saveTimeForDate() {
-      if (!currentSelectedDateForTime) return;
-      
-      let timeStr = '';
-      
-      // Check if a time slot is selected
-      const selectedSlot = timeSlotsContainer.querySelector('.time-slot.selected');
-      if (selectedSlot) {
-        timeStr = `${formatTime(selectedSlot.dataset.time)}`;
-      } else {
-        // Use custom time
-        const startTime = customStartTime.value;
-        const endTime = customEndTime.value;
-        if (startTime && endTime) {
-          timeStr = `${formatTime(startTime)} - ${formatTime(endTime)}`;
-        } else {
-          timeStr = 'Sepanjang hari';
-        }
-      }
-      
-      dateTimeMap.set(currentSelectedDateForTime, timeStr);
-      closeTimeSelectionModal();
-      renderCalendar();
-    }
-
-    async function saveAvailabilityDates() {
-      if (!currentProfile || currentProfile.role !== 'doctor') {
-        alert('Hanya doktor boleh simpan availability.');
-        return;
-      }
-      
-      if (selectedDates.size === 0) {
-        alert('Sila pilih sekurang-kurangnya satu tarikh.');
-        return;
-      }
-      
-      try {
-        const availabilityData = Array.from(selectedDates).map(date => {
-          const timeInfo = dateTimeMap.get(date) || 'Sepanjang hari';
-          let timeSlots = [];
-          
-          // Parse time info into slots
-          if (timeInfo.includes('-')) {
-            const [startStr, endStr] = timeInfo.split('-').map(s => s.trim());
-            // Convert formatted time back to 24-hour format
-            // This is a simplified conversion - you might want to improve this
-            timeSlots = [{
-              start: startStr.replace(' AM', '').replace(' PM', ''),
-              end: endStr.replace(' AM', '').replace(' PM', '')
-            }];
-          }
-          
-          return {
-            doctor_id: currentProfile.id,
-            date: date,
-            time_slots: timeSlots.length > 0 ? timeSlots : null
-          };
-        });
-        
-        const { error } = await db
-          .from('doctor_availability')
-          .upsert(availabilityData, {
-            onConflict: 'doctor_id,date'
-          });
-        
-        if (error) throw error;
-        
-        alert('Tarikh available berjaya disimpan!');
-        closeAvailabilityCalendar();
-        
-        // Refresh if staff is viewing availability
-        if (currentSelectedDoctorId) {
-          loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
-        }
-      } catch (error) {
-        console.error('Error saving availability', error);
-        alert('Gagal menyimpan tarikh available.');
-      }
-    }
-
-    // ==============================
-    // INIT TIME MODAL EVENT LISTENERS
-    // ==============================
+    // Time selection modal
     if (closeTimeModal) {
       closeTimeModal.addEventListener('click', closeTimeSelectionModal);
     }
@@ -4746,23 +4902,58 @@
       saveTimeSelection.addEventListener('click', saveTimeForDate);
     }
     
+    // Availability table untuk staff
+    document.querySelectorAll('.availability-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.availability-tab-btn').forEach(b => {
+          b.classList.remove('active');
+        });
+        btn.classList.add('active');
+        
+        currentAvailabilityView = btn.dataset.view;
+        
+        if (currentSelectedDoctorId) {
+          loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
+        }
+      });
+    });
+    
+    // Close availability table
     if (closeAvailabilityTable) {
       closeAvailabilityTable.addEventListener('click', hideAvailabilityTable);
     }
     
-    // Close modal when clicking outside
-    if (timeSelectionModal) {
-      timeSelectionModal.addEventListener('click', (e) => {
-        if (e.target === timeSelectionModal) {
-          closeTimeSelectionModal();
-        }
-      });
-    }
-    
-    if (availabilityTableContainer) {
-      availabilityTableContainer.addEventListener('click', (e) => {
-        if (e.target === availabilityTableContainer) {
-          hideAvailabilityTable();
+    // Close availability table ketika klik di luar
+    document.addEventListener('click', (e) => {
+      if (availabilityTableContainer && !availabilityTableContainer.contains(e.target) && 
+          e.target !== doctorSelect && 
+          !doctorSelect.contains(e.target) &&
+          e.target !== closeAvailabilityTable) {
+        hideAvailabilityTable();
+      }
+    });
+
+    // Close modals when clicking outside
+    document.addEventListener('click', (e) => {
+      if (timeSelectionModal.style.display === 'flex' && e.target === timeSelectionModal) {
+        closeTimeSelectionModal();
+      }
+      if (fixedAppointmentModal.style.display === 'flex' && e.target === fixedAppointmentModal) {
+        closeFixedAppointmentModal();
+      }
+      if (availabilityTableContainer.style.display === 'block' && e.target === availabilityTableContainer) {
+        hideAvailabilityTable();
+      }
+    });
+
+    // Event listener untuk dropdown pemilihan doktor (staff)
+    if (fixedAppointmentDoctorSelect) {
+      fixedAppointmentDoctorSelect.addEventListener('change', function() {
+        const doctorId = this.value;
+        if (doctorId) {
+          loadFixedAppointments(doctorId);
+        } else {
+          fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500">Pilih doktor untuk lihat setting semasa.</p>';
         }
       });
     }
@@ -4790,6 +4981,11 @@
       const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
       const endTime = `${oneHourLater.getHours().toString().padStart(2, '0')}:${oneHourLater.getMinutes().toString().padStart(2, '0')}`;
       if (customEndTime) customEndTime.value = endTime;
+      
+      if (todayActionsListEl) {
+        todayActionsListEl.innerHTML =
+          '<p class="text-base text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
+      }
       
       // Set initial style untuk availability table
       if (availabilityTableContainer) {
