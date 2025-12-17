@@ -4932,14 +4932,28 @@
 
           card.appendChild(actionRow);
 
-      // Dalam fungsi approveBtn.addEventListener("click")
+    // KOD ASAL (tanpa doctor_selected_date):
 approveBtn.addEventListener("click", async () => {
-  // Approve dengan tarikh yang dicadangkan pesakit
+  const { error } = await db
+    .from("appointments")
+    .update({ status: "approved" })
+    .eq("id", a.id);
+    
+  if (error) {
+    console.error("Error approve", error);
+    alert("Gagal update status.");
+    return;
+  }
+  alert("Temujanji telah diluluskan dengan tarikh pesakit.");
+});
+
+// KOD BARU (dengan doctor_selected_date):
+approveBtn.addEventListener("click", async () => {
   const { error } = await db
     .from("appointments")
     .update({ 
-      status: "approved", 
-      doctor_selected_date: a.requested_date,  // ✅ INI PENTING
+      status: "approved",
+      doctor_selected_date: a.requested_date,  // <-- TAMBAH INI
       appointment_time: a.appointment_time || "09:00",
       appointment_duration: a.appointment_duration || 60
     })
