@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+"<!DOCTYPE html>
 <html lang="ms">
 <head>
   <meta charset="UTF-8" />
@@ -465,6 +465,121 @@
       font-weight: 600;
       color: #334155;
     }
+    
+    /* ============================== */
+    /* STYLE UNTUK SISTEM BERKHATAN */
+    /* ============================== */
+    
+    /* Color coding untuk slot status */
+    .slot-available { background: #d1fae5; color: #065f46; } /* Hijau */
+    .slot-booked { background: #fef3c7; color: #92400e; } /* Kuning */
+    .slot-unavailable { background: #f1f5f9; color: #64748b; } /* Kelabu */
+    
+    /* Doctor method badges */
+    .method-laser { background: #e0e7ff; color: #3730a3; }
+    .method-gunting { background: #fce7f3; color: #831843; }
+    .method-klip { background: #fef3c7; color: #92400e; }
+    
+    /* Dashboard berkhatan */
+    .circumcision-slot-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      background: white;
+      transition: all 0.2s ease;
+    }
+    
+    .circumcision-slot-card:hover {
+      border-color: #10b981;
+      box-shadow: 0 8px 20px -5px rgba(5, 150, 105, 0.1);
+    }
+    
+    .slot-bubble {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .slot-bubble:hover {
+      transform: scale(1.1);
+    }
+    
+    /* Method filter */
+    .method-filter-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #cbd5e1;
+      background: white;
+      transition: all 0.2s ease;
+    }
+    
+    .method-filter-btn.active {
+      border-color: #10b981;
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    /* Quick booking modal */
+    .quick-booking-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .quick-booking-content {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    /* Today Actions summary untuk berkhatan */
+    .circumcision-summary {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f9ff 100%);
+      border: 1px solid #c7d2fe;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    /* Slot time display */
+    .slot-time-display {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    
+    /* Price display */
+    .price-badge {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="text-slate-900">
@@ -641,6 +756,12 @@
                   </div>
                   <span class="text-sm md:text-base">Sistem masa temujanji membolehkan pengurusan slot masa yang fleksibel.</span>
                 </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span class="text-emerald-600 font-bold text-xs">6</span>
+                  </div>
+                  <span class="text-sm md:text-base">Sistem berkhatan dengan slot management khas untuk musim berkhatan.</span>
+                </li>
               </ul>
               
               <div class="mt-6 p-4 rounded-xl bg-white/80 border border-emerald-200 text-sm md:text-base">
@@ -719,10 +840,87 @@
                     <span>Perlu follow-up</span>
                     <span class="font-bold text-slate-900" id="todayRejectedCount">0</span>
                   </div>
+                  <div class="px-4 py-2 rounded-full bg-white shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-blue-400"></span>
+                    <span>Berkhatan</span>
+                    <span class="font-bold text-slate-900" id="todayCircumcisionCount">0</span>
+                  </div>
                 </div>
               </div>
               <div id="todayActionsList" class="mt-6 space-y-4 text-sm md:text-base text-slate-700">
                 <!-- auto render -->
+              </div>
+              
+              <!-- Today Actions Summary untuk Berkhatan -->
+              <div id="circumcisionTodaySummary" class="mt-6 circumcision-summary hidden">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-lg font-bold text-slate-800">✂️ Ringkasan Slot Berkhatan Hari Ini</h3>
+                  <button id="openCircumcisionDashboard" class="text-sm px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    📊 Buka Dashboard
+                  </button>
+                </div>
+                <div id="circumcisionSummaryContent" class="text-sm text-slate-600">
+                  Loading ringkasan slot berkhatan...
+                </div>
+              </div>
+            </div>
+
+            <!-- DASHBOARD BERKHATAN (TAMBAHAN BAHARU) -->
+            <div id="circumcisionDashboard" class="mt-6 hidden">
+              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 md:p-8">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                  <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-900">✂️ Dashboard Berkhatan</h2>
+                    <p class="text-sm md:text-base text-slate-500 mt-2">
+                      Urus slot, booking pantas dan pantau status prosedur berkhatan
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap gap-3">
+                    <button id="setupCircumcisionSlots" class="text-sm px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                      🗓️ Setup Slot Doktor
+                    </button>
+                    <button id="circumcisionReportBtn" class="text-sm px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">
+                      📊 Laporan Berkhatan
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Filter Dashboard -->
+                <div class="bg-white border border-slate-200 rounded-xl p-4 mb-6">
+                  <div class="flex flex-col md:flex-row md:items-center gap-4">
+                    <div class="flex-1">
+                      <label class="block text-sm font-medium text-slate-700 mb-2">Pilih Tarikh</label>
+                      <input type="date" id="circumcisionDateFilter" class="w-full rounded-lg border border-slate-200 px-4 py-2" />
+                    </div>
+                    <div class="flex-1">
+                      <label class="block text-sm font-medium text-slate-700 mb-2">Kaedah Berkhatan</label>
+                      <div class="flex flex-wrap gap-2">
+                        <button class="method-filter-btn active" data-method="all">Semua</button>
+                        <button class="method-filter-btn" data-method="Laser">Laser</button>
+                        <button class="method-filter-btn" data-method="Gunting">Gunting</button>
+                        <button class="method-filter-btn" data-method="Klip">Klip</button>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <label class="block text-sm font-medium text-slate-700 mb-2">Status Slot</label>
+                      <div class="flex flex-wrap gap-2">
+                        <button class="method-filter-btn active" data-status="all">Semua</button>
+                        <button class="method-filter-btn" data-status="available">Kosong</button>
+                        <button class="method-filter-btn" data-status="booked">Ditempah</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Doctor Slot Cards -->
+                <div id="circumcisionDoctorsContainer" class="space-y-6">
+                  <!-- Doctor slot cards akan di-render oleh JavaScript -->
+                  <div class="text-center py-8 text-slate-500">
+                    <div class="text-4xl mb-3">✂️</div>
+                    <p>Tiada slot berkhatan dijumpai untuk tarikh ini.</p>
+                    <p class="text-sm mt-2">Sila setup slot doktor terlebih dahulu.</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -892,6 +1090,10 @@
                               data-status="rejected">
                         Rejected
                       </button>
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                              data-status="circumcision">
+                        ✂️ Berkhatan
+                      </button>
                     </div>
                     <button id="refreshStaffAppointments"
                             class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
@@ -1053,6 +1255,10 @@
                               data-status="rejected">
                         Rejected
                       </button>
+                      <button class="staff-filter-btn-mobile px-4 py-2 rounded-full font-semibold text-slate-600"
+                              data-status="circumcision">
+                        ✂️ Berkhatan
+                      </button>
                     </div>
                     <button id="refreshStaffAppointmentsMobile"
                             class="text-sm px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
@@ -1131,6 +1337,11 @@
                          class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
                   Rejected
                 </label>
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportCircumcision" type="checkbox" checked
+                         class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
+                  ✂️ Berkhatan
+                </label>
               </div>
             </div>
 
@@ -1142,6 +1353,10 @@
               <button id="exportExcelBtn"
                       class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
                 Export ke Excel
+              </button>
+              <button id="exportCircumcisionReportBtn"
+                      class="inline-flex items-center justify-center gap-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                ✂️ Laporan Berkhatan
               </button>
             </div>
 
@@ -1178,6 +1393,11 @@
                   <span>⏰</span>
                   Setting Temujanji Tetap
                 </button>
+                <button id="doctorCircumcisionBtn"
+                        class="inline-flex items-center gap-2 text-sm md:text-base px-4 py-2 rounded-full border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 hover:border-purple-300 transition">
+                  <span>✂️</span>
+                  Slot Berkhatan Saya
+                </button>
                 <div class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
                   <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                           data-tab="pending">
@@ -1190,6 +1410,10 @@
                   <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                           data-tab="rejected">
                     Rejected
+                  </button>
+                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                          data-tab="circumcision">
+                    ✂️ Berkhatan
                   </button>
                 </div>
                 <button id="refreshDoctorAppointments"
@@ -1277,6 +1501,7 @@
                       <option value="text">Text</option>
                       <option value="phone">Phone</option>
                       <option value="date">Date</option>
+                      <option value="number">Number</option>
                     </select>
                   </div>
                   <div>
@@ -1466,7 +1691,164 @@
     </div>
   </div>
 
-  <script>
+  <!-- MODAL UNTUK SETUP SLOT BERKHATAN -->
+  <div id="setupCircumcisionModal" class="quick-booking-modal">
+    <div class="quick-booking-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-slate-900">✂️ Setup Slot Berkhatan untuk Doktor</h3>
+        <button id="closeSetupCircModal" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Pilih Doktor</label>
+          <select id="setupDoctorSelect" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+            <option value="">Pilih doktor...</option>
+          </select>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Tarikh Mula</label>
+            <input type="date" id="slotStartDate" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Tarikh Akhir</label>
+            <input type="date" id="slotEndDate" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Slot per hari</label>
+          <select id="slotCountSelect" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+            <option value="2">2 slot (Pagi & Petang)</option>
+            <option value="4" selected>4 slot (09:00, 11:00, 14:00, 16:00)</option>
+            <option value="6">6 slot (Setiap 2 jam)</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Masa Slot (jika custom)</label>
+          <div id="customSlotTimes" class="space-y-2 hidden">
+            <div class="flex items-center gap-2">
+              <input type="time" class="flex-1 rounded-lg border border-slate-200 px-3 py-2" placeholder="Masa slot">
+              <button type="button" class="text-rose-500 hover:text-rose-700">×</button>
+            </div>
+            <button type="button" id="addSlotTime" class="text-sm text-blue-500 hover:text-blue-700">+ Tambah Masa Slot</button>
+          </div>
+        </div>
+        
+        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+          <p class="text-sm text-blue-700">Slot akan dibuat untuk setiap hari antara tarikh mula dan tarikh akhir.</p>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-6">
+        <button id="cancelSetupCirc" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50">
+          Batal
+        </button>
+        <button id="saveCircumcisionSlots" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          Buat Slot
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL UNTUK QUICK BOOKING BERKHATAN -->
+  <div id="circumcisionBookingModal" class="quick-booking-modal">
+    <div class="quick-booking-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-slate-900">✂️ Tempah Slot Berkhatan</h3>
+        <button id="closeCircBookingModal" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div id="quickBookingContent">
+        <!-- Content akan diisi oleh JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL UNTUK LAPORAN BERKHATAN -->
+  <div id="circumcisionReportModal" class="quick-booking-modal">
+    <div class="quick-booking-content" style="max-width: 800px;">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-slate-900">✂️ Laporan Berkhatan</h3>
+        <button id="closeCircReportModal" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Tarikh Mula</label>
+            <input type="date" id="reportStartDate" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">Tarikh Akhir</label>
+            <input type="date" id="reportEndDate" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2">
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Kaedah Berkhatan</label>
+          <div class="flex flex-wrap gap-2">
+            <button class="method-filter-btn active" data-method="all">Semua</button>
+            <button class="method-filter-btn" data-method="Laser">Laser</button>
+            <button class="method-filter-btn" data-method="Gunting">Gunting</button>
+            <button class="method-filter-btn" data-method="Klip">Klip</button>
+          </div>
+        </div>
+        
+        <div id="circumcisionReportStats" class="hidden p-4 bg-slate-50 rounded-lg">
+          <!-- Statistik akan diisi di sini -->
+        </div>
+        
+        <div id="circumcisionReportTable" class="hidden">
+          <div class="overflow-auto max-h-96">
+            <table class="min-w-full divide-y divide-slate-200">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-700">Tarikh</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-700">Doktor</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-700">Slot</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-700">Kaedah</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-700">Pesakit</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-700">Harga</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-slate-700">Status</th>
+                </tr>
+              </thead>
+              <tbody id="reportTableBody" class="divide-y divide-slate-200">
+                <!-- Data akan diisi di sini -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-3 mt-6">
+        <button id="cancelCircReport" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50">
+          Batal
+        </button>
+        <button id="generateCircReport" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          Jana Laporan
+        </button>
+        <button id="exportCircReport" class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 hidden">
+          Export ke Excel
+        </button>
+      </div>
+    </div>
+  </div>  <script>
     // ==============================
     // KONFIGURASI SUPABASE & APP
     // ==============================
@@ -1505,6 +1887,16 @@
     let selectedDays = new Set();
     let fixedAppointmentsCache = [];
     let doctorFixedTimes = new Map(); // Untuk menyimpan masa tetap doktor
+    
+    // State untuk sistem berkhatan
+    let circumcisionProfiles = [];
+    let circumcisionSlots = [];
+    let circumcisionBookings = [];
+    let activeCircumcisionMethod = 'all';
+    let activeCircumcisionStatus = 'all';
+    let currentCircumcisionDoctorId = null;
+    let currentCircumcisionSlotData = null;
+    let currentCircumcisionReportMethod = 'all';
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -1552,6 +1944,47 @@
     // Butang baru untuk staff
     const staffFixedAppointmentBtn = document.getElementById("staffFixedAppointmentBtn");
     const staffFixedAppointmentBtnMobile = document.getElementById("staffFixedAppointmentBtnMobile");
+    
+    // Elements berkhatan
+    const circumcisionDashboard = document.getElementById("circumcisionDashboard");
+    const openCircumcisionDashboardBtn = document.getElementById("openCircumcisionDashboard");
+    const circumcisionTodaySummary = document.getElementById("circumcisionTodaySummary");
+    const circumcisionSummaryContent = document.getElementById("circumcisionSummaryContent");
+    const todayCircumcisionCountEl = document.getElementById("todayCircumcisionCount");
+    const setupCircumcisionSlotsBtn = document.getElementById("setupCircumcisionSlots");
+    const circumcisionReportBtn = document.getElementById("circumcisionReportBtn");
+    const circumcisionDateFilter = document.getElementById("circumcisionDateFilter");
+    const circumcisionDoctorsContainer = document.getElementById("circumcisionDoctorsContainer");
+    
+    // Modals berkhatan
+    const setupCircumcisionModal = document.getElementById("setupCircumcisionModal");
+    const closeSetupCircModal = document.getElementById("closeSetupCircModal");
+    const setupDoctorSelect = document.getElementById("setupDoctorSelect");
+    const slotStartDate = document.getElementById("slotStartDate");
+    const slotEndDate = document.getElementById("slotEndDate");
+    const slotCountSelect = document.getElementById("slotCountSelect");
+    const customSlotTimes = document.getElementById("customSlotTimes");
+    const addSlotTimeBtn = document.getElementById("addSlotTime");
+    const cancelSetupCirc = document.getElementById("cancelSetupCirc");
+    const saveCircumcisionSlotsBtn = document.getElementById("saveCircumcisionSlots");
+    
+    const circumcisionBookingModal = document.getElementById("circumcisionBookingModal");
+    const closeCircBookingModal = document.getElementById("closeCircBookingModal");
+    const quickBookingContent = document.getElementById("quickBookingContent");
+    
+    const circumcisionReportModal = document.getElementById("circumcisionReportModal");
+    const closeCircReportModal = document.getElementById("closeCircReportModal");
+    const reportStartDate = document.getElementById("reportStartDate");
+    const reportEndDate = document.getElementById("reportEndDate");
+    const circumcisionReportStats = document.getElementById("circumcisionReportStats");
+    const circumcisionReportTable = document.getElementById("circumcisionReportTable");
+    const reportTableBody = document.getElementById("reportTableBody");
+    const cancelCircReport = document.getElementById("cancelCircReport");
+    const generateCircReportBtn = document.getElementById("generateCircReport");
+    const exportCircReportBtn = document.getElementById("exportCircReport");
+    const exportCircumcisionReportBtn = document.getElementById("exportCircumcisionReportBtn");
+    
+    const doctorCircumcisionBtn = document.getElementById("doctorCircumcisionBtn");
 
     // Staff form elements (Mobile)
     const serviceSelectMobile = document.getElementById("serviceSelectMobile");
@@ -1586,6 +2019,7 @@
     const exportPending = document.getElementById("exportPending");
     const exportApproved = document.getElementById("exportApproved");
     const exportRejected = document.getElementById("exportRejected");
+    const exportCircumcision = document.getElementById("exportCircumcision");
     const exportPreviewBtn = document.getElementById("exportPreviewBtn");
     const exportExcelBtn = document.getElementById("exportExcelBtn");
     const exportPreview = document.getElementById("exportPreview");
@@ -1824,6 +2258,912 @@
       ];
       const index = serviceId ? parseInt(serviceId, 36) % colors.length : 0;
       return colors[index];
+    }
+
+    // ==============================
+    // CLASS SISTEM BERKHATAN (CORE FUNCTIONS)
+    // ==============================
+    class CircumcisionSystem {
+      // 1. Dashboard management
+      static async loadCircumcisionDashboard(date) {
+        if (!date) {
+          date = new Date().toISOString().split('T')[0];
+          circumcisionDateFilter.value = date;
+        }
+        
+        try {
+          // Load doctor profiles dengan servis berkhatan
+          const { data: profiles, error: profError } = await db
+            .from('circumcision_profiles')
+            .select(`
+              id,
+              doctor_id,
+              method,
+              notes,
+              price,
+              duration,
+              is_active,
+              profiles!inner(full_name)
+            `)
+            .eq('is_active', true);
+          
+          if (profError) throw profError;
+          
+          circumcisionProfiles = profiles || [];
+          
+          // Load slots untuk tarikh tersebut
+          const { data: slots, error: slotError } = await db
+            .from('circumcision_slots')
+            .select(`
+              *,
+              circumcision_bookings!left(
+                id,
+                slot_number,
+                patient_name,
+                status
+              )
+            `)
+            .eq('date', date)
+            .eq('is_available', true);
+          
+          if (slotError) throw slotError;
+          
+          circumcisionSlots = slots || [];
+          
+          // Render dashboard
+          this.renderDashboard(circumcisionProfiles, circumcisionSlots, date);
+          
+          // Update summary
+          this.updateTodaySummary();
+          
+        } catch (error) {
+          console.error('Error loading circumcision dashboard', error);
+          circumcisionDoctorsContainer.innerHTML = `
+            <div class="text-center py-8 text-rose-500">
+              <p>❌ Gagal memuatkan dashboard berkhatan.</p>
+              <p class="text-sm">${error.message}</p>
+            </div>
+          `;
+        }
+      }
+      
+      static renderDashboard(profiles, slots, date) {
+        if (profiles.length === 0) {
+          circumcisionDoctorsContainer.innerHTML = `
+            <div class="text-center py-8 text-slate-500">
+              <div class="text-4xl mb-3">✂️</div>
+              <p>Tiada doktor berkhatan didaftarkan.</p>
+              <p class="text-sm mt-2">Sila setup profile doktor berkhatan terlebih dahulu.</p>
+            </div>
+          `;
+          return;
+        }
+        
+        let html = '';
+        
+        profiles.forEach(profile => {
+          const doctorSlots = slots.filter(slot => slot.doctor_id === profile.doctor_id);
+          const doctorName = profile.profiles?.full_name || 'Doktor';
+          const methodClass = `method-${profile.method.toLowerCase()}`;
+          
+          html += `
+            <div class="circumcision-slot-card">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="font-bold text-lg text-slate-900">${doctorName}</h3>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="${methodClass} px-3 py-1 rounded-full text-xs font-medium">${profile.method}</span>
+                    <span class="price-badge">RM${profile.price}</span>
+                    <span class="text-xs text-slate-500">${profile.duration} minit</span>
+                  </div>
+                  ${profile.notes ? `<p class="text-sm text-slate-600 mt-2">${profile.notes}</p>` : ''}
+                </div>
+                <div class="text-right">
+                  <div class="text-sm text-slate-500">${date}</div>
+                  <div class="text-xs text-slate-400">${doctorSlots.length} slot available</div>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium text-slate-700">Slot Available:</span>
+                  <span class="text-xs text-slate-500">Klik untuk tempah</span>
+                </div>
+                <div class="flex flex-wrap gap-3">
+          `;
+          
+          // Generate slot bubbles
+          const slotTimes = doctorSlots.length > 0 && doctorSlots[0].slot_times 
+            ? JSON.parse(doctorSlots[0].slot_times)
+            : { slot1: "09:00", slot2: "11:00", slot3: "14:00", slot4: "16:00" };
+          
+          const slotCount = doctorSlots.length > 0 ? doctorSlots[0].slot_count : 4;
+          
+          for (let i = 1; i <= slotCount; i++) {
+            const slotKey = `slot${i}`;
+            const slotTime = slotTimes[slotKey] || "09:00";
+            const existingBooking = doctorSlots.flatMap(slot => 
+              slot.circumcision_bookings || []
+            ).find(booking => booking.slot_number === i);
+            
+            const isBooked = !!existingBooking;
+            const statusClass = isBooked ? 'slot-booked' : 'slot-available';
+            const statusText = isBooked ? 'Ditempah' : 'Kosong';
+            
+            html += `
+              <div class="flex flex-col items-center">
+                <div class="slot-bubble ${statusClass}" 
+                     data-doctor-id="${profile.doctor_id}"
+                     data-slot-id="${doctorSlots.length > 0 ? doctorSlots[0].id : ''}"
+                     data-date="${date}"
+                     data-slot-number="${i}"
+                     data-time="${slotTime}"
+                     data-method="${profile.method}"
+                     data-price="${profile.price}"
+                     data-doctor-name="${doctorName}"
+                     ${!isBooked ? 'style="cursor:pointer;"' : ''}>
+                  ${i}
+                </div>
+                <div class="text-xs mt-1 ${isBooked ? 'text-amber-600' : 'text-emerald-600'}">${statusText}</div>
+                <div class="slot-time-display">${formatTime(slotTime)}</div>
+                ${existingBooking ? `
+                  <div class="text-xs text-slate-500 mt-1 truncate max-w-[80px]">
+                    ${existingBooking.patient_name || ''}
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }
+          
+          html += `
+                </div>
+              </div>
+              
+              ${!isBooked ? `
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                  <button class="w-full quick-book-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium"
+                          data-doctor-id="${profile.doctor_id}"
+                          data-date="${date}"
+                          data-doctor-name="${doctorName}">
+                    📅 Quick Book Semua Slot Kosong
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+        
+        circumcisionDoctorsContainer.innerHTML = html;
+        
+        // Add event listeners untuk slot bubbles
+        document.querySelectorAll('.slot-bubble:not(.slot-booked)').forEach(bubble => {
+          bubble.addEventListener('click', () => {
+            const doctorId = bubble.dataset.doctorId;
+            const slotId = bubble.dataset.slotId;
+            const date = bubble.dataset.date;
+            const slotNumber = bubble.dataset.slotNumber;
+            const time = bubble.dataset.time;
+            const method = bubble.dataset.method;
+            const price = bubble.dataset.price;
+            const doctorName = bubble.dataset.doctorName;
+            
+            CircumcisionSystem.openQuickBookingModal({
+              doctorId,
+              slotId,
+              date,
+              slotNumber,
+              time,
+              method,
+              price,
+              doctorName
+            });
+          });
+        });
+        
+        // Add event listeners untuk quick book buttons
+        document.querySelectorAll('.quick-book-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const doctorId = btn.dataset.doctorId;
+            const date = btn.dataset.date;
+            const doctorName = btn.dataset.doctorName;
+            
+            CircumcisionSystem.openQuickBookingModal({
+              doctorId,
+              date,
+              doctorName,
+              isQuickBook: true
+            });
+          });
+        });
+      }
+      
+      // 2. Slot management  
+      static async setupDoctorSlots(doctorId, startDate, endDate, slotCount = 4) {
+        try {
+          // Generate dates between start and end
+          const start = new Date(startDate);
+          const end = new Date(endDate);
+          const dates = [];
+          
+          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            dates.push(d.toISOString().split('T')[0]);
+          }
+          
+          const slotsData = dates.map(date => ({
+            doctor_id: doctorId,
+            date: date,
+            slot_count: slotCount,
+            slot_times: JSON.stringify({
+              slot1: "09:00",
+              slot2: "11:00", 
+              slot3: "14:00",
+              slot4: "16:00",
+              ...(slotCount >= 5 && { slot5: "18:00" }),
+              ...(slotCount >= 6 && { slot6: "20:00" })
+            }),
+            is_available: true
+          }));
+          
+          const { error } = await db
+            .from('circumcision_slots')
+            .insert(slotsData);
+          
+          if (error) throw error;
+          
+          return { success: true, count: dates.length };
+          
+        } catch (error) {
+          console.error('Error setting up circumcision slots', error);
+          return { success: false, error: error.message };
+        }
+      }
+      
+      static async getAvailableSlots(date, method = 'all') {
+        try {
+          let query = db
+            .from('circumcision_slots')
+            .select(`
+              *,
+              circumcision_profiles!inner(method, price, duration),
+              profiles!inner(full_name),
+              circumcision_bookings(slot_number, status)
+            `)
+            .eq('date', date)
+            .eq('is_available', true);
+          
+          if (method !== 'all') {
+            query = query.eq('circumcision_profiles.method', method);
+          }
+          
+          const { data, error } = await query;
+          
+          if (error) throw error;
+          
+          return data || [];
+          
+        } catch (error) {
+          console.error('Error getting available slots', error);
+          return [];
+        }
+      }
+      
+      // 3. Booking system
+      static async quickBookSlot(doctorId, date, slotNumber, patientData) {
+        try {
+          // 1. Cari slot
+          const { data: slots, error: slotError } = await db
+            .from('circumcision_slots')
+            .select('*')
+            .eq('doctor_id', doctorId)
+            .eq('date', date)
+            .eq('is_available', true)
+            .single();
+          
+          if (slotError) throw slotError;
+          
+          // 2. Cari profile doktor
+          const { data: profile, error: profError } = await db
+            .from('circumcision_profiles')
+            .select('*')
+            .eq('doctor_id', doctorId)
+            .single();
+          
+          if (profError) throw profError;
+          
+          // 3. Create appointment dalam sistem utama
+          const appointmentData = {
+            service_id: await CircumcisionSystem.getCircumcisionServiceId(),
+            doctor_id: doctorId,
+            patient_name: patientData.patient_name,
+            patient_ic: patientData.patient_ic,
+            patient_phone: patientData.patient_phone,
+            patient_age: patientData.patient_age,
+            complaint: patientData.complaint || 'Berkhatan',
+            requested_date: date,
+            appointment_time: this.getSlotTime(slots, slotNumber),
+            appointment_duration: profile.duration || 120,
+            status: 'pending',
+            is_circumcision: true,
+            circumcision_method: profile.method,
+            procedure_price: profile.price
+          };
+          
+          const { data: appointment, error: appError } = await db
+            .from('appointments')
+            .insert(appointmentData)
+            .select('*')
+            .single();
+          
+          if (appError) throw appError;
+          
+          // 4. Create booking record
+          const bookingData = {
+            slot_id: slots.id,
+            appointment_id: appointment.id,
+            slot_number: slotNumber,
+            patient_name: patientData.patient_name,
+            patient_age: patientData.patient_age,
+            method: profile.method,
+            booked_by: currentProfile?.full_name || 'Staff',
+            notes: patientData.notes || '',
+            status: 'booked'
+          };
+          
+          const { error: bookingError } = await db
+            .from('circumcision_bookings')
+            .insert(bookingData);
+          
+          if (bookingError) throw bookingError;
+          
+          // 5. Send notifications
+          await this.sendCircumcisionNotifications(appointment, slotNumber);
+          
+          return { success: true, appointment, booking: bookingData };
+          
+        } catch (error) {
+          console.error('Error in quickBookSlot', error);
+          return { success: false, error: error.message };
+        }
+      }
+      
+      static async autoCreateAppointment(bookingData) {
+        // Function ini dipanggil dari quickBookSlot
+        return bookingData;
+      }
+      
+      // 4. Notification system
+      static async sendCircumcisionNotifications(appointment, slotNumber) {
+        try {
+          // Dapatkan maklumat doktor
+          const { data: doctor, error: docError } = await db
+            .from('profiles')
+            .select('full_name, whatsapp_phone')
+            .eq('id', appointment.doctor_id)
+            .single();
+          
+          if (docError) throw docError;
+          
+          // Dapatkan maklumat slot
+          const { data: slot, error: slotError } = await db
+            .from('circumcision_slots')
+            .select('slot_times')
+            .eq('doctor_id', appointment.doctor_id)
+            .eq('date', appointment.requested_date)
+            .single();
+          
+          if (slotError) throw slotError;
+          
+          const slotTimes = slot.slot_times ? JSON.parse(slot.slot_times) : {};
+          const time = slotTimes[`slot${slotNumber}`] || "09:00";
+          
+          // Template WhatsApp
+          const CIRCUMCISION_TEMPLATES = {
+            TO_DOCTOR: `✂️ [BERKHATAN BARU] - ${doctor.full_name}
+📅 ${formatDate(appointment.requested_date)} | Slot ${slotNumber} (${formatTime(time)})
+👦 ${appointment.patient_name} (${appointment.patient_age || 'N/A'} tahun)
+📞 ${appointment.patient_phone}
+💰 RM${appointment.procedure_price} (${appointment.circumcision_method})
+
+✅ Sila buka sistem untuk approve/reject`,
+            
+            TO_PATIENT: `✂️ TEMPAHAN BERJAYA - Klinik SihatSokmo
+Anak: ${appointment.patient_name} (${appointment.patient_age || 'N/A'} tahun)
+Doktor: ${doctor.full_name} (${appointment.circumcision_method})
+Tarikh: ${formatDate(appointment.requested_date)}
+Masa: ${formatTime(time)} (${appointment.appointment_duration} minit)
+Harga: RM${appointment.procedure_price}
+
+📍 Lokasi: Klinik SihatSokmo
+📞 Pertanyaan: 09-1234567
+
+📋 PERSEDIAAN:
+1. Mandi bersih sebelum datang
+2. Bawa kad pengenalan asal
+3. Pakai pakaian longgar
+4. Puasa 4 jam sebelum (jika bius)
+
+⏰ Datang 30 minit awal.`,
+            
+            AFTERCARE: `🩹 PANDUAN PENJAGAAN SELEPAS BERKHATAN
+Prosedur ${appointment.patient_name} telah SELESAI.
+
+🩺 PENJAGAAN:
+1. Bersihkan dengan antiseptic 2x sehari
+2. Elak aktiviti lasak 1 minggu
+3. Pakai pakaian longgar
+4. Mandi biasa selepas 24 jam
+
+💊 Ubat: Ikut arahan doktor
+📅 Follow-up: 7 hari selepas prosedur
+📞 Kecemasan: 09-1234567`
+          };
+          
+          // Hantar ke doktor
+          if (doctor.whatsapp_phone) {
+            const doctorMsg = CIRCUMCISION_TEMPLATES.TO_DOCTOR;
+            const doctorUrl = buildWhatsAppLink(doctor.whatsapp_phone, doctorMsg);
+            window.open(doctorUrl, '_blank');
+          }
+          
+          // Hantar ke pesakit
+          const patientMsg = CIRCUMCISION_TEMPLATES.TO_PATIENT;
+          const patientUrl = buildWhatsAppLink(appointment.patient_phone, patientMsg);
+          window.open(patientUrl, '_blank');
+          
+          return true;
+          
+        } catch (error) {
+          console.error('Error sending circumcision notifications', error);
+          return false;
+        }
+      }
+      
+      // 5. Reporting
+      static async generateCircumcisionReport(startDate, endDate) {
+        try {
+          const { data, error } = await db
+            .from('circumcision_bookings')
+            .select(`
+              *,
+              circumcision_slots!inner(date, doctor_id),
+              profiles!circumcision_slots_doctor_id_fkey(full_name),
+              appointments!inner(patient_name, patient_age, procedure_price, status)
+            `)
+            .gte('circumcision_slots.date', startDate)
+            .lte('circumcision_slots.date', endDate)
+            .order('circumcision_slots.date', { ascending: false });
+          
+          if (error) throw error;
+          
+          return data || [];
+          
+        } catch (error) {
+          console.error('Error generating circumcision report', error);
+          return [];
+        }
+      }
+      
+      // Helper functions
+      static async getCircumcisionServiceId() {
+        // Cari atau create servis berkhatan
+        const { data: services, error } = await db
+          .from('services')
+          .select('id')
+          .ilike('name', '%berkhatan%')
+          .limit(1);
+        
+        if (error || !services || services.length === 0) {
+          // Create new service if not exists
+          const { data: newService, error: createError } = await db
+            .from('services')
+            .insert({
+              name: 'Berkhatan',
+              description: 'Prosedur berkhatan',
+              status: 'active'
+            })
+            .select('id')
+            .single();
+          
+          if (createError) return null;
+          return newService.id;
+        }
+        
+        return services[0].id;
+      }
+      
+      static getSlotTime(slot, slotNumber) {
+        if (!slot.slot_times) return "09:00";
+        try {
+          const times = JSON.parse(slot.slot_times);
+          return times[`slot${slotNumber}`] || "09:00";
+        } catch {
+          return "09:00";
+        }
+      }
+      
+      static async updateTodaySummary() {
+        try {
+          const today = new Date().toISOString().split('T')[0];
+          
+          const { data: todaySlots, error: slotError } = await db
+            .from('circumcision_slots')
+            .select(`
+              *,
+              circumcision_bookings!left(slot_number, status)
+            `)
+            .eq('date', today)
+            .eq('is_available', true);
+          
+          if (slotError) throw slotError;
+          
+          const { data: todayBookings, error: bookError } = await db
+            .from('circumcision_bookings')
+            .select(`
+              *,
+              circumcision_slots!inner(date)
+            `)
+            .eq('circumcision_slots.date', today);
+          
+          if (bookError) throw bookError;
+          
+          const totalSlots = todaySlots.reduce((sum, slot) => sum + (slot.slot_count || 0), 0);
+          const bookedSlots = todayBookings.length;
+          const availableSlots = totalSlots - bookedSlots;
+          
+          // Update counter
+          todayCircumcisionCountEl.textContent = bookedSlots;
+          
+          // Update summary content
+          circumcisionSummaryContent.innerHTML = `
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div class="bg-white p-3 rounded-lg">
+                <div class="text-2xl font-bold text-slate-900">${totalSlots}</div>
+                <div class="text-xs text-slate-500">Total Slot</div>
+              </div>
+              <div class="bg-white p-3 rounded-lg">
+                <div class="text-2xl font-bold text-emerald-600">${availableSlots}</div>
+                <div class="text-xs text-slate-500">Slot Kosong</div>
+              </div>
+              <div class="bg-white p-3 rounded-lg">
+                <div class="text-2xl font-bold text-amber-600">${bookedSlots}</div>
+                <div class="text-xs text-slate-500">Ditempah</div>
+              </div>
+            </div>
+            ${availableSlots > 0 ? `
+              <div class="mt-4 text-center">
+                <button class="text-sm px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 open-dashboard-btn">
+                  📅 Lihat & Tempah Slot
+                </button>
+              </div>
+            ` : ''}
+          `;
+          
+          // Show/hide summary based on data
+          if (totalSlots > 0) {
+            circumcisionTodaySummary.classList.remove('hidden');
+          } else {
+            circumcisionTodaySummary.classList.add('hidden');
+          }
+          
+          // Add event listener to open dashboard button
+          document.querySelector('.open-dashboard-btn')?.addEventListener('click', () => {
+            circumcisionDashboard.classList.remove('hidden');
+            CircumcisionSystem.loadCircumcisionDashboard(today);
+          });
+          
+        } catch (error) {
+          console.error('Error updating today summary', error);
+          circumcisionTodaySummary.classList.add('hidden');
+        }
+      }
+      
+      static openQuickBookingModal(data) {
+        currentCircumcisionSlotData = data;
+        
+        let html = '';
+        
+        if (data.isQuickBook) {
+          // Quick book semua slot
+          html = `
+            <div class="space-y-4">
+              <div class="p-3 bg-blue-50 rounded-lg">
+                <p class="text-sm text-blue-700">✂️ Quick Book untuk ${data.doctorName} pada ${formatDate(data.date)}</p>
+                <p class="text-xs text-blue-600 mt-1">Isi maklumat pesakit untuk semua slot kosong</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Nama Anak</label>
+                  <input type="text" id="quickPatientName" class="w-full rounded-lg border border-slate-200 px-3 py-2" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Umur (tahun)</label>
+                    <input type="number" id="quickPatientAge" class="w-full rounded-lg border border-slate-200 px-3 py-2" min="0" max="18" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">No. Telefon Ibu/Bapa</label>
+                    <input type="tel" id="quickPatientPhone" class="w-full rounded-lg border border-slate-200 px-3 py-2" required>
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">No. IC/Passport</label>
+                  <input type="text" id="quickPatientIC" class="w-full rounded-lg border border-slate-200 px-3 py-2" required>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Nota (optional)</label>
+                  <textarea id="quickPatientNotes" class="w-full rounded-lg border border-slate-200 px-3 py-2" rows="2"></textarea>
+                </div>
+              </div>
+              
+              <div class="mt-6">
+                <button id="submitQuickBookAll" class="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium">
+                  📅 Tempah Semua Slot Kosong
+                </button>
+                <p class="text-xs text-slate-500 mt-2 text-center">Sistem akan create appointment dan hantar WhatsApp automatik</p>
+              </div>
+            </div>
+          `;
+        } else {
+          // Book single slot
+          html = `
+            <div class="space-y-4">
+              <div class="p-3 bg-blue-50 rounded-lg">
+                <p class="text-sm text-blue-700">✂️ Tempah Slot ${data.slotNumber} (${formatTime(data.time)})</p>
+                <p class="text-xs text-blue-600 mt-1">${data.doctorName} | ${formatDate(data.date)} | ${data.method} | RM${data.price}</p>
+              </div>
+              
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Nama Anak</label>
+                  <input type="text" id="quickPatientName" class="w-full rounded-lg border border-slate-200 px-3 py-2" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Umur (tahun)</label>
+                    <input type="number" id="quickPatientAge" class="w-full rounded-lg border border-slate-200 px-3 py-2" min="0" max="18" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">No. Telefon Ibu/Bapa</label>
+                    <input type="tel" id="quickPatientPhone" class="w-full rounded-lg border border-slate-200 px-3 py-2" required>
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">No. IC/Passport</label>
+                  <input type="text" id="quickPatientIC" class="w-full rounded-lg border border-slate-200 px-3 py-2" required>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Nota (optional)</label>
+                  <textarea id="quickPatientNotes" class="w-full rounded-lg border border-slate-200 px-3 py-2" rows="2"></textarea>
+                </div>
+              </div>
+              
+              <div class="mt-6">
+                <button id="submitQuickBook" class="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium">
+                  ✂️ Tempah Slot Ini
+                </button>
+                <p class="text-xs text-slate-500 mt-2 text-center">Sistem akan create appointment dan hantar WhatsApp automatik</p>
+              </div>
+            </div>
+          `;
+        }
+        
+        quickBookingContent.innerHTML = html;
+        circumcisionBookingModal.style.display = 'flex';
+        
+        // Add event listeners
+        document.getElementById('submitQuickBook')?.addEventListener('click', async () => {
+          await CircumcisionSystem.handleQuickBooking(false);
+        });
+        
+        document.getElementById('submitQuickBookAll')?.addEventListener('click', async () => {
+          await CircumcisionSystem.handleQuickBooking(true);
+        });
+      }
+      
+      static async handleQuickBooking(isQuickBookAll = false) {
+        const patientData = {
+          patient_name: document.getElementById('quickPatientName').value.trim(),
+          patient_age: parseInt(document.getElementById('quickPatientAge').value) || 0,
+          patient_phone: document.getElementById('quickPatientPhone').value.trim(),
+          patient_ic: document.getElementById('quickPatientIC').value.trim(),
+          notes: document.getElementById('quickPatientNotes').value.trim(),
+          complaint: 'Berkhatan'
+        };
+        
+        // Validation
+        if (!patientData.patient_name || !patientData.patient_phone || !patientData.patient_ic) {
+          alert('Sila isi semua maklumat wajib: Nama, Telefon dan IC/Passport.');
+          return;
+        }
+        
+        if (isQuickBookAll) {
+          // Quick book semua slot kosong untuk doktor pada tarikh tersebut
+          const slots = await CircumcisionSystem.getAvailableSlots(
+            currentCircumcisionSlotData.date,
+            'all'
+          );
+          
+          const doctorSlots = slots.filter(slot => 
+            slot.doctor_id === currentCircumcisionSlotData.doctorId
+          );
+          
+          let bookedCount = 0;
+          for (const slot of doctorSlots) {
+            // Check which slots are available
+            const bookedSlots = slot.circumcision_bookings || [];
+            const bookedNumbers = bookedSlots.map(b => b.slot_number);
+            
+            for (let i = 1; i <= slot.slot_count; i++) {
+              if (!bookedNumbers.includes(i)) {
+                // Slot available, book it
+                const result = await CircumcisionSystem.quickBookSlot(
+                  currentCircumcisionSlotData.doctorId,
+                  currentCircumcisionSlotData.date,
+                  i,
+                  patientData
+                );
+                
+                if (result.success) {
+                  bookedCount++;
+                }
+              }
+            }
+          }
+          
+          alert(`✅ Berjaya tempah ${bookedCount} slot berkhatan!`);
+          
+        } else {
+          // Book single slot
+          const result = await CircumcisionSystem.quickBookSlot(
+            currentCircumcisionSlotData.doctorId,
+            currentCircumcisionSlotData.date,
+            currentCircumcisionSlotData.slotNumber,
+            patientData
+          );
+          
+          if (result.success) {
+            alert('✅ Slot berkhatan berjaya ditempah! WhatsApp telah dihantar.');
+          } else {
+            alert(`❌ Gagal tempah slot: ${result.error}`);
+          }
+        }
+        
+        // Close modal dan refresh dashboard
+        circumcisionBookingModal.style.display = 'none';
+        CircumcisionSystem.loadCircumcisionDashboard(currentCircumcisionSlotData.date);
+        refreshStaffAppointmentsList();
+      }
+      
+      static async loadCircumcisionReport() {
+        const startDate = reportStartDate.value;
+        const endDate = reportEndDate.value;
+        
+        if (!startDate || !endDate) {
+          alert('Sila pilih tarikh mula dan tarikh akhir.');
+          return;
+        }
+        
+        const reportData = await CircumcisionSystem.generateCircumcisionReport(startDate, endDate);
+        
+        if (reportData.length === 0) {
+          circumcisionReportStats.innerHTML = `
+            <div class="text-center py-4 text-slate-500">
+              Tiada data berkhatan ditemui untuk tempoh ini.
+            </div>
+          `;
+          circumcisionReportTable.classList.add('hidden');
+          exportCircReportBtn.classList.add('hidden');
+          return;
+        }
+        
+        // Calculate statistics
+        const totalBookings = reportData.length;
+        const totalRevenue = reportData.reduce((sum, item) => 
+          sum + (parseFloat(item.appointments?.procedure_price) || 0), 0);
+        const methods = {};
+        reportData.forEach(item => {
+          const method = item.method || 'Unknown';
+          methods[method] = (methods[method] || 0) + 1;
+        });
+        
+        // Display statistics
+        circumcisionReportStats.innerHTML = `
+          <div class="grid grid-cols-3 gap-4">
+            <div class="bg-white p-3 rounded-lg text-center">
+              <div class="text-xl font-bold text-slate-900">${totalBookings}</div>
+              <div class="text-xs text-slate-500">Total Tempahan</div>
+            </div>
+            <div class="bg-white p-3 rounded-lg text-center">
+              <div class="text-xl font-bold text-emerald-600">RM${totalRevenue.toFixed(2)}</div>
+              <div class="text-xs text-slate-500">Total Revenue</div>
+            </div>
+            <div class="bg-white p-3 rounded-lg text-center">
+              <div class="text-xl font-bold text-blue-600">${Object.keys(methods).length}</div>
+              <div class="text-xs text-slate-500">Kaedah Berbeza</div>
+            </div>
+          </div>
+          <div class="mt-3 text-sm text-slate-600">
+            ${Object.entries(methods).map(([method, count]) => 
+              `<span class="inline-block mr-3">${method}: ${count}</span>`
+            ).join('')}
+          </div>
+        `;
+        circumcisionReportStats.classList.remove('hidden');
+        
+        // Display table
+        let tableHTML = '';
+        reportData.forEach((item, index) => {
+          tableHTML += `
+            <tr>
+              <td class="px-3 py-2 text-sm">${formatDate(item.circumcision_slots?.date)}</td>
+              <td class="px-3 py-2 text-sm">${item.profiles?.full_name || '-'}</td>
+              <td class="px-3 py-2 text-sm">Slot ${item.slot_number}</td>
+              <td class="px-3 py-2 text-sm">
+                <span class="method-${item.method?.toLowerCase()} px-2 py-1 rounded-full text-xs">
+                  ${item.method}
+                </span>
+              </td>
+              <td class="px-3 py-2 text-sm">${item.patient_name} (${item.patient_age || 'N/A'} tahun)</td>
+              <td class="px-3 py-2 text-sm font-medium">RM${parseFloat(item.appointments?.procedure_price || 0).toFixed(2)}</td>
+              <td class="px-3 py-2 text-sm">
+                <span class="px-2 py-1 rounded-full text-xs ${
+                  item.status === 'booked' ? 'bg-emerald-100 text-emerald-800' :
+                  item.status === 'completed' ? 'bg-blue-100 text-blue-800' :
+                  'bg-slate-100 text-slate-800'
+                }">
+                  ${item.status}
+                </span>
+              </td>
+            </tr>
+          `;
+        });
+        
+        reportTableBody.innerHTML = tableHTML;
+        circumcisionReportTable.classList.remove('hidden');
+        exportCircReportBtn.classList.remove('hidden');
+        
+        // Store report data for export
+        window.circumcisionReportData = reportData;
+      }
+      
+      static exportCircumcisionReport() {
+        if (!window.circumcisionReportData || window.circumcisionReportData.length === 0) {
+          alert('Tiada data untuk diexport.');
+          return;
+        }
+        
+        const excelData = window.circumcisionReportData.map((item, index) => ({
+          'Bil': index + 1,
+          'Tarikh': formatDate(item.circumcision_slots?.date),
+          'Doktor': item.profiles?.full_name || '-',
+          'Slot': `Slot ${item.slot_number}`,
+          'Kaedah': item.method,
+          'Nama Pesakit': item.patient_name,
+          'Umur': item.patient_age || 'N/A',
+          'Harga': `RM${parseFloat(item.appointments?.procedure_price || 0).toFixed(2)}`,
+          'Status': item.status,
+          'Ditempah Oleh': item.booked_by,
+          'Nota': item.notes || '-',
+          'Tarikh Tempahan': formatDateTime(item.created_at)
+        }));
+        
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan_Berkhatan");
+        
+        const startDate = formatDate(reportStartDate.value);
+        const endDate = formatDate(reportEndDate.value);
+        const fileName = `Laporan_Berkhatan_${startDate}_hingga_${endDate}.xlsx`;
+        
+        XLSX.writeFile(wb, fileName);
+      }
     }
 
     // ==============================
@@ -2937,6 +4277,7 @@
               if (currentProfile.role === 'staff') {
                 await refreshStaffAppointmentsList();
                 await refreshTodayActions();
+                await CircumcisionSystem.updateTodaySummary();
               } else if (currentProfile.role === 'doctor') {
                 await refreshDoctorAppointmentsList();
               }
@@ -2976,6 +4317,34 @@
             if (currentSelectedDoctorId) {
               await loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
             }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'circumcision_slots'
+          },
+          async (payload) => {
+            if (circumcisionDashboard && !circumcisionDashboard.classList.contains('hidden')) {
+              await CircumcisionSystem.loadCircumcisionDashboard(circumcisionDateFilter.value);
+            }
+            await CircumcisionSystem.updateTodaySummary();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'circumcision_bookings'
+          },
+          async (payload) => {
+            if (circumcisionDashboard && !circumcisionDashboard.classList.contains('hidden')) {
+              await CircumcisionSystem.loadCircumcisionDashboard(circumcisionDateFilter.value);
+            }
+            await CircumcisionSystem.updateTodaySummary();
           }
         )
         .subscribe((status) => {
@@ -3045,6 +4414,7 @@
       if (profile.role === "staff") {
         setActiveTab("tab-staff");
         await refreshStaffAppointmentsList();
+        await CircumcisionSystem.updateTodaySummary();
       } else {
         setActiveTab("tab-doctor");
         await refreshDoctorAppointmentsList();
@@ -3159,6 +4529,16 @@
           opt.value = d.id;
           opt.textContent = d.full_name;
           exportDoctor.appendChild(opt);
+        });
+      }
+
+      if (setupDoctorSelect) {
+        setupDoctorSelect.innerHTML = '<option value="">Pilih doktor...</option>';
+        doctorsCache.forEach(d => {
+          const opt = document.createElement("option");
+          opt.value = d.id;
+          opt.textContent = d.full_name;
+          setupDoctorSelect.appendChild(opt);
         });
       }
     }
@@ -3693,7 +5073,7 @@
         `\nMasa dicadangkan: ${formatTime(appointment.appointment_time)} (${appointment.appointment_duration || 60} minit)` : 
         '';
 
-      // PERBAIKAN: Gunakan appointment.patient_ic secara langsung, bukan dari undefined
+      // PERBAIKAN: Gunakan appointment.patient_ic secara langsung
       const patientICValue = appointment.patient_ic || "Tiada IC";
 
       const message = [
@@ -3727,7 +5107,7 @@
       if (!currentProfile || currentProfile.role !== "staff") return;
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, complaint, created_at")
+        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, complaint, created_at, is_circumcision, circumcision_method, patient_age, procedure_price")
         .order("created_at", { ascending: false })
         .limit(30);
 
@@ -3756,7 +5136,7 @@
       
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at")
+        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at, is_circumcision")
         .order("created_at", { ascending: false })
         .limit(50);
 
@@ -3771,17 +5151,63 @@
         const d = a.doctor_selected_date || a.requested_date;
         return formatDate(d) === todayISO;
       });
+      
+      // Count circumcision appointments
+      const circumcisionList = data.filter(a => a.is_circumcision === true);
+      const circumcisionToday = data.filter(a => {
+        if (a.is_circumcision !== true) return false;
+        const d = a.doctor_selected_date || a.requested_date;
+        return formatDate(d) === todayISO;
+      });
 
       todayPendingCountEl.textContent = pendingList.length;
       todayRejectedCountEl.textContent = rejectedList.length;
       todayApprovedCountEl.textContent = approvedToday.length;
+      todayCircumcisionCountEl.textContent = circumcisionToday.length;
 
       todayActionsListEl.innerHTML = "";
 
-      if (!pendingList.length && !rejectedList.length && !approvedToday.length) {
+      if (!pendingList.length && !rejectedList.length && !approvedToday.length && !circumcisionToday.length) {
         todayActionsListEl.innerHTML =
           '<p class="text-base text-slate-500">Tiada tindakan kritikal untuk hari ini. Boleh semak semula kemudian 🙂</p>';
         return;
+      }
+
+      if (circumcisionToday.length) {
+        const circumcisionBlock = document.createElement("div");
+        circumcisionBlock.className = "space-y-3 mb-4 p-4 border border-blue-200 rounded-xl bg-blue-50 card-hover";
+        
+        const circumcisionHeader = document.createElement("div");
+        circumcisionHeader.className = "flex items-center gap-3 mb-3";
+        circumcisionHeader.innerHTML = `
+          <span class="service-tag bg-blue-100 text-blue-800 border-blue-200">✂️ Berkhatan</span>
+          <span class="text-sm font-bold text-blue-600">TINDAKAN: Prosedur Berkhatan Hari Ini</span>
+        `;
+        circumcisionBlock.appendChild(circumcisionHeader);
+
+        circumcisionToday.slice(0, 3).forEach(a => {
+          const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
+          const line = document.createElement("div");
+          line.className = "text-sm text-slate-700 ml-4";
+          line.textContent = `• ${a.patient_name} - ${formatDate(
+            a.doctor_selected_date || a.requested_date
+          )}${timeInfo}`;
+          circumcisionBlock.appendChild(line);
+        });
+        
+        if (circumcisionToday.length > 3) {
+          const more = document.createElement("div");
+          more.className = "text-sm text-slate-500 ml-4";
+          more.textContent = `...dan ${circumcisionToday.length - 3} lagi`;
+          circumcisionBlock.appendChild(more);
+        }
+        
+        const instruction = document.createElement("div");
+        instruction.className = "mt-3 text-sm text-slate-500 ml-4";
+        instruction.textContent = "Pesakit berkhatan perlu dihadiri mengikut slot masa yang ditetapkan.";
+        circumcisionBlock.appendChild(instruction);
+        
+        todayActionsListEl.appendChild(circumcisionBlock);
       }
 
       if (approvedToday.length) {
@@ -3999,7 +5425,13 @@
       const listEl = staffAppointmentsList;
       if (!listEl) return;
 
-      const filtered = staffAppointmentsCache.filter(a => a.status === activeStaffFilter);
+      const filtered = staffAppointmentsCache.filter(a => {
+        if (activeStaffFilter === "circumcision") {
+          return a.is_circumcision === true;
+        } else {
+          return a.status === activeStaffFilter;
+        }
+      });
 
       if (!filtered.length) {
         listEl.innerHTML =
@@ -4031,6 +5463,7 @@
             <div class="flex items-center gap-3">
               <span class="service-tag ${serviceColor} font-semibold">${serviceName}</span>
               <span class="text-sm text-slate-500 bg-slate-100 px-2 py-1 rounded-full">${serviceAppointments.length} temujanji</span>
+              ${activeStaffFilter === "circumcision" ? '<span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">✂️ Berkhatan</span>' : ''}
             </div>
             <span class="text-xs text-slate-400">${activeStaffFilter.toUpperCase()}</span>
           </div>
@@ -4069,11 +5502,23 @@
               <span>${formatTime(a.appointment_time)} (${a.appointment_duration || 60} minit)</span>
             </div>` : '';
 
+          // Circumcision info jika berkhatan
+          const circumcisionInfo = a.is_circumcision ? `
+            <div class="flex items-center text-blue-600 mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm font-medium">✂️ Berkhatan (${a.circumcision_method || 'N/A'})</span>
+              ${a.procedure_price ? `<span class="ml-2 text-sm font-bold">RM${a.procedure_price}</span>` : ''}
+            </div>
+          ` : '';
+
           card.innerHTML = `
-            <div class="flex justify-between items-start mb-3">
+            <div class="flex items-start justify-between gap-3">
               <div class="flex-1">
                 <h3 class="font-bold text-slate-900 text-base truncate">${a.patient_name}</h3>
                 <p class="text-sm text-slate-500 mt-1">${doctorName}</p>
+                ${a.patient_age ? `<p class="text-sm text-slate-500">Umur: ${a.patient_age} tahun</p>` : ''}
                 ${a.complaint ? `<p class="text-sm text-slate-600 mt-2">Complaint: ${a.complaint}</p>` : ''}
               </div>
               <div class="flex flex-col items-end gap-2">
@@ -4095,6 +5540,7 @@
                 <span>${formatDate(a.requested_date)}</span>
               </div>
               ${timeInfo}
+              ${circumcisionInfo}
               <div class="flex items-center text-slate-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -4194,7 +5640,13 @@
       const listEl = staffAppointmentsListMobile;
       if (!listEl) return;
 
-      const filtered = staffAppointmentsCache.filter(a => a.status === activeStaffFilter);
+      const filtered = staffAppointmentsCache.filter(a => {
+        if (activeStaffFilter === "circumcision") {
+          return a.is_circumcision === true;
+        } else {
+          return a.status === activeStaffFilter;
+        }
+      });
 
       if (!filtered.length) {
         listEl.innerHTML =
@@ -4226,6 +5678,7 @@
             <div class="flex items-center gap-2">
               <span class="service-tag ${serviceColor} font-semibold text-xs">${serviceName}</span>
               <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">${serviceAppointments.length}</span>
+              ${activeStaffFilter === "circumcision" ? '<span class="text-xs text-blue-600 bg-blue-100 px-1 py-0.5 rounded-full">✂️</span>' : ''}
             </div>
             <span class="text-xs text-slate-400">${activeStaffFilter.toUpperCase()}</span>
           </div>
@@ -4256,11 +5709,16 @@
           const timeInfo = a.appointment_time ? 
             `<div class="text-xs text-slate-600 mt-1">${formatTime(a.appointment_time)} (${a.appointment_duration || 60} minit)</div>` : '';
 
+          const circumcisionInfo = a.is_circumcision ? `
+            <div class="text-xs text-blue-600 mt-1">✂️ ${a.circumcision_method || 'Berkhatan'}</div>
+          ` : '';
+
           card.innerHTML = `
             <div class="flex justify-between items-start mb-2">
               <div class="flex-1">
                 <h3 class="font-bold text-slate-900 text-sm truncate">${a.patient_name}</h3>
                 <p class="text-xs text-slate-500 mt-1">${doctorName}</p>
+                ${a.patient_age ? `<p class="text-xs text-slate-500">${a.patient_age} tahun</p>` : ''}
                 ${a.complaint ? `<p class="text-xs text-slate-600 mt-1 truncate">${a.complaint}</p>` : ''}
               </div>
               <div class="flex flex-col items-end gap-1">
@@ -4282,6 +5740,7 @@
                 <span>${formatDate(a.requested_date)}</span>
               </div>
               ${timeInfo}
+              ${circumcisionInfo}
             </div>
           `;
 
@@ -4542,6 +6001,7 @@
           patient_name,
           patient_ic,
           patient_phone,
+          patient_age,
           complaint,
           requested_date,
           appointment_time,
@@ -4553,6 +6013,9 @@
           created_at,
           service_id,
           doctor_id,
+          is_circumcision,
+          circumcision_method,
+          procedure_price,
           services(name),
           profiles!appointments_doctor_id_fkey(full_name)
         `)
@@ -4569,6 +6032,11 @@
       
       if (statusFilters.length > 0) {
         query = query.in("status", statusFilters);
+      }
+
+      // Filter untuk berkhatan jika dipilih
+      if (exportCircumcision.checked) {
+        query = query.eq("is_circumcision", true);
       }
 
       const { data, error } = await query;
@@ -4629,6 +6097,9 @@
               <th class="px-3 py-2 text-left font-semibold text-slate-700">Masa</th>
               <th class="px-3 py-2 text-left font-semibold text-slate-700">Tempoh</th>
               <th class="px-3 py-2 text-left font-semibold text-slate-700">Tarikh Diluluskan</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Berkhatan</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Kaedah</th>
+              <th class="px-3 py-2 text-left font-semibold text-slate-700">Harga</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
@@ -4641,10 +6112,14 @@
           rejected: 'text-rose-600'
         };
         
+        const circumcisionInfo = item.is_circumcision ? '✂️ Ya' : 'Tidak';
+        const methodInfo = item.circumcision_method || '-';
+        const priceInfo = item.procedure_price ? `RM${item.procedure_price}` : '-';
+        
         tableHTML += `
           <tr class="hover:bg-slate-50">
             <td class="px-3 py-2">${index + 1}</td>
-            <td class="px-3 py-2 font-medium">${item.patient_name}</td>
+            <td class="px-3 py-2 font-medium">${item.patient_name} ${item.patient_age ? `(${item.patient_age}t)` : ''}</td>
             <td class="px-3 py-2">${item.patient_ic}</td>
             <td class="px-3 py-2">${item.patient_phone}</td>
             <td class="px-3 py-2">${item.services?.name || '-'}</td>
@@ -4654,6 +6129,9 @@
             <td class="px-3 py-2">${item.appointment_time ? formatTime(item.appointment_time) : '-'}</td>
             <td class="px-3 py-2">${item.appointment_duration ? item.appointment_duration + ' min' : '-'}</td>
             <td class="px-3 py-2">${formatDate(item.doctor_selected_date)}</td>
+            <td class="px-3 py-2">${circumcisionInfo}</td>
+            <td class="px-3 py-2">${methodInfo}</td>
+            <td class="px-3 py-2">${priceInfo}</td>
           </tr>
         `;
       });
@@ -4678,6 +6156,7 @@
       const excelData = data.map((item, index) => ({
         'Bil': index + 1,
         'Nama Pesakit': item.patient_name,
+        'Umur': item.patient_age || '',
         'No. IC': item.patient_ic,
         'No. Telefon': item.patient_phone,
         'Servis': item.services?.name || '-',
@@ -4689,6 +6168,9 @@
         'Tarikh Diluluskan': formatDate(item.doctor_selected_date),
         'Cadangan Tarikh 1': formatDate(item.doctor_alt_date1),
         'Cadangan Tarikh 2': formatDate(item.doctor_alt_date2),
+        'Berkhatan': item.is_circumcision ? 'Ya' : 'Tidak',
+        'Kaedah Berkhatan': item.circumcision_method || '-',
+        'Harga Prosedur': item.procedure_price ? `RM${item.procedure_price}` : '-',
         'Complaint': item.complaint || '-',
         'Tarikh Didaftar': formatDateTime(item.created_at)
       }));
@@ -4736,7 +6218,7 @@
       
       let query = db
         .from("appointments")
-        .select("id, patient_name, patient_ic, patient_phone, complaint, requested_date, appointment_time, appointment_duration, status, doctor_selected_date, doctor_alt_date1, doctor_alt_date2, service_id")
+        .select("id, patient_name, patient_ic, patient_phone, patient_age, complaint, requested_date, appointment_time, appointment_duration, status, doctor_selected_date, doctor_alt_date1, doctor_alt_date2, service_id, is_circumcision, circumcision_method, procedure_price")
         .eq("doctor_id", currentProfile.id);
 
       if (activeDoctorTab === "pending") {
@@ -4754,6 +6236,11 @@
         query = query.eq("status", "rejected");
         doctorTabDescription.innerHTML = `
           Senarai temujanji yang telah ditolak dengan cadangan tarikh alternatif. Status ini menunggu tindakan staff klinik.
+        `;
+      } else if (activeDoctorTab === "circumcision") {
+        query = query.eq("is_circumcision", true);
+        doctorTabDescription.innerHTML = `
+          Senarai temujanji berkhatan untuk doktor ini. Termasuk semua status.
         `;
       }
 
@@ -4773,6 +6260,7 @@
         if (activeDoctorTab === "pending") message = "Belum ada temujanji yang menunggu tindakan.";
         else if (activeDoctorTab === "approved") message = "Belum ada temujanji yang telah diluluskan.";
         else if (activeDoctorTab === "rejected") message = "Belum ada temujanji yang ditolak.";
+        else if (activeDoctorTab === "circumcision") message = "Belum ada temujanji berkhatan.";
         
         doctorAppointmentsList.innerHTML =
           `<p class="text-base text-slate-500">${message}</p>`;
@@ -4792,612 +6280,745 @@
           if (a.status === "reschedule_pending") cls = "bg-emerald-50 text-emerald-700";
           if (a.status === "approved") cls = "bg-emerald-50 text-emerald-700";
           if (a.status === "rejected") cls = "bg-rose-50 text-rose-700";
-          return `<span class="inline-flex px-3 py-1.5 rounded-full text-sm ${cls} border border-current">${a.status}</span>`;
-        })();
+return `<span class="status-badge ${cls}">${a.status}</span>`;
+})();
 
-        // Info tarikh dan masa pesakit (READ-ONLY sahaja, tanpa kotak input)
-        const patientDateTimeInfo = `
-          <div class="mt-3 space-y-2">
-            <div class="read-only-info">
-              <div class="read-only-label">Tarikh yang dicadangkan pesakit:</div>
-              <div class="read-only-value">${formatDate(a.requested_date)}</div>
-            </div>
-            ${a.appointment_time ? `
-              <div class="read-only-info">
-                <div class="read-only-label">Masa yang dicadangkan pesakit:</div>
-                <div class="read-only-value">${formatTime(a.appointment_time)} (${a.appointment_duration || 60} minit)</div>
-              </div>
-            ` : ''}
-          </div>
-        `;
+const timeInfo = a.appointment_time ?
+<div class="flex items-center text-slate-600">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>
+<span>${formatTime(a.appointment_time)} (${a.appointment_duration || 60} minit)</span>
+</div>
+: '';
 
-        card.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex-1">
-              <div class="text-base md:text-lg font-bold text-slate-900">${a.patient_name}</div>
-              <div class="text-sm text-slate-500">${serviceName}</div>
-              <div class="text-sm text-slate-400">
-                IC: ${a.patient_ic} • Tel: ${a.patient_phone}
-              </div>
-              ${a.complaint ? `<div class="text-sm text-slate-600 mt-2">Complaint: ${a.complaint}</div>` : ''}
-            </div>
-            <div class="text-right text-sm text-slate-500">
-              <div>Tarikh diminta: ${formatDate(a.requested_date)}</div>
-              ${a.doctor_selected_date ? `<div>Tarikh dipilih: ${formatDate(a.doctor_selected_date)}</div>` : ""}
-              ${statusBadge}
-            </div>
-          </div>
-          ${patientDateTimeInfo}
-        `;
+// Circumcision info jika berkhatan
+const circumcisionInfo = a.is_circumcision ? 
+<div class="flex items-center text-blue-600">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>
+<span class="text-sm font-medium">✂️ ${a.circumcision_method || 'Berkhatan'}</span>
+${a.procedure_price ? <span class="ml-2 text-sm font-bold">RM${a.procedure_price}</span> : ''}
+</div>
+: '';
 
-        if (activeDoctorTab === "pending") {
-          const actionRow = document.createElement("div");
-          actionRow.className = "mt-4 grid md:grid-cols-2 gap-4";
+card.innerHTML = 
+<div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+<div class="flex-1">
+<div class="flex items-center justify-between mb-2">
+<div>
+<h3 class="font-bold text-slate-900 text-lg">${a.patient_name}</h3>
+<p class="text-sm text-slate-500">${serviceName}</p>
+</div>
+${statusBadge}
+</div>
 
-          const approveWrapper = document.createElement("div");
-          approveWrapper.className = "space-y-3";
-          
-          // BUANG KOTAK INPUT UNTUK DOKTOR MEMILIH TARIKH
-          // Hanya tunjukkan tarikh pesakit dan approval button sahaja
-          
-          const approveBtn = document.createElement("button");
-          approveBtn.textContent = "Approve Tarikh Pesakit";
-          approveBtn.className = "w-full rounded-lg bg-emerald-500 hover:bg-emerald-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl";
+<div class="grid md:grid-cols-2 gap-3 mb-3">
+<div>
+<p class="read-only-label">IC/Passport</p>
+<div class="read-only-value">${a.patient_ic}</div>
+</div>
+<div>
+<p class="read-only-label">Telefon</p>
+<div class="read-only-value">${a.patient_phone}</div>
+</div>
+</div>
 
-          const approveWhatsappBtn = document.createElement("button");
-          approveWhatsappBtn.textContent = "Approve & WhatsApp Klinik";
-          approveWhatsappBtn.className = "w-full rounded-lg bg-green-500 hover:bg-green-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
+${a.patient_age ? 
+<div class="mb-2">
+<p class="read-only-label">Umur</p>
+<div class="read-only-value">${a.patient_age} tahun</div>
+</div>
+: ''}
 
-          approveWrapper.appendChild(approveBtn);
-          approveWrapper.appendChild(approveWhatsappBtn);
+<div class="mb-2">
+<p class="read-only-label">Tarikh Diminta Pesakit</p>
+<div class="read-only-value flex items-center gap-2">
+${formatDate(a.requested_date)}
+${timeInfo}
+</div>
+</div>
 
-          const rejectWrapper = document.createElement("div");
-          rejectWrapper.className = "space-y-3";
+${circumcisionInfo}
 
-          const rejectBtn = document.createElement("button");
-          rejectBtn.textContent = "Reject & Cadang Tarikh Lain";
-          rejectBtn.className = "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl";
+${a.complaint ? 
+<div class="mt-2">
+<p class="read-only-label">Complaint</p>
+<div class="read-only-value text-sm">${a.complaint}</div>
+</div>
+: ''}
+</div>
+</div>
+`;
 
-          const rejectPanel = document.createElement("div");
-          rejectPanel.className = "mt-3 space-y-3 hidden";
+// Action buttons berdasarkan status
+const actionContainer = document.createElement("div");
+actionContainer.className = "border-t border-slate-100 pt-3 mt-3";
 
-          const altDatesContainer = document.createElement("div");
-          altDatesContainer.className = "space-y-3";
-          altDatesContainer.innerHTML = `
-            <div class="space-y-2">
-              <label class="block text-sm text-slate-700">Tarikh cadangan 1</label>
-              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
-              <div class="mt-1">
-                <label class="block text-xs text-slate-600">Masa:</label>
-                <input type="time" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm" value="09:00" />
-              </div>
-            </div>
-            <div class="space-y-2">
-              <label class="block text-sm text-slate-700">Tarikh cadangan 2</label>
-              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
-              <div class="mt-1">
-                <label class="block text-xs text-slate-600">Masa:</label>
-                <input type="time" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm" value="14:00" />
-              </div>
-            </div>
-          `;
+if (activeDoctorTab === "pending" || (a.status === "pending" && activeDoctorTab === "circumcision")) {
+actionContainer.innerHTML = 
+<div class="flex flex-col sm:flex-row gap-3">
+<button class="flex-1 approve-btn bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+data-appointment-id="${a.id}">
+✅ Approve
+</button>
+<button class="flex-1 reject-btn bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200"
+data-appointment-id="${a.id}">
+❌ Reject & Cadang Tarikh Lain
+</button>
+</div>
+;
 
-          const addDateBtn = document.createElement("button");
-          addDateBtn.textContent = "+ Tambah Tarikh Cadangan";
-          addDateBtn.type = "button";
-          addDateBtn.className = "text-sm text-emerald-600 hover:text-emerald-700";
-          addDateBtn.addEventListener("click", () => {
-            const newDateInput = document.createElement("div");
-            newDateInput.className = "space-y-2";
-            newDateInput.innerHTML = `
-              <label class="block text-sm text-slate-700">Tarikh cadangan tambahan</label>
-              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
-              <div class="mt-1">
-                <label class="block text-xs text-slate-600">Masa:</label>
-                <input type="time" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm" value="16:00" />
-              </div>
-            `;
-            altDatesContainer.appendChild(newDateInput);
-          });
+const approveBtn = actionContainer.querySelector(".approve-btn");
+const rejectBtn = actionContainer.querySelector(".reject-btn");
 
-          const rejectConfirmBtn = document.createElement("button");
-          rejectConfirmBtn.textContent = "Reject dengan Cadangan Tarikh";
-          rejectConfirmBtn.className = "w-full rounded-lg bg-rose-600 hover:bg-rose-700 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
+approveBtn.addEventListener("click", () => handleDoctorApprove(a.id));
+rejectBtn.addEventListener("click", () => handleDoctorReject(a.id));
+}
+else if (a.status === "approved") {
+const selectedDate = a.doctor_selected_date || a.requested_date;
+actionContainer.innerHTML = 
+<div>
+<div class="text-sm text-emerald-700 mb-2 font-medium flex items-center gap-2">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>
+Telah diluluskan untuk: ${formatDate(selectedDate)}
+</div>
+<div class="flex gap-2">
+<button class="flex-1 whatsapp-patient-btn bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+data-appointment-id="${a.id}">
+📱 WhatsApp Pesakit
+</button>
+<button class="flex-1 reschedule-btn bg-slate-500 hover:bg-slate-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+data-appointment-id="${a.id}">
+✏️ Ubah Tarikh
+</button>
+</div>
+</div>
+;
 
-          const rejectWhatsappBtn = document.createElement("button");
-          rejectWhatsappBtn.textContent = "Reject & WhatsApp Klinik";
-          rejectWhatsappBtn.className = "w-full rounded-lg bg-rose-500 hover:bg-rose-600 text-base font-semibold text-white px-4 py-2.5 shadow-lg hover:shadow-xl mt-2";
+actionContainer.querySelector(".whatsapp-patient-btn").addEventListener("click", () => {
+sendWhatsAppToPatientApproved(a);
+});
 
-          rejectPanel.appendChild(altDatesContainer);
-          rejectPanel.appendChild(addDateBtn);
-          rejectPanel.appendChild(rejectConfirmBtn);
-          rejectPanel.appendChild(rejectWhatsappBtn);
+actionContainer.querySelector(".reschedule-btn").addEventListener("click", () => {
+handleDoctorReschedule(a.id);
+});
+}
+else if (a.status === "rejected") {
+const dates = [
+a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
+a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
+].filter(Boolean);
 
-          rejectWrapper.appendChild(rejectBtn);
-          rejectWrapper.appendChild(rejectPanel);
+actionContainer.innerHTML = 
+<div>
+<div class="text-sm text-rose-700 mb-2 font-medium flex items-center gap-2">
+<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>
+Ditolak. Cadangan tarikh: ${dates.join(" atau ")}
+</div>
+<div class="text-xs text-slate-500">Menunggu staff klinik hubungi pesakit.</div>
+</div>
+;
+}
 
-          actionRow.appendChild(approveWrapper);
-          actionRow.appendChild(rejectWrapper);
+card.appendChild(actionContainer);
+doctorAppointmentsList.appendChild(card);
+});
+}
 
-          card.appendChild(actionRow);
+async function handleDoctorApprove(appointmentId) {
+const dateInput = prompt("Masukkan tarikh approved (YYYY-MM-DD):");
+if (!dateInput) return;
 
-          approveBtn.addEventListener("click", async () => {
-            // Approve dengan tarikh yang dicadangkan pesakit
-            const { error } = await db
-              .from("appointments")
-              .update({ 
-                status: "approved", 
-                doctor_selected_date: a.requested_date,
-                appointment_time: a.appointment_time || "09:00",
-                appointment_duration: a.appointment_duration || 60
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error approve", error);
-              alert("Gagal update status.");
-              return;
-            }
-            alert("Temujanji telah diluluskan dengan tarikh pesakit.");
-          });
+// Check if the date is in the doctor's availability
+const { data: availability } = await db
+.from("doctor_availability")
+.select("date")
+.eq("doctor_id", currentProfile.id)
+.eq("date", dateInput)
+.single();
 
-          approveWhatsappBtn.addEventListener("click", async () => {
-            // Approve dengan tarikh pesakit dan WhatsApp klinik
-            const { error } = await db
-              .from("appointments")
-              .update({ 
-                status: "approved", 
-                doctor_selected_date: a.requested_date,
-                appointment_time: a.appointment_time || "09:00",
-                appointment_duration: a.appointment_duration || 60
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error approve", error);
-              alert("Gagal update status.");
-              return;
-            }
-            
-            const clinicPhone = await fetchClinicWhatsapp();
-            const msg = [
-              "Assalamualaikum / Salam sejahtera,",
-              "",
-              "Saya setuju untuk temujanji pesakit berikut:",
-              `Servis: ${serviceName}`,
-              `Nama: ${a.patient_name}`,
-              `Complaint: ${a.complaint || "Tiada complaint dinyatakan"}`,
-              `Tarikh temujanji: ${formatDate(a.requested_date)}`,
-              `Masa: ${a.appointment_time ? formatTime(a.appointment_time) : '09:00 AM'} (${a.appointment_duration || 60} minit)`,
-              "",
-              "Sila maklumkan kepada pesakit."
-            ].join("\n");
-            
-            const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
-            window.open(waUrl, "_blank");
-          });
+if (!availability) {
+if (!confirm("⚠️ Tarikh ini TIDAK dalam senarai available anda. Teruskan approve?")) {
+return;
+}
+}
 
-          rejectBtn.addEventListener("click", () => {
-            rejectPanel.classList.toggle("hidden");
-          });
+try {
+const { error } = await db
+.from("appointments")
+.update({
+status: "approved",
+doctor_selected_date: dateInput,
+approved_at: new Date().toISOString()
+})
+.eq("id", appointmentId);
 
-          rejectConfirmBtn.addEventListener("click", async () => {
-            const dateInputs = altDatesContainer.querySelectorAll("input[type='date']");
-            const timeInputs = altDatesContainer.querySelectorAll("input[type='time']");
-            
-            const dates = Array.from(dateInputs).map(input => input.value).filter(date => date);
-            const times = Array.from(timeInputs).map(input => input.value).filter(time => time);
-            
-            if (dates.length < 2) {
-              alert("Sila isi sekurang-kurangnya dua tarikh cadangan.");
-              return;
-            }
-            
-            // Simpan tarikh dan masa cadangan
-            const altDatesWithTimes = dates.map((date, index) => ({
-              date: date,
-              time: times[index] || "09:00"
-            }));
-            
-            const { error } = await db
-              .from("appointments")
-              .update({
-                status: "rejected",
-                doctor_alt_date1: altDatesWithTimes[0].date,
-                doctor_alt_time1: altDatesWithTimes[0].time,
-                doctor_alt_date2: altDatesWithTimes[1].date,
-                doctor_alt_time2: altDatesWithTimes[1].time,
-                ...(altDatesWithTimes[2] && { 
-                  doctor_alt_date3: altDatesWithTimes[2].date,
-                  doctor_alt_time3: altDatesWithTimes[2].time
-                }),
-                ...(altDatesWithTimes[3] && { 
-                  doctor_alt_date4: altDatesWithTimes[3].date,
-                  doctor_alt_time4: altDatesWithTimes[3].time
-                })
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error reject", error);
-              alert("Gagal update status.");
-              return;
-            }
-            
-            alert("Temujanji telah ditolak dengan cadangan tarikh alternatif.");
-          });
+if (error) throw error;
 
-          rejectWhatsappBtn.addEventListener("click", async () => {
-            const dateInputs = altDatesContainer.querySelectorAll("input[type='date']");
-            const timeInputs = altDatesContainer.querySelectorAll("input[type='time']");
-            
-            const dates = Array.from(dateInputs).map(input => input.value).filter(date => date);
-            const times = Array.from(timeInputs).map(input => input.value).filter(time => time);
-            
-            if (dates.length < 2) {
-              alert("Sila isi sekurang-kurangnya dua tarikh cadangan.");
-              return;
-            }
-            
-            // Simpan tarikh dan masa cadangan
-            const altDatesWithTimes = dates.map((date, index) => ({
-              date: date,
-              time: times[index] || "09:00"
-            }));
-            
-            const { error } = await db
-              .from("appointments")
-              .update({
-                status: "rejected",
-                doctor_alt_date1: altDatesWithTimes[0].date,
-                doctor_alt_time1: altDatesWithTimes[0].time,
-                doctor_alt_date2: altDatesWithTimes[1].date,
-                doctor_alt_time2: altDatesWithTimes[1].time,
-                ...(altDatesWithTimes[2] && { 
-                  doctor_alt_date3: altDatesWithTimes[2].date,
-                  doctor_alt_time3: altDatesWithTimes[2].time
-                }),
-                ...(altDatesWithTimes[3] && { 
-                  doctor_alt_date4: altDatesWithTimes[3].date,
-                  doctor_alt_time4: altDatesWithTimes[3].time
-                })
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error reject", error);
-              alert("Gagal update status.");
-              return;
-            }
-            
-            const clinicPhone = await fetchClinicWhatsapp();
-            const msg = [
-              "Assalamualaikum / Salam sejahtera,",
-              "",
-              "Saya TIDAK dapat hadir pada tarikh temujanji asal untuk pesakit berikut:",
-              `Servis: ${serviceName}`,
-              `Nama: ${a.patient_name}`,
-              `Complaint: ${a.complaint || "Tiada complaint dinyatakan"}`,
-              `Tarikh asal: ${formatDate(a.requested_date)}`,
-              `Masa asal: ${a.appointment_time ? formatTime(a.appointment_time) : 'Tiada masa ditetapkan'}`,
-              "",
-              "Cadangan tarikh & masa baharu:",
-              ...altDatesWithTimes.map((item, idx) => `${idx + 1}) ${formatDate(item.date)} - ${formatTime(item.time)}`),
-              "",
-              "Sila hubungi pesakit untuk maklumat lanjut."
-            ].join("\n");
-            
-            const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
-            window.open(waUrl, "_blank");
-          });
-        } else if (activeDoctorTab === "rejected") {
-          // Tunjukkan cadangan tarikh dan masa doktor
-          const altDates = [];
-          if (a.doctor_alt_date1) {
-            altDates.push({
-              date: a.doctor_alt_date1,
-              time: a.doctor_alt_time1 || "Tiada masa ditetapkan"
-            });
-          }
-          if (a.doctor_alt_date2) {
-            altDates.push({
-              date: a.doctor_alt_date2,
-              time: a.doctor_alt_time2 || "Tiada masa ditetapkan"
-            });
-          }
-          if (a.doctor_alt_date3) {
-            altDates.push({
-              date: a.doctor_alt_date3,
-              time: a.doctor_alt_time3 || "Tiada masa ditetapkan"
-            });
-          }
-          if (a.doctor_alt_date4) {
-            altDates.push({
-              date: a.doctor_alt_date4,
-              time: a.doctor_alt_time4 || "Tiada masa ditetapkan"
-            });
-          }
-          
-          if (altDates.length > 0) {
-            const datesDiv = document.createElement("div");
-            datesDiv.className = "mt-3 space-y-2";
-            datesDiv.innerHTML = `
-              <div class="text-sm font-medium text-slate-700">Cadangan tarikh & masa anda:</div>
-              <div class="space-y-1">
-                ${altDates.map(item => `
-                  <div class="text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
-                    ${formatDate(item.date)} - ${item.time.includes(':') ? formatTime(item.time) : item.time}
-                  </div>
-                `).join('')}
-              </div>
-            `;
-            card.appendChild(datesDiv);
-            
-            const note = document.createElement("div");
-            note.className = "mt-2 text-sm text-slate-500";
-            note.textContent = "Menunggu staff klinik hubungi pesakit untuk pilih tarikh baharu.";
-            card.appendChild(note);
-          }
-        } else if (activeDoctorTab === "approved") {
-          if (a.doctor_selected_date) {
-            const timeInfoApproved = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
-            const confirmedDiv = document.createElement("div");
-            confirmedDiv.className = "mt-3 text-sm text-emerald-600 bg-emerald-50 p-2 rounded-lg";
-            confirmedDiv.textContent = `Tarikh temujanji disahkan: ${formatDate(a.doctor_selected_date)}${timeInfoApproved}`;
-            card.appendChild(confirmedDiv);
-          }
-        }
+// Send WhatsApp to patient
+const { data: appointment } = await db
+.from("appointments")
+.select("patient_name, patient_phone, service_id")
+.eq("id", appointmentId)
+.single();
 
-        doctorAppointmentsList.appendChild(card);
-      });
-    }
+const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
 
-    if (refreshDoctorAppointments) {
-      refreshDoctorAppointments.addEventListener("click", () => {
-        refreshDoctorAppointmentsList();
-      });
-    }
+const msg = [
+"Assalamualaikum / Salam sejahtera,",
+"",
+"Temujanji anda telah DISAHKAN.",
+`Servis: ${serviceName}`,
+`Doktor: ${currentProfile.full_name}`,
+`Tarikh temujanji: ${formatDate(dateInput)}`,
+"",
+"Sila hadir ke klinik pada tarikh yang ditetapkan. Jika ingin ubah tarikh, sila hubungi klinik."
+].join("\n");
 
-    doctorTabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        activeDoctorTab = btn.dataset.tab;
-        
-        doctorTabButtons.forEach(b => {
-          if (b.dataset.tab === activeDoctorTab) {
-            b.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
-          } else {
-            b.classList.remove("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
-          }
-        });
-        
-        refreshDoctorAppointmentsList();
-      });
-    });
+const waUrl = buildWhatsAppLink(appointment.patient_phone || "", msg);
+window.open(waUrl, "_blank");
 
-    // ==============================
-    // SETTINGS HANDLERS
-    // ==============================
-    if (serviceForm) {
-      serviceForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        if (!currentProfile || currentProfile.role !== "staff") return;
+alert("Temujanji berjaya diluluskan!");
+await refreshDoctorAppointmentsList();
+} catch (error) {
+console.error("Error approve appointment", error);
+alert("Gagal meluluskan temujanji.");
+}
+}
 
-        const payload = {
-          name: serviceName.value.trim(),
-          description: serviceDescription.value.trim() || null,
-          status: serviceStatus.value,
-          default_doctor_id: serviceDoctor.value || null
-        };
+async function handleDoctorReject(appointmentId) {
+const date1 = prompt("Cadangkan tarikh alternatif pertama (YYYY-MM-DD):");
+if (!date1) return;
 
-        const { error } = await db.from("services").insert(payload);
-        if (error) {
-          console.error("Error insert service", error);
-          showMessage(serviceMessage, error.message || "Gagal simpan servis.", true);
-          return;
-        }
-        serviceForm.reset();
-        showMessage(serviceMessage, "Servis berjaya disimpan.", false);
-        await loadServices();
-      });
-    }
+const date2 = prompt("Cadangkan tarikh alternatif kedua (YYYY-MM-DD):");
+if (!date2) return;
 
-    if (fieldForm) {
-      fieldForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        if (!currentProfile || currentProfile.role !== "staff") return;
+try {
+const { error } = await db
+.from("appointments")
+.update({
+status: "rejected",
+doctor_alt_date1: date1,
+doctor_alt_date2: date2,
+rejected_at: new Date().toISOString()
+})
+.eq("id", appointmentId);
 
-        const label = fieldLabel.value.trim();
-        if (!label) return;
+if (error) throw error;
 
-        const fieldKey = label
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "_")
-          .replace(/^_+|_+$/g, "");
+// Send WhatsApp to clinic staff
+const clinicPhone = await fetchClinicWhatsapp();
+if (clinicPhone) {
+const { data: appointment } = await db
+.from("appointments")
+.select("patient_name, service_id")
+.eq("id", appointmentId)
+.single();
 
-        const payload = {
-          label,
-          field_key: fieldKey,
-          input_type: fieldType.value,
-          is_required: fieldRequired.checked,
-          service_id: fieldService.value || null,
-          sort_order: customFieldsCache.length + 1
-        };
+const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
 
-        const { error } = await db.from("appointment_fields").insert(payload);
-        if (error) {
-          console.error("Error insert field", error);
-          showMessage(fieldMessage, error.message || "Gagal tambah kolom.", true);
-          return;
-        }
+const msg = [
+"Assalamualaikum / Salam sejahtera Staff,",
+"",
+"Dr telah menolak temujanji berikut:",
+`Pesakit: ${appointment.patient_name}`,
+`Servis: ${serviceName}`,
+`Cadangan tarikh alternatif: ${formatDate(date1)} atau ${formatDate(date2)}`,
+"",
+"Sila hubungi pesakit untuk pilih salah satu tarikh."
+].join("\n");
 
-        fieldForm.reset();
-        showMessage(fieldMessage, "Kolom berjaya ditambah.", false);
-        await loadCustomFields();
-      });
-    }
+const waUrl = buildWhatsAppLink(clinicPhone, msg);
+window.open(waUrl, "_blank");
+}
 
-    // ==============================
-    // EVENT LISTENERS UNTUK FEATURE BARU
-    // ==============================
-    
-    // Availability calendar untuk doktor
-    if (availabilityBtn) {
-      availabilityBtn.addEventListener('click', openAvailabilityCalendar);
-    }
-    
-    if (backFromCalendar) {
-      backFromCalendar.addEventListener('click', closeAvailabilityCalendar);
-    }
-    
-    if (saveAvailability) {
-      saveAvailability.addEventListener('click', saveAvailabilityDates);
-    }
-    
-    // Fixed appointment modal untuk staff dan doktor
-    if (staffFixedAppointmentBtn) {
-      staffFixedAppointmentBtn.addEventListener('click', openFixedAppointmentModalForStaff);
-    }
-    
-    if (staffFixedAppointmentBtnMobile) {
-      staffFixedAppointmentBtnMobile.addEventListener('click', openFixedAppointmentModalForStaff);
-    }
-    
-    if (fixedAppointmentBtn) {
-      fixedAppointmentBtn.addEventListener('click', openFixedAppointmentModalForDoctor);
-    }
-    
-    if (closeFixedModal) {
-      closeFixedModal.addEventListener('click', closeFixedAppointmentModal);
-    }
-    
-    if (cancelFixedSetting) {
-      cancelFixedSetting.addEventListener('click', closeFixedAppointmentModal);
-    }
-    
-    if (saveFixedAppointment) {
-      saveFixedAppointment.addEventListener('click', saveFixedAppointmentSetting);
-    }
-    
-    // Day selectors for fixed appointments
-    daySelectors.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const day = btn.dataset.day;
-        if (selectedDays.has(day)) {
-          selectedDays.delete(day);
-          btn.classList.remove('bg-blue-500', 'text-white');
-          btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
-        } else {
-          selectedDays.add(day);
-          btn.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
-          btn.classList.add('bg-blue-500', 'text-white');
-        }
-      });
-    });
-    
-    // Time selection modal
-    if (closeTimeModal) {
-      closeTimeModal.addEventListener('click', closeTimeSelectionModal);
-    }
-    
-    if (cancelTimeSelection) {
-      cancelTimeSelection.addEventListener('click', closeTimeSelectionModal);
-    }
-    
-    if (saveTimeSelection) {
-      saveTimeSelection.addEventListener('click', saveTimeForDate);
-    }
-    
-    // Availability table untuk staff
-    document.querySelectorAll('.availability-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.availability-tab-btn').forEach(b => {
-          b.classList.remove('active');
-        });
-        btn.classList.add('active');
-        
-        currentAvailabilityView = btn.dataset.view;
-        
-        if (currentSelectedDoctorId) {
-          loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
-        }
-      });
-    });
-    
-    // Close availability table
-    if (closeAvailabilityTable) {
-      closeAvailabilityTable.addEventListener('click', hideAvailabilityTable);
-    }
-    
-    // Close availability table ketika klik di luar
-    document.addEventListener('click', (e) => {
-      if (availabilityTableContainer && !availabilityTableContainer.contains(e.target) && 
-          e.target !== doctorSelect && 
-          !doctorSelect.contains(e.target) &&
-          e.target !== closeAvailabilityTable) {
-        hideAvailabilityTable();
-      }
-    });
+alert("Temujanji berjaya ditolak dengan cadangan tarikh alternatif.");
+await refreshDoctorAppointmentsList();
+} catch (error) {
+console.error("Error reject appointment", error);
+alert("Gagal menolak temujanji.");
+}
+}
 
-    // Close modals when clicking outside
-    document.addEventListener('click', (e) => {
-      if (timeSelectionModal.style.display === 'flex' && e.target === timeSelectionModal) {
-        closeTimeSelectionModal();
-      }
-      if (fixedAppointmentModal.style.display === 'flex' && e.target === fixedAppointmentModal) {
-        closeFixedAppointmentModal();
-      }
-      if (availabilityTableContainer.style.display === 'block' && e.target === availabilityTableContainer) {
-        hideAvailabilityTable();
-      }
-    });
+async function handleDoctorReschedule(appointmentId) {
+const newDate = prompt("Masukkan tarikh baharu (YYYY-MM-DD):");
+if (!newDate) return;
 
-    // Event listener untuk dropdown pemilihan doktor (staff)
-    if (fixedAppointmentDoctorSelect) {
-      fixedAppointmentDoctorSelect.addEventListener('change', function() {
-        const doctorId = this.value;
-        if (doctorId) {
-          loadFixedAppointments(doctorId);
-        } else {
-          fixedAppointmentsList.innerHTML = '<p class="text-sm text-slate-500">Pilih doktor untuk lihat setting semasa.</p>';
-        }
-      });
-    }
+try {
+const { error } = await db
+.from("appointments")
+.update({
+doctor_selected_date: newDate,
+status: "pending"
+})
+.eq("id", appointmentId);
 
-    // ==============================
-    // INIT
-    // ==============================
-    document.addEventListener("DOMContentLoaded", () => {
-      setActiveTab("tab-login");
-      loadSession();
-      populateYearDropdown();
-      renderStaffFilterTabs();
-      
-      doctorTabButtons.forEach(btn => {
-        if (btn.dataset.tab === "pending") {
-          btn.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
-        }
-      });
-      
-      // Set current time for time inputs
-      const now = new Date();
-      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      if (customStartTime) customStartTime.value = currentTime;
-      
-      const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-      const endTime = `${oneHourLater.getHours().toString().padStart(2, '0')}:${oneHourLater.getMinutes().toString().padStart(2, '0')}`;
-      if (customEndTime) customEndTime.value = endTime;
-      
-      if (todayActionsListEl) {
-        todayActionsListEl.innerHTML =
-          '<p class="text-base text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
-      }
-      
-      // Set initial style untuk availability table
-      if (availabilityTableContainer) {
-        availabilityTableContainer.style.opacity = '0';
-        availabilityTableContainer.style.transition = 'opacity 0.2s ease';
-      }
-    });
-  </script>
+if (error) throw error;
+
+alert("Tarikh temujanji berjaya diubah. Status kembali ke pending untuk pengesahan staff.");
+await refreshDoctorAppointmentsList();
+} catch (error) {
+console.error("Error reschedule appointment", error);
+alert("Gagal mengubah tarikh.");
+}
+}
+
+if (refreshDoctorAppointments) {
+refreshDoctorAppointments.addEventListener("click", () => {
+refreshDoctorAppointmentsList();
+});
+}
+
+doctorTabButtons.forEach(btn => {
+btn.addEventListener("click", () => {
+doctorTabButtons.forEach(b => {
+b.classList.remove("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
+});
+btn.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
+activeDoctorTab = btn.dataset.tab;
+refreshDoctorAppointmentsList();
+});
+});
+
+// ==============================
+// SETTINGS HANDLERS
+// ==============================
+if (serviceForm) {
+serviceForm.addEventListener("submit", async (e) => {
+e.preventDefault();
+showMessage(serviceMessage, "", false);
+
+if (!currentProfile || currentProfile.role !== "staff") {
+showMessage(serviceMessage, "Hanya staff boleh urus servis.", true);
+return;
+}
+
+const payload = {
+name: serviceName.value.trim(),
+description: serviceDescription.value.trim() || null,
+status: serviceStatus.value,
+default_doctor_id: serviceDoctor.value || null
+};
+
+const { error } = await db
+.from("services")
+.insert(payload);
+
+if (error) {
+console.error("Error insert service", error);
+showMessage(serviceMessage, error.message || "Gagal simpan servis.", true);
+return;
+}
+
+showMessage(serviceMessage, "Servis berjaya disimpan.", false);
+serviceName.value = "";
+serviceDescription.value = "";
+serviceStatus.value = "active";
+serviceDoctor.value = "";
+
+await loadServices();
+});
+}
+
+if (fieldForm) {
+fieldForm.addEventListener("submit", async (e) => {
+e.preventDefault();
+showMessage(fieldMessage, "", false);
+
+if (!currentProfile || currentProfile.role !== "staff") {
+showMessage(fieldMessage, "Hanya staff boleh tambah kolom.", true);
+return;
+}
+
+const payload = {
+label: fieldLabel.value.trim(),
+input_type: fieldType.value,
+service_id: fieldService.value || null,
+is_required: fieldRequired.checked,
+is_active: true,
+sort_order: customFieldsCache.length + 1
+};
+
+const { error } = await db
+.from("appointment_fields")
+.insert(payload);
+
+if (error) {
+console.error("Error insert field", error);
+showMessage(fieldMessage, error.message || "Gagal tambah kolom.", true);
+return;
+}
+
+showMessage(fieldMessage, "Kolom berjaya ditambah.", false);
+fieldLabel.value = "";
+fieldType.value = "text";
+fieldService.value = "";
+fieldRequired.checked = false;
+
+await loadCustomFields();
+});
+}
+
+// ==============================
+// EVENT LISTENERS TAMBAHAN
+// ==============================
+
+// Availability modal events
+if (availabilityBtn) {
+availabilityBtn.addEventListener("click", openAvailabilityCalendar);
+}
+
+if (backFromCalendar) {
+backFromCalendar.addEventListener("click", closeAvailabilityCalendar);
+}
+
+if (saveAvailability) {
+saveAvailability.addEventListener("click", saveAvailabilityDates);
+}
+
+// Time selection modal events
+if (closeTimeModal) {
+closeTimeModal.addEventListener("click", closeTimeSelectionModal);
+}
+
+if (cancelTimeSelection) {
+cancelTimeSelection.addEventListener("click", closeTimeSelectionModal);
+}
+
+if (saveTimeSelection) {
+saveTimeSelection.addEventListener("click", saveTimeForDate);
+}
+
+// Fixed appointment modal events
+if (daySelectors) {
+daySelectors.forEach(selector => {
+selector.addEventListener("click", () => {
+const day = selector.dataset.day;
+if (selectedDays.has(day)) {
+selectedDays.delete(day);
+selector.classList.remove("bg-blue-500", "text-white");
+selector.classList.add("bg-white", "text-slate-700", "border-slate-300");
+} else {
+selectedDays.add(day);
+selector.classList.remove("bg-white", "text-slate-700", "border-slate-300");
+selector.classList.add("bg-blue-500", "text-white");
+}
+});
+});
+}
+
+if (closeFixedModal) {
+closeFixedModal.addEventListener("click", closeFixedAppointmentModal);
+}
+
+if (cancelFixedSetting) {
+cancelFixedSetting.addEventListener("click", closeFixedAppointmentModal);
+}
+
+if (saveFixedAppointment) {
+saveFixedAppointment.addEventListener("click", saveFixedAppointmentSetting);
+}
+
+// Staff fixed appointment button
+if (staffFixedAppointmentBtn) {
+staffFixedAppointmentBtn.addEventListener("click", openFixedAppointmentModalForStaff);
+}
+
+if (staffFixedAppointmentBtnMobile) {
+staffFixedAppointmentBtnMobile.addEventListener("click", openFixedAppointmentModalForStaff);
+}
+
+if (fixedAppointmentBtn) {
+fixedAppointmentBtn.addEventListener("click", openFixedAppointmentModalForDoctor);
+}
+
+// Availability table events
+if (closeAvailabilityTable) {
+closeAvailabilityTable.addEventListener("click", hideAvailabilityTable);
+}
+
+// Availability tab buttons
+document.querySelectorAll(".availability-tab-btn").forEach(btn => {
+btn.addEventListener("click", () => {
+document.querySelectorAll(".availability-tab-btn").forEach(b => {
+b.classList.remove("active");
+});
+btn.classList.add("active");
+currentAvailabilityView = btn.dataset.view;
+
+if (currentSelectedDoctorId) {
+loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
+}
+});
+});
+
+// Doctor selector for staff fixed appointments
+if (fixedAppointmentDoctorSelect) {
+fixedAppointmentDoctorSelect.addEventListener("change", async () => {
+const doctorId = fixedAppointmentDoctorSelect.value;
+if (doctorId) {
+await loadFixedAppointments(doctorId);
+}
+});
+}
+
+// ==============================
+// EVENT LISTENERS BERKHATAN
+// ==============================
+
+// Open circumcision dashboard
+if (openCircumcisionDashboardBtn) {
+openCircumcisionDashboardBtn.addEventListener("click", () => {
+circumcisionDashboard.classList.remove("hidden");
+const today = new Date().toISOString().split('T')[0];
+circumcisionDateFilter.value = today;
+CircumcisionSystem.loadCircumcisionDashboard(today);
+});
+}
+
+// Setup circumcision slots modal
+if (setupCircumcisionSlotsBtn) {
+setupCircumcisionSlotsBtn.addEventListener("click", () => {
+// Set default dates
+const today = new Date();
+const startDate = today.toISOString().split('T')[0];
+const endDate = new Date(today.setDate(today.getDate() + 30)).toISOString().split('T')[0];
+slotStartDate.value = startDate;
+slotEndDate.value = endDate;
+
+// Show modal
+setupCircumcisionModal.style.display = 'flex';
+});
+}
+
+// Close setup modal
+if (closeSetupCircModal) {
+closeSetupCircModal.addEventListener("click", () => {
+setupCircumcisionModal.style.display = 'none';
+});
+}
+
+// Cancel setup
+if (cancelSetupCirc) {
+cancelSetupCirc.addEventListener("click", () => {
+setupCircumcisionModal.style.display = 'none';
+});
+}
+
+// Save circumcision slots
+if (saveCircumcisionSlotsBtn) {
+saveCircumcisionSlotsBtn.addEventListener("click", async () => {
+const doctorId = setupDoctorSelect.value;
+const startDate = slotStartDate.value;
+const endDate = slotEndDate.value;
+const slotCount = slotCountSelect.value;
+
+if (!doctorId || !startDate || !endDate) {
+alert('Sila isi semua maklumat: Doktor, Tarikh Mula, Tarikh Akhir.');
+return;
+}
+
+const result = await CircumcisionSystem.setupDoctorSlots(doctorId, startDate, endDate, slotCount);
+
+if (result.success) {
+alert(`✅ Berjaya membuat ${result.count} slot berkhatan!`);
+setupCircumcisionModal.style.display = 'none';
+CircumcisionSystem.loadCircumcisionDashboard(startDate);
+} else {
+alert(`❌ Gagal membuat slot: ${result.error}`);
+}
+});
+}
+
+// Close booking modal
+if (closeCircBookingModal) {
+closeCircBookingModal.addEventListener("click", () => {
+circumcisionBookingModal.style.display = 'none';
+});
+}
+
+// Circumcision report button
+if (circumcisionReportBtn) {
+circumcisionReportBtn.addEventListener("click", () => {
+// Set default dates
+const today = new Date();
+const startDate = new Date(today.setDate(today.getDate() - 30)).toISOString().split('T')[0];
+const endDate = new Date().toISOString().split('T')[0];
+reportStartDate.value = startDate;
+reportEndDate.value = endDate;
+
+// Show modal
+circumcisionReportModal.style.display = 'flex';
+circumcisionReportStats.classList.add('hidden');
+circumcisionReportTable.classList.add('hidden');
+exportCircReportBtn.classList.add('hidden');
+});
+}
+
+// Close report modal
+if (closeCircReportModal) {
+closeCircReportModal.addEventListener("click", () => {
+circumcisionReportModal.style.display = 'none';
+});
+}
+
+// Cancel report
+if (cancelCircReport) {
+cancelCircReport.addEventListener("click", () => {
+circumcisionReportModal.style.display = 'none';
+});
+}
+
+// Generate circumcision report
+if (generateCircReportBtn) {
+generateCircReportBtn.addEventListener("click", async () => {
+await CircumcisionSystem.loadCircumcisionReport();
+});
+}
+
+// Export circumcision report
+if (exportCircReportBtn) {
+exportCircReportBtn.addEventListener("click", () => {
+CircumcisionSystem.exportCircumcisionReport();
+});
+}
+
+// Export panel circumcision report button
+if (exportCircumcisionReportBtn) {
+exportCircumcisionReportBtn.addEventListener("click", () => {
+// Set default dates
+const today = new Date();
+const startDate = new Date(today.setDate(today.getDate() - 30)).toISOString().split('T')[0];
+const endDate = new Date().toISOString().split('T')[0];
+reportStartDate.value = startDate;
+reportEndDate.value = endDate;
+
+// Show modal
+circumcisionReportModal.style.display = 'flex';
+circumcisionReportStats.classList.add('hidden');
+circumcisionReportTable.classList.add('hidden');
+exportCircReportBtn.classList.add('hidden');
+});
+}
+
+// Doctor circumcision button
+if (doctorCircumcisionBtn) {
+doctorCircumcisionBtn.addEventListener("click", () => {
+activeDoctorTab = 'circumcision';
+doctorTabButtons.forEach(btn => {
+btn.classList.remove("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
+if (btn.dataset.tab === 'circumcision') {
+btn.classList.add("bg-emerald-600", "text-white", "shadow", "shadow-emerald-200");
+}
+});
+refreshDoctorAppointmentsList();
+});
+}
+
+// Circumcision date filter
+if (circumcisionDateFilter) {
+circumcisionDateFilter.addEventListener("change", () => {
+const date = circumcisionDateFilter.value;
+CircumcisionSystem.loadCircumcisionDashboard(date);
+});
+}
+
+// Circumcision method filter buttons
+document.addEventListener('click', (e) => {
+if (e.target.classList.contains('method-filter-btn') && e.target.closest('#circumcisionDashboard')) {
+// Update active button
+document.querySelectorAll('#circumcisionDashboard .method-filter-btn').forEach(btn => {
+btn.classList.remove('active');
+});
+e.target.classList.add('active');
+activeCircumcisionMethod = e.target.dataset.method;
+
+// Reload dashboard with filter
+const date = circumcisionDateFilter.value;
+CircumcisionSystem.loadCircumcisionDashboard(date);
+}
+
+if (e.target.classList.contains('method-filter-btn') && e.target.dataset.status) {
+// Status filter
+document.querySelectorAll('#circumcisionDashboard [data-status]').forEach(btn => {
+btn.classList.remove('active');
+});
+e.target.classList.add('active');
+activeCircumcisionStatus = e.target.dataset.status;
+
+// Reload dashboard with filter
+const date = circumcisionDateFilter.value;
+CircumcisionSystem.loadCircumcisionDashboard(date);
+}
+});
+
+// ==============================
+// INITIALIZATION
+// ==============================
+(async function init() {
+await loadSession();
+await populateYearDropdown();
+
+// Set default dates
+const today = new Date().toISOString().split('T')[0];
+if (requestedDate) requestedDate.value = today;
+if (requestedDateMobile) requestedDateMobile.value = today;
+
+// Set default export year to current year
+exportYear.value = new Date().getFullYear().toString();
+
+// Load doctor fixed times for current doctor
+if (currentProfile && currentProfile.role === 'doctor') {
+await loadDoctorFixedTime(currentProfile.id);
+}
+
+// Initialize circumcision summary
+await CircumcisionSystem.updateTodaySummary();
+
+// Add event listener for ESC key to close modals
+document.addEventListener('keydown', (e) => {
+if (e.key === 'Escape') {
+closeAvailabilityCalendar();
+closeTimeSelectionModal();
+closeFixedAppointmentModal();
+setupCircumcisionModal.style.display = 'none';
+circumcisionBookingModal.style.display = 'none';
+circumcisionReportModal.style.display = 'none';
+hideAvailabilityTable();
+}
+});
+
+// Close modals when clicking outside
+document.addEventListener('click', (e) => {
+if (availabilityCalendarModal.style.display === 'flex' && !e.target.closest('#availabilityCalendarModal')) {
+closeAvailabilityCalendar();
+}
+if (timeSelectionModal.style.display === 'flex' && !e.target.closest('.time-modal-content')) {
+closeTimeSelectionModal();
+}
+if (fixedAppointmentModal.style.display === 'flex' && !e.target.closest('.time-modal-content')) {
+closeFixedAppointmentModal();
+}
+if (setupCircumcisionModal.style.display === 'flex' && !e.target.closest('.quick-booking-content')) {
+setupCircumcisionModal.style.display = 'none';
+}
+if (circumcisionBookingModal.style.display === 'flex' && !e.target.closest('.quick-booking-content')) {
+circumcisionBookingModal.style.display = 'none';
+}
+if (circumcisionReportModal.style.display === 'flex' && !e.target.closest('.quick-booking-content')) {
+circumcisionReportModal.style.display = 'none';
+}
+if (availabilityTableContainer.style.display === 'block' && !e.target.closest('#availabilityTableContainer') && !e.target.closest('select')) {
+hideAvailabilityTable();
+}
+});
+})();
+</script>
 </body>
-  </html>
+</html>
