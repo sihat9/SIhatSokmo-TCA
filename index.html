@@ -3751,190 +3751,194 @@
       await refreshTodayActions();
     }
 
-    async function refreshTodayActions() {
-      if (!currentProfile || currentProfile.role !== "staff") return;
+  async function refreshTodayActions() {
+  if (!currentProfile || currentProfile.role !== "staff") return;
+  
+  const { data, error } = await db
+    .from("appointments")
+    .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at")
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) return;
+
+  const todayISO = new Date().toISOString().slice(0, 10);
+
+  const pendingList = data.filter(a => a.status === "pending");
+  const rejectedList = data.filter(a => a.status === "rejected");
+  
+  // PERBAIKAN DI SINI: Approved hari ini mestilah:
+  // 1. Status = "approved"
+  // 2. doctor_selected_date ATAU requested_date = hari ini
+  const approvedToday = data.filter(a => {
+    if (a.status !== "approved") return false;
+    const d = a.doctor_selected_date || a.requested_date;
+    return formatDate(d) === todayISO;
+  });
+
+  todayPendingCountEl.textContent = pendingList.length;
+  todayRejectedCountEl.textContent = rejectedList.length;
+  todayApprovedCountEl.textContent = approvedToday.length;
+
+  todayActionsListEl.innerHTML = "";
+
+  if (!pendingList.length && !rejectedList.length && !approvedToday.length) {
+    todayActionsListEl.innerHTML =
+      '<p class="text-base text-slate-500">Tiada tindakan kritikal untuk hari ini. Boleh semak semula kemudian 🙂</p>';
+    return;
+  }
+
+  if (approvedToday.length) {
+    const approvedByService = {};
+    approvedToday.forEach(a => {
+      const serviceId = a.service_id;
+      if (!approvedByService[serviceId]) {
+        approvedByService[serviceId] = [];
+      }
+      approvedByService[serviceId].push(a);
+    });
+
+    Object.keys(approvedByService).forEach(serviceId => {
+      const serviceAppointments = approvedByService[serviceId];
+      const service = servicesCache.find(s => s.id === serviceId);
+      const serviceName = service?.name || "Servis Tidak Dikenali";
+      const serviceColor = getServiceColor(serviceId);
+
+      const block = document.createElement("div");
+      block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
       
-      const { data, error } = await db
-        .from("appointments")
-        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at")
-        .order("created_at", { ascending: false })
-        .limit(50);
+      const serviceHeader = document.createElement("div");
+      serviceHeader.className = "flex items-center gap-3 mb-3";
+      serviceHeader.innerHTML = `
+        <span class="service-tag ${serviceColor}">${serviceName}</span>
+        <span class="text-sm font-bold text-emerald-600">TINDAKAN: Temujanji Berlangsung Hari Ini</span>
+      `;
+      block.appendChild(serviceHeader);
 
-      if (error) return;
-
-      const todayISO = new Date().toISOString().slice(0, 10);
-
-      const pendingList = data.filter(a => a.status === "pending");
-      const rejectedList = data.filter(a => a.status === "rejected");
-      const approvedToday = data.filter(a => {
-        if (a.status !== "approved") return false;
-        const d = a.doctor_selected_date || a.requested_date;
-        return formatDate(d) === todayISO;
+      serviceAppointments.forEach(a => {
+        const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
+        const line = document.createElement("div");
+        line.className = "text-sm text-slate-700 ml-4";
+        line.textContent = `• ${a.patient_name} - ${formatDate(
+          a.doctor_selected_date || a.requested_date
+        )}${timeInfo}`;
+        block.appendChild(line);
       });
+      
+      const instruction = document.createElement("div");
+      instruction.className = "mt-3 text-sm text-slate-500 ml-4";
+      instruction.textContent = "Pesakit perlu dihadiri di klinik pada tarikh yang ditetapkan.";
+      block.appendChild(instruction);
+      
+      todayActionsListEl.appendChild(block);
+    });
+  }
 
-      todayPendingCountEl.textContent = pendingList.length;
-      todayRejectedCountEl.textContent = rejectedList.length;
-      todayApprovedCountEl.textContent = approvedToday.length;
-
-      todayActionsListEl.innerHTML = "";
-
-      if (!pendingList.length && !rejectedList.length && !approvedToday.length) {
-        todayActionsListEl.innerHTML =
-          '<p class="text-base text-slate-500">Tiada tindakan kritikal untuk hari ini. Boleh semak semula kemudian 🙂</p>';
-        return;
+  if (pendingList.length) {
+    const pendingByService = {};
+    pendingList.forEach(a => {
+      const serviceId = a.service_id;
+      if (!pendingByService[serviceId]) {
+        pendingByService[serviceId] = [];
       }
+      pendingByService[serviceId].push(a);
+    });
 
-      if (approvedToday.length) {
-        const approvedByService = {};
-        approvedToday.forEach(a => {
-          const serviceId = a.service_id;
-          if (!approvedByService[serviceId]) {
-            approvedByService[serviceId] = [];
-          }
-          approvedByService[serviceId].push(a);
-        });
+    Object.keys(pendingByService).forEach(serviceId => {
+      const serviceAppointments = pendingByService[serviceId];
+      const service = servicesCache.find(s => s.id === serviceId);
+      const serviceName = service?.name || "Servis Tidak Dikenali";
+      const serviceColor = getServiceColor(serviceId);
 
-        Object.keys(approvedByService).forEach(serviceId => {
-          const serviceAppointments = approvedByService[serviceId];
-          const service = servicesCache.find(s => s.id === serviceId);
-          const serviceName = service?.name || "Servis Tidak Dikenali";
-          const serviceColor = getServiceColor(serviceId);
+      const block = document.createElement("div");
+      block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
+      
+      const serviceHeader = document.createElement("div");
+      serviceHeader.className = "flex items-center gap-3 mb-3";
+      serviceHeader.innerHTML = `
+        <span class="service-tag ${serviceColor}">${serviceName}</span>
+        <span class="text-sm font-bold text-amber-600">TINDAKAN: Perlu Follow-up Dengan Doktor</span>
+      `;
+      block.appendChild(serviceHeader);
 
-          const block = document.createElement("div");
-          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
-          
-          const serviceHeader = document.createElement("div");
-          serviceHeader.className = "flex items-center gap-3 mb-3";
-          serviceHeader.innerHTML = `
-            <span class="service-tag ${serviceColor}">${serviceName}</span>
-            <span class="text-sm font-bold text-emerald-600">TINDAKAN: Temujanji Berlangsung Hari Ini</span>
-          `;
-          block.appendChild(serviceHeader);
-
-          serviceAppointments.forEach(a => {
-            const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
-            const line = document.createElement("div");
-            line.className = "text-sm text-slate-700 ml-4";
-            line.textContent = `• ${a.patient_name} - ${formatDate(
-              a.doctor_selected_date || a.requested_date
-            )}${timeInfo}`;
-            block.appendChild(line);
-          });
-          
-          const instruction = document.createElement("div");
-          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
-          instruction.textContent = "Pesakit perlu dihadiri di klinik pada tarikh yang ditetapkan.";
-          block.appendChild(instruction);
-          
-          todayActionsListEl.appendChild(block);
-        });
+      serviceAppointments.slice(0, 3).forEach(a => {
+        const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
+        const line = document.createElement("div");
+        line.className = "text-sm text-slate-700 ml-4";
+        line.textContent = `• ${a.patient_name} - diminta untuk ${formatDate(a.requested_date)}${timeInfo}`;
+        block.appendChild(line);
+      });
+      
+      if (serviceAppointments.length > 3) {
+        const more = document.createElement("div");
+        more.className = "text-sm text-slate-500 ml-4";
+        more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
+        block.appendChild(more);
       }
+      
+      const instruction = document.createElement("div");
+      instruction.className = "mt-3 text-sm text-slate-500 ml-4";
+      instruction.textContent = "Sila pastikan doktor approve/reject temujanji ini secepat mungkin.";
+      block.appendChild(instruction);
+      
+      todayActionsListEl.appendChild(block);
+    });
+  }
 
-      if (pendingList.length) {
-        const pendingByService = {};
-        pendingList.forEach(a => {
-          const serviceId = a.service_id;
-          if (!pendingByService[serviceId]) {
-            pendingByService[serviceId] = [];
-          }
-          pendingByService[serviceId].push(a);
-        });
-
-        Object.keys(pendingByService).forEach(serviceId => {
-          const serviceAppointments = pendingByService[serviceId];
-          const service = servicesCache.find(s => s.id === serviceId);
-          const serviceName = service?.name || "Servis Tidak Dikenali";
-          const serviceColor = getServiceColor(serviceId);
-
-          const block = document.createElement("div");
-          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
-          
-          const serviceHeader = document.createElement("div");
-          serviceHeader.className = "flex items-center gap-3 mb-3";
-          serviceHeader.innerHTML = `
-            <span class="service-tag ${serviceColor}">${serviceName}</span>
-            <span class="text-sm font-bold text-amber-600">TINDAKAN: Perlu Follow-up Dengan Doktor</span>
-          `;
-          block.appendChild(serviceHeader);
-
-          serviceAppointments.slice(0, 3).forEach(a => {
-            const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
-            const line = document.createElement("div");
-            line.className = "text-sm text-slate-700 ml-4";
-            line.textContent = `• ${a.patient_name} - diminta untuk ${formatDate(a.requested_date)}${timeInfo}`;
-            block.appendChild(line);
-          });
-          
-          if (serviceAppointments.length > 3) {
-            const more = document.createElement("div");
-            more.className = "text-sm text-slate-500 ml-4";
-            more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
-            block.appendChild(more);
-          }
-          
-          const instruction = document.createElement("div");
-          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
-          instruction.textContent = "Sila pastikan doktor approve/reject temujanji ini secepat mungkin.";
-          block.appendChild(instruction);
-          
-          todayActionsListEl.appendChild(block);
-        });
+  if (rejectedList.length) {
+    const rejectedByService = {};
+    rejectedList.forEach(a => {
+      const serviceId = a.service_id;
+      if (!rejectedByService[serviceId]) {
+        rejectedByService[serviceId] = [];
       }
+      rejectedByService[serviceId].push(a);
+    });
 
-      if (rejectedList.length) {
-        const rejectedByService = {};
-        rejectedList.forEach(a => {
-          const serviceId = a.service_id;
-          if (!rejectedByService[serviceId]) {
-            rejectedByService[serviceId] = [];
-          }
-          rejectedByService[serviceId].push(a);
-        });
+    Object.keys(rejectedByService).forEach(serviceId => {
+      const serviceAppointments = rejectedByService[serviceId];
+      const service = servicesCache.find(s => s.id === serviceId);
+      const serviceName = service?.name || "Servis Tidak Dikenali";
+      const serviceColor = getServiceColor(serviceId);
 
-        Object.keys(rejectedByService).forEach(serviceId => {
-          const serviceAppointments = rejectedByService[serviceId];
-          const service = servicesCache.find(s => s.id === serviceId);
-          const serviceName = service?.name || "Servis Tidak Dikenali";
-          const serviceColor = getServiceColor(serviceId);
+      const block = document.createElement("div");
+      block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
+      
+      const serviceHeader = document.createElement("div");
+      serviceHeader.className = "flex items-center gap-3 mb-3";
+      serviceHeader.innerHTML = `
+        <span class="service-tag ${serviceColor}">${serviceName}</span>
+        <span class="text-sm font-bold text-rose-600">TINDAKAN: Hubungi Pesakit Untuk Tarikh Baharu</span>
+      `;
+      block.appendChild(serviceHeader);
 
-          const block = document.createElement("div");
-          block.className = "space-y-3 mb-4 p-4 border border-slate-200 rounded-xl bg-white card-hover";
-          
-          const serviceHeader = document.createElement("div");
-          serviceHeader.className = "flex items-center gap-3 mb-3";
-          serviceHeader.innerHTML = `
-            <span class="service-tag ${serviceColor}">${serviceName}</span>
-            <span class="text-sm font-bold text-rose-600">TINDAKAN: Hubungi Pesakit Untuk Tarikh Baharu</span>
-          `;
-          block.appendChild(serviceHeader);
-
-          serviceAppointments.slice(0, 3).forEach(a => {
-            const line = document.createElement("div");
-            line.className = "text-sm text-slate-700 ml-4";
-            const dates = [
-              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
-              a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
-            ].filter(Boolean).join(' atau ');
-            line.textContent = `• ${a.patient_name} - cadangan: ${dates}`;
-            block.appendChild(line);
-          });
-          
-          if (serviceAppointments.length > 3) {
-            const more = document.createElement("div");
-            more.className = "text-sm text-slate-500 ml-4";
-            more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
-            block.appendChild(more);
-          }
-          
-          const instruction = document.createElement("div");
-          instruction.className = "mt-3 text-sm text-slate-500 ml-4";
-          instruction.textContent = "Sila hubungi pesakit untuk memilih salah satu tarikh cadangan doktor.";
-          block.appendChild(instruction);
-          
-          todayActionsListEl.appendChild(block);
-        });
+      serviceAppointments.slice(0, 3).forEach(a => {
+        const line = document.createElement("div");
+        line.className = "text-sm text-slate-700 ml-4";
+        const dates = [
+          a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
+          a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
+        ].filter(Boolean).join(' atau ');
+        line.textContent = `• ${a.patient_name} - cadangan: ${dates}`;
+        block.appendChild(line);
+      });
+      
+      if (serviceAppointments.length > 3) {
+        const more = document.createElement("div");
+        more.className = "text-sm text-slate-500 ml-4";
+        more.textContent = `...dan ${serviceAppointments.length - 3} lagi`;
+        block.appendChild(more);
       }
-    }
+      
+      const instruction = document.createElement("div");
+      instruction.className = "mt-3 text-sm text-slate-500 ml-4";
+      instruction.textContent = "Sila hubungi pesakit untuk memilih salah satu tarikh cadangan doktor.";
+      block.appendChild(instruction);
+      
+      todayActionsListEl.appendChild(block);
+    });
+  }
+}
 
     function renderStaffFilterTabs() {
       staffFilterButtons.forEach(btn => {
