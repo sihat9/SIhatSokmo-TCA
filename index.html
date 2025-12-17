@@ -3771,11 +3771,17 @@
   // 1. Status = "approved"
   // 2. doctor_selected_date ATAU requested_date = hari ini
   const approvedToday = data.filter(a => {
-    if (a.status !== "approved") return false;
-    const d = a.doctor_selected_date || a.requested_date;
-    return formatDate(d) === todayISO;
-  });
-
+  if (a.status !== "approved") return false;
+  
+  // Dapatkan tarikh yang sepatutnya
+  const appointmentDate = a.doctor_selected_date || a.requested_date;
+  
+  // Jika appointmentDate kosong/null, return false
+  if (!appointmentDate) return false;
+  
+  // Bandingkan dengan hari ini
+  return formatDate(appointmentDate) === todayISO;
+});
   todayPendingCountEl.textContent = pendingList.length;
   todayRejectedCountEl.textContent = rejectedList.length;
   todayApprovedCountEl.textContent = approvedToday.length;
