@@ -4932,61 +4932,63 @@
 
           card.appendChild(actionRow);
 
-          approveBtn.addEventListener("click", async () => {
-            // Approve dengan tarikh yang dicadangkan pesakit
-            const { error } = await db
-              .from("appointments")
-              .update({ 
-                status: "approved", 
-                doctor_selected_date: a.requested_date,
-                appointment_time: a.appointment_time || "09:00",
-                appointment_duration: a.appointment_duration || 60
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error approve", error);
-              alert("Gagal update status.");
-              return;
-            }
-            alert("Temujanji telah diluluskan dengan tarikh pesakit.");
-          });
+      // Dalam fungsi approveBtn.addEventListener("click")
+approveBtn.addEventListener("click", async () => {
+  // Approve dengan tarikh yang dicadangkan pesakit
+  const { error } = await db
+    .from("appointments")
+    .update({ 
+      status: "approved", 
+      doctor_selected_date: a.requested_date,  // ✅ INI PENTING
+      appointment_time: a.appointment_time || "09:00",
+      appointment_duration: a.appointment_duration || 60
+    })
+    .eq("id", a.id);
+    
+  if (error) {
+    console.error("Error approve", error);
+    alert("Gagal update status.");
+    return;
+  }
+  alert("Temujanji telah diluluskan dengan tarikh pesakit.");
+});
 
-          approveWhatsappBtn.addEventListener("click", async () => {
-            // Approve dengan tarikh pesakit dan WhatsApp klinik
-            const { error } = await db
-              .from("appointments")
-              .update({ 
-                status: "approved", 
-                doctor_selected_date: a.requested_date,
-                appointment_time: a.appointment_time || "09:00",
-                appointment_duration: a.appointment_duration || 60
-              })
-              .eq("id", a.id);
-              
-            if (error) {
-              console.error("Error approve", error);
-              alert("Gagal update status.");
-              return;
-            }
-            
-            const clinicPhone = await fetchClinicWhatsapp();
-            const msg = [
-              "Assalamualaikum / Salam sejahtera,",
-              "",
-              "Saya setuju untuk temujanji pesakit berikut:",
-              `Servis: ${serviceName}`,
-              `Nama: ${a.patient_name}`,
-              `Complaint: ${a.complaint || "Tiada complaint dinyatakan"}`,
-              `Tarikh temujanji: ${formatDate(a.requested_date)}`,
-              `Masa: ${a.appointment_time ? formatTime(a.appointment_time) : '09:00 AM'} (${a.appointment_duration || 60} minit)`,
-              "",
-              "Sila maklumkan kepada pesakit."
-            ].join("\n");
-            
-            const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
-            window.open(waUrl, "_blank");
-          });
+// Juga dalam approveWhatsappBtn.addEventListener("click")
+approveWhatsappBtn.addEventListener("click", async () => {
+  // Approve dengan tarikh pesakit dan WhatsApp klinik
+  const { error } = await db
+    .from("appointments")
+    .update({ 
+      status: "approved", 
+      doctor_selected_date: a.requested_date,  // ✅ INI PENTING
+      appointment_time: a.appointment_time || "09:00",
+      appointment_duration: a.appointment_duration || 60
+    })
+    .eq("id", a.id);
+    
+  if (error) {
+    console.error("Error approve", error);
+    alert("Gagal update status.");
+    return;
+  }
+  
+  const clinicPhone = await fetchClinicWhatsapp();
+  const msg = [
+    "Assalamualaikum / Salam sejahtera,",
+    "",
+    "Saya setuju untuk temujanji pesakit berikut:",
+    `Servis: ${serviceName}`,
+    `Nama: ${a.patient_name}`,
+    `Complaint: ${a.complaint || "Tiada complaint dinyatakan"}`,
+    `Tarikh temujanji: ${formatDate(a.requested_date)}`,
+    `Masa: ${a.appointment_time ? formatTime(a.appointment_time) : '09:00 AM'} (${a.appointment_duration || 60} minit)`,
+    "",
+    "Sila maklumkan kepada pesakit."
+  ].join("\n");
+  
+  const waUrl = buildWhatsAppLink(clinicPhone || "", msg);
+  window.open(waUrl, "_blank");
+});
 
           rejectBtn.addEventListener("click", () => {
             rejectPanel.classList.toggle("hidden");
