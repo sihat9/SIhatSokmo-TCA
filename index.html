@@ -3861,39 +3861,44 @@
    // ==============================
 // STAFF: LIST + TINDAKAN HARI INI - DIPERBAIKI UNTUK APPOINTED HARI INI
 // ==============================
+// ==============================
+// STAFF: LIST + TINDAKAN HARI INI - DIPERBAIKI UNTUK APPOINTED HARI INI
+// ==============================
 async function refreshTodayActions() {
   if (!currentProfile || currentProfile.role !== "staff") return;
   
   const { data, error } = await db
     .from("appointments")
-    .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at")
+    .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at, updated_at") // TAMBAH updated_at
     .order("created_at", { ascending: false })
     .limit(50);
 
   if (error) return;
 
-  const todayISO = new Date().toISOString().slice(0, 10);
-  console.log("Today's date:", todayISO); // Debug log
+  const today = new Date();
+  const todayISO = today.toISOString().slice(0, 10);
+  console.log("Today's date:", todayISO);
 
   const pendingList = data.filter(a => a.status === "pending");
   const rejectedList = data.filter(a => a.status === "rejected");
   
-  // PERBAIKAN: Dapatkan temujanji approved yang tarikhnya hari ini
+  // PERBAIKAN: Dapatkan temujanji yang DILULUSKAN HARI INI (berdasarkan updated_at)
   const approvedToday = data.filter(a => {
     if (a.status !== "approved") return false;
     
-    // Gunakan doctor_selected_date jika ada, jika tidak gunakan requested_date
-    const appointmentDate = a.doctor_selected_date || a.requested_date;
-    if (!appointmentDate) return false;
+    // Check jika appointment ini diluluskan hari ini
+    // Gunakan updated_at untuk menentukan bila status berubah
+    if (!a.updated_at) return false;
     
-    // Format appointmentDate ke YYYY-MM-DD untuk perbandingan
-    const appointmentDateISO = new Date(appointmentDate).toISOString().split('T')[0];
-    console.log(`Appointment ${a.id}: status=${a.status}, date=${appointmentDate}, iso=${appointmentDateISO}`); // Debug log
+    const updatedDate = new Date(a.updated_at);
+    const updatedDateISO = updatedDate.toISOString().split('T')[0];
     
-    return appointmentDateISO === todayISO;
+    console.log(`Appointment ${a.id}: status=${a.status}, updated_at=${a.updated_at}, updated_date_iso=${updatedDateISO}`); // Debug
+    
+    return updatedDateISO === todayISO;
   });
 
-  console.log(`Pending: ${pendingList.length}, Rejected: ${rejectedList.length}, Approved Today: ${approvedToday.length}`); // Debug log
+  console.log(`Pending: ${pendingList.length}, Rejected: ${rejectedList.length}, Approved Today: ${approvedToday.length}`);
 
   todayPendingCountEl.textContent = pendingList.length;
   todayRejectedCountEl.textContent = rejectedList.length;
@@ -3908,7 +3913,7 @@ async function refreshTodayActions() {
   }
 
   if (approvedToday.length) {
-    console.log("Approved today appointments found:", approvedToday.length); // Debug log
+    console.log("Approved today appointments found:", approvedToday.length);
     
     const approvedByService = {};
     approvedToday.forEach(a => {
@@ -3932,22 +3937,25 @@ async function refreshTodayActions() {
       serviceHeader.className = "flex items-center gap-3 mb-3";
       serviceHeader.innerHTML = `
         <span class="service-tag ${serviceColor}">${serviceName}</span>
-        <span class="text-sm font-bold text-emerald-600">TINDAKAN: Temujanji Berlangsung Hari Ini</span>
+        <span class="text-sm font-bold text-emerald-600">TINDAKAN: Temujanji Baru Diluluskan Hari Ini</span>
       `;
       block.appendChild(serviceHeader);
 
       serviceAppointments.forEach(a => {
         const appointmentDate = a.doctor_selected_date || a.requested_date;
         const timeInfo = a.appointment_time ? ` (${formatTime(a.appointment_time)})` : '';
+        const doctor = doctorsCache.find(d => d.id === a.doctor_id);
+        const doctorName = doctor?.full_name || "Doktor";
+        
         const line = document.createElement("div");
         line.className = "text-sm text-slate-700 ml-4";
-        line.textContent = `• ${a.patient_name} - ${formatDate(appointmentDate)}${timeInfo}`;
+        line.textContent = `• ${a.patient_name} - ${doctorName} - ${formatDate(appointmentDate)}${timeInfo}`;
         block.appendChild(line);
       });
       
       const instruction = document.createElement("div");
       instruction.className = "mt-3 text-sm text-slate-500 ml-4";
-      instruction.textContent = "Pesakit perlu dihadiri di klinik pada tarikh yang ditetapkan.";
+      instruction.textContent = "Temujanji baru diluluskan oleh doktor hari ini. Sila hubungi pesakit untuk maklumat lanjut.";
       block.appendChild(instruction);
       
       todayActionsListEl.appendChild(block);
@@ -4036,7 +4044,6 @@ async function refreshTodayActions() {
         const line = document.createElement("div");
         line.className = "text-sm text-slate-700 ml-4";
         
-        // TAMPILKAN TARIKH DAN MASA CADANGAN DARI DOKTOR
         const datesWithTimes = [];
         if (a.doctor_alt_date1) {
           const timeInfo1 = a.doctor_alt_time1 ? ` (${formatTime(a.doctor_alt_time1)})` : '';
@@ -4068,7 +4075,6 @@ async function refreshTodayActions() {
     });
   }
 }
-
     function renderStaffFilterTabs() {
       staffFilterButtons.forEach(btn => {
         const status = btn.dataset.status;
