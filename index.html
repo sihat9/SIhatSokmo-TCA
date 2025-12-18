@@ -1864,11 +1864,11 @@
       
       // Jika nombor bermula dengan '0', tukar kepada '6'
       if (cleanNumber.startsWith('0')) {
-        cleanNumber = '6' + cleanNumber.substring(1);
+        cleanNumber = '60' + cleanNumber.substring(1);
       }
       // Jika nombor tidak bermula dengan '6', tambah '6' di hadapan
       else if (!cleanNumber.startsWith('6')) {
-        cleanNumber = '6' + cleanNumber;
+        cleanNumber = '60' + cleanNumber;
       }
       
       return cleanNumber;
