@@ -1965,101 +1965,152 @@
     }
 
     // ==============================
-    // FUNGSI BARU: CHECK MASA DEFAULT UNTUK TARIKH
+    // FUNGSI BARU: UPDATE DROPDOWN MASA DENGAN RANGE DOKTOR
     // ==============================
-    async function checkAndSetDefaultTimeForDate(doctorId, dateStr) {
+    async function updateTimeDropdownWithDoctorRange(doctorId, dateStr) {
       if (!doctorId || !dateStr) return;
       
-      // Load fixed time untuk doktor ini
-      await loadDoctorFixedTime(doctorId);
+      // First check if there's availability data for this specific date
+      const { data: availabilityData, error: availabilityError } = await db
+        .from('doctor_availability')
+        .select('start_time, end_time')
+        .eq('doctor_id', doctorId)
+        .eq('date', dateStr)
+        .single();
       
-      // Dapatkan hari dalam seminggu (0 = Ahad, 1 = Isnin, ...)
-      const dateObj = new Date(dateStr);
-      const dayOfWeek = dateObj.getDay(); // 0-6
-      
-      // Check jika doktor ada setting masa untuk hari ini
-      const fixedTime = doctorFixedTimes.get(dayOfWeek);
-      
-      if (fixedTime && fixedTime.start_time) {
-        // Ada setting masa tetap untuk hari ini
-        // Update dropdown masa dengan pilihan dalam range masa doktor
-        await updateTimeDropdownWithDoctorRange(fixedTime.start_time, fixedTime.end_time, doctorId);
+      if (!availabilityError && availabilityData && availabilityData.start_time && availabilityData.end_time) {
+        // Ada availability data untuk tarikh spesifik ini
+        const startTime = availabilityData.start_time;
+        const endTime = availabilityData.end_time;
         
-        // Set masa default
-        if (appointmentTime) {
-          appointmentTime.value = fixedTime.start_time;
-        }
-        if (appointmentTimeMobile) {
-          appointmentTimeMobile.value = fixedTime.start_time;
-        }
-        if (appointmentDuration) {
-          appointmentDuration.value = fixedTime.duration || "60";
-        }
-        if (appointmentDurationMobile) {
-          appointmentDurationMobile.value = fixedTime.duration || "60";
-        }
+        // Generate time slots berdasarkan availability doktor untuk tarikh ini
+        const timeSlots = generateTimeSlots(startTime, endTime, 30); // 30 minit intervals
         
-        return {
-          hasFixedTime: true,
-          time: fixedTime.start_time,
-          duration: fixedTime.duration || "60"
-        };
-      } else {
-        // Tiada setting masa tetap untuk hari ini - kosongkan dropdown
+        // Update desktop dropdown
         if (appointmentTime) {
           appointmentTime.innerHTML = '<option value="">Pilih masa...</option>';
-          // Tambah pilihan standard
-          const standardTimes = [
-            '08:00', '09:00', '10:00', '11:00', '12:00',
-            '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
-          ];
-          standardTimes.forEach(time => {
+          timeSlots.forEach(time => {
             const option = document.createElement('option');
             option.value = time;
             option.textContent = formatTime(time);
             appointmentTime.appendChild(option);
           });
-          appointmentTime.value = "";
         }
+        
+        // Update mobile dropdown
         if (appointmentTimeMobile) {
           appointmentTimeMobile.innerHTML = '<option value="">Pilih masa...</option>';
-          const standardTimes = [
-            '08:00', '09:00', '10:00', '11:00', '12:00',
-            '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
-          ];
-          standardTimes.forEach(time => {
+          timeSlots.forEach(time => {
             const option = document.createElement('option');
             option.value = time;
             option.textContent = formatTime(time);
             appointmentTimeMobile.appendChild(option);
           });
-          appointmentTimeMobile.value = "";
         }
         
         return {
-          hasFixedTime: false,
-          time: null,
-          duration: null
+          hasAvailability: true,
+          start_time: startTime,
+          end_time: endTime,
+          timeSlots: timeSlots
         };
+      } else {
+        // Tiada availability data untuk tarikh spesifik, check fixed time
+        const dateObj = new Date(dateStr);
+        const dayOfWeek = dateObj.getDay(); // 0-6
+        
+        // Load fixed time untuk doktor ini
+        await loadDoctorFixedTime(doctorId);
+        
+        // Check jika doktor ada setting masa untuk hari ini
+        const fixedTime = doctorFixedTimes.get(dayOfWeek);
+        
+        if (fixedTime && fixedTime.start_time) {
+          // Ada setting masa tetap untuk hari ini
+          const timeSlots = generateTimeSlots(fixedTime.start_time, fixedTime.end_time, fixedTime.duration || 60);
+          
+          // Update desktop dropdown
+          if (appointmentTime) {
+            appointmentTime.innerHTML = '<option value="">Pilih masa...</option>';
+            timeSlots.forEach(time => {
+              const option = document.createElement('option');
+              option.value = time;
+              option.textContent = formatTime(time);
+              appointmentTime.appendChild(option);
+            });
+          }
+          
+          // Update mobile dropdown
+          if (appointmentTimeMobile) {
+            appointmentTimeMobile.innerHTML = '<option value="">Pilih masa...</option>';
+            timeSlots.forEach(time => {
+              const option = document.createElement('option');
+              option.value = time;
+              option.textContent = formatTime(time);
+              appointmentTimeMobile.appendChild(option);
+            });
+          }
+          
+          return {
+            hasAvailability: true,
+            start_time: fixedTime.start_time,
+            end_time: fixedTime.end_time,
+            duration: fixedTime.duration || 60,
+            timeSlots: timeSlots
+          };
+        } else {
+          // Tiada setting masa tetap untuk hari ini - kosongkan dropdown
+          if (appointmentTime) {
+            appointmentTime.innerHTML = '<option value="">Pilih masa...</option>';
+            // Tambah pilihan standard
+            const standardTimes = [
+              '08:00', '09:00', '10:00', '11:00', '12:00',
+              '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+            ];
+            standardTimes.forEach(time => {
+              const option = document.createElement('option');
+              option.value = time;
+              option.textContent = formatTime(time);
+              appointmentTime.appendChild(option);
+            });
+            appointmentTime.value = "";
+          }
+          if (appointmentTimeMobile) {
+            appointmentTimeMobile.innerHTML = '<option value="">Pilih masa...</option>';
+            const standardTimes = [
+              '08:00', '09:00', '10:00', '11:00', '12:00',
+              '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+            ];
+            standardTimes.forEach(time => {
+              const option = document.createElement('option');
+              option.value = time;
+              option.textContent = formatTime(time);
+              appointmentTimeMobile.appendChild(option);
+            });
+            appointmentTimeMobile.value = "";
+          }
+          
+          return {
+            hasAvailability: false,
+            time: null,
+            duration: null
+          };
+        }
       }
     }
 
     // ==============================
-    // FUNGSI BARU: UPDATE DROPDOWN MASA DENGAN RANGE DOKTOR
+    // FUNGSI BARU: GENERATE TIME SLOTS
     // ==============================
-    async function updateTimeDropdownWithDoctorRange(startTime, endTime, doctorId) {
-      if (!startTime || !endTime) return;
-      
-      // Convert time to minutes
+    function generateTimeSlots(startTime, endTime, intervalMinutes = 30) {
       const [startHour, startMinute] = startTime.split(':').map(Number);
       const [endHour, endMinute] = endTime.split(':').map(Number);
       
       const startTotal = startHour * 60 + startMinute;
       const endTotal = endHour * 60 + endMinute;
       
-      if (endTotal <= startTotal) return;
+      if (endTotal <= startTotal) return [];
       
-      // Create time slots every 30 minutes
       const timeSlots = [];
       let current = startTotal;
       
@@ -2068,34 +2119,14 @@
         const minute = current % 60;
         const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         timeSlots.push(timeStr);
-        current += 30; // 30 minute intervals
+        current += intervalMinutes;
       }
       
-      // Update desktop dropdown
-      if (appointmentTime) {
-        appointmentTime.innerHTML = '<option value="">Pilih masa...</option>';
-        timeSlots.forEach(time => {
-          const option = document.createElement('option');
-          option.value = time;
-          option.textContent = formatTime(time);
-          appointmentTime.appendChild(option);
-        });
-      }
-      
-      // Update mobile dropdown
-      if (appointmentTimeMobile) {
-        appointmentTimeMobile.innerHTML = '<option value="">Pilih masa...</option>';
-        timeSlots.forEach(time => {
-          const option = document.createElement('option');
-          option.value = time;
-          option.textContent = formatTime(time);
-          appointmentTimeMobile.appendChild(option);
-        });
-      }
+      return timeSlots;
     }
 
     // ==============================
-    // FEATURE AVAILABILITY DOKTOR DENGAN MASA
+    // FEATURE AVAILABILITY DOKTOR DENGAN MASA (DIPERBAIKI)
     // ==============================
     function openAvailabilityCalendar() {
       if (!currentProfile || currentProfile.role !== 'doctor') return;
@@ -2166,11 +2197,14 @@
       timeModalDate.textContent = dateFormatted;
       timeSlotsContainer.innerHTML = '';
       
-      // Add predefined time slots
-      const timeSlots = [
-        '08:00', '09:00', '10:00', '11:00', '12:00',
-        '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
-      ];
+      // Add predefined time slots (lebih fleksibel)
+      const timeSlots = [];
+      for (let hour = 8; hour <= 22; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+          const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+          timeSlots.push(timeStr);
+        }
+      }
       
       timeSlots.forEach(slot => {
         const timeSlotEl = document.createElement('div');
@@ -2178,7 +2212,7 @@
         timeSlotEl.textContent = formatTime(slot);
         timeSlotEl.dataset.time = slot;
         
-        // Check if this time is already selected for this date
+        // Check if this time is within existing time range for this date
         const existingTime = dateTimeMap.get(dateStr);
         if (existingTime && existingTime.start_time === slot) {
           timeSlotEl.classList.add('selected');
@@ -2191,9 +2225,9 @@
           timeSlotEl.classList.add('selected');
           customStartTime.value = slot;
           
-          // Auto-set end time (1 hour later)
+          // Auto-set end time (2 hours later by default, tapi user boleh ubah)
           const [hours, minutes] = slot.split(':');
-          const endHour = (parseInt(hours) + 1).toString().padStart(2, '0');
+          const endHour = (parseInt(hours) + 2).toString().padStart(2, '0');
           customEndTime.value = `${endHour}:${minutes}`;
         });
         
@@ -2206,8 +2240,9 @@
         customStartTime.value = existingTime.start_time;
         customEndTime.value = existingTime.end_time;
       } else {
+        // Default: 9:00 AM to 5:00 PM
         customStartTime.value = '09:00';
-        customEndTime.value = '10:00';
+        customEndTime.value = '17:00';
       }
       
       timeSelectionModal.style.display = 'flex';
@@ -2280,7 +2315,7 @@
         <div class="text-center">
           <h3 class="text-lg font-semibold text-slate-800">${monthNames[currentCalendarMonth]} ${currentCalendarYear}</h3>
           <div class="text-sm text-slate-500">Klik pada tarikh untuk pilih/buang</div>
-          <div class="text-xs text-slate-500 mt-1">Klik 2 kali untuk tetapkan masa</div>
+          <div class="text-xs text-slate-500 mt-1">Klik 2 kali untuk tetapkan masa (bebas pilih waktu)</div>
           <div class="text-xs text-rose-500 mt-1">🟥 = Cuti Umum</div>
         </div>
         <button id="nextMonth" class="p-2 rounded-lg hover:bg-slate-100">
@@ -2345,7 +2380,7 @@
             dayElement.title = holiday.name + ' - Cuti (sudah dipilih)';
           }
         } else {
-          dayElement.title = 'Klik untuk pilih tarikh available. Klik 2 kali untuk tetapkan masa.';
+          dayElement.title = 'Klik untuk pilih tarikh available. Klik 2 kali untuk tetapkan masa (bebas pilih waktu).';
         }
         
         // Check if past date
@@ -2387,7 +2422,7 @@
             }
           });
           
-          // Double click to set time
+          // Double click to set time (DOKTOR BEBAS PILIH WAKTU)
           dayElement.addEventListener('dblclick', () => {
             if (!selectedDates.has(dateStr)) {
               // First select the date
@@ -2444,7 +2479,7 @@
         if (holidayName) {
           element.title = holidayName + ' - Cuti (boleh dipilih)';
         } else {
-          element.title = 'Klik untuk pilih tarikh available. Klik 2 kali untuk tetapkan masa.';
+          element.title = 'Klik untuk pilih tarikh available. Klik 2 kali untuk tetapkan masa (bebas pilih waktu).';
         }
         
         // Remove time badge if exists
@@ -2460,7 +2495,7 @@
         if (holidayName) {
           element.title = holidayName + ' - Cuti (sudah dipilih)';
         } else {
-          element.title = 'Tarikh available (sudah dipilih)\nKlik 2 kali untuk tetapkan masa.';
+          element.title = 'Tarikh available (sudah dipilih)\nKlik 2 kali untuk tetapkan masa (bebas pilih waktu).';
         }
       }
       
@@ -2763,7 +2798,7 @@
     }
 
     // ==============================
-    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS - POSISI DIKANAN TENGAH
+    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS - POSISI DIKANAN TENGAH (DIPERBAIKI)
     // ==============================
     function showAvailabilityTable(doctorId, doctorName) {
       if (!doctorId) return;
@@ -2849,7 +2884,9 @@
               ${timeInfo}
             </div>
             <button class="select-date-btn px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
-                    data-date="${item.date}">
+                    data-date="${item.date}"
+                    data-start-time="${item.start_time || ''}"
+                    data-end-time="${item.end_time || ''}">
               Pilih Tarikh
             </button>
           </div>
@@ -2862,23 +2899,29 @@
       availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const date = btn.dataset.date;
+          const startTime = btn.dataset.startTime;
+          const endTime = btn.dataset.endTime;
+          
           requestedDate.value = date;
           
-          // Also try to set time if available
-          const availabilityItem = availabilityData.find(item => item.date === date);
-          if (availabilityItem && availabilityItem.start_time) {
-            appointmentTime.value = availabilityItem.start_time;
-          } else {
-            // Check for doctor's fixed time for this date
-            if (doctorSelect.value) {
-              checkAndSetDefaultTimeForDate(doctorSelect.value, date);
+          // Update time dropdown berdasarkan availability doktor untuk tarikh ini
+          if (doctorSelect.value) {
+            updateTimeDropdownWithDoctorRange(doctorSelect.value, date);
+            
+            // Jika ada start time dari availability, set sebagai pilihan default
+            if (startTime && appointmentTime) {
+              // Cari option yang sesuai dengan start time
+              const option = Array.from(appointmentTime.options).find(opt => opt.value === startTime);
+              if (option) {
+                appointmentTime.value = startTime;
+              }
             }
           }
           
           hideAvailabilityTable();
           
           // Tampilkan notifikasi
-          showMessage(appointmentMessage, `Tarikh ${formatDate(date)} telah dipilih.`, false);
+          showMessage(appointmentMessage, `Tarikh ${formatDate(date)} telah dipilih. Masa telah dikemaskini mengikut jadual doktor.`, false);
           setTimeout(() => {
             appointmentMessage.classList.add('hidden');
           }, 3000);
@@ -2904,7 +2947,9 @@
         .map(item => ({
           day: new Date(item.date).getDate(),
           date: item.date,
-          time: item.start_time ? `${formatTime(item.start_time)}-${formatTime(item.end_time)}` : null
+          time: item.start_time ? `${formatTime(item.start_time)}-${formatTime(item.end_time)}` : null,
+          start_time: item.start_time,
+          end_time: item.end_time
         }));
       
       let html = `
@@ -2961,7 +3006,9 @@
           
           html += `
             <button class="w-full text-left p-3 text-sm text-slate-700 hover:bg-white rounded-lg select-date-btn flex items-center justify-between transition-all duration-200"
-                    data-date="${item.date}">
+                    data-date="${item.date}"
+                    data-start-time="${item.start_time || ''}"
+                    data-end-time="${item.end_time || ''}">
               <div class="flex items-center">
                 <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mr-3">
                   <span class="text-emerald-600 font-bold">${item.day}</span>
@@ -2987,25 +3034,31 @@
       availabilityTableView.querySelectorAll('.select-date-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const date = btn.dataset.date;
+          const startTime = btn.dataset.startTime;
+          const endTime = btn.dataset.endTime;
+          
           if (!date) return;
           
           requestedDate.value = date;
           
-          // Try to find time info from availabilityData
-          const availabilityItem = availabilityData.find(item => item.date === date);
-          if (availabilityItem && availabilityItem.start_time) {
-            appointmentTime.value = availabilityItem.start_time;
-          } else {
-            // Check for doctor's fixed time for this date
-            if (doctorSelect.value) {
-              checkAndSetDefaultTimeForDate(doctorSelect.value, date);
+          // Update time dropdown berdasarkan availability doktor untuk tarikh ini
+          if (doctorSelect.value) {
+            updateTimeDropdownWithDoctorRange(doctorSelect.value, date);
+            
+            // Jika ada start time dari availability, set sebagai pilihan default
+            if (startTime && appointmentTime) {
+              // Cari option yang sesuai dengan start time
+              const option = Array.from(appointmentTime.options).find(opt => opt.value === startTime);
+              if (option) {
+                appointmentTime.value = startTime;
+              }
             }
           }
           
           hideAvailabilityTable();
           
           // Tampilkan notifikasi
-          showMessage(appointmentMessage, `Tarikh ${formatDate(date)} telah dipilih.`, false);
+          showMessage(appointmentMessage, `Tarikh ${formatDate(date)} telah dipilih. Masa telah dikemaskini mengikut jadual doktor.`, false);
           setTimeout(() => {
             appointmentMessage.classList.add('hidden');
           }, 3000);
@@ -3227,6 +3280,11 @@
           
           if (doctorId) {
             showAvailabilityTable(doctorId, doctorName);
+            
+            // Update time dropdown jika tarikh telah dipilih
+            if (requestedDate.value) {
+              updateTimeDropdownWithDoctorRange(doctorId, requestedDate.value);
+            }
           } else {
             hideAvailabilityTable();
           }
@@ -3240,6 +3298,13 @@
           opt.value = d.id;
           opt.textContent = d.full_name;
           doctorSelectMobile.appendChild(opt);
+        });
+        
+        doctorSelectMobile.addEventListener('change', (e) => {
+          const doctorId = e.target.value;
+          if (doctorId && requestedDateMobile.value) {
+            updateTimeDropdownWithDoctorRange(doctorId, requestedDateMobile.value);
+          }
         });
       }
 
@@ -3347,6 +3412,7 @@
           const selected = servicesCache.find(s => s.id === serviceSelectMobile.value);
           if (selected && selected.default_doctor_id && doctorSelectMobile) {
             doctorSelectMobile.value = selected.default_doctor_id;
+            doctorSelectMobile.dispatchEvent(new Event('change'));
           }
           renderCustomFieldsFormMobile();
         });
@@ -3513,7 +3579,7 @@
     }
 
     // ==============================
-    // STAFF: CREATE APPOINTMENT DENGAN MASA DAN FORMAT TELEFON
+    // STAFF: CREATE APPOINTMENT DENGAN MASA DAN FORMAT TELEFON (DIPERBAIKI)
     // ==============================
     if (appointmentForm) {
       appointmentForm.addEventListener("submit", async (e) => {
@@ -3605,26 +3671,26 @@
         buildStaffWhatsappLink(insertResult);
       });
       
-      // Event listener untuk tarikh - check masa default doktor
+      // Event listener untuk tarikh - update masa dropdown berdasarkan doktor
       if (requestedDate) {
         requestedDate.addEventListener('change', async () => {
           const doctorId = doctorSelect.value;
           const dateStr = requestedDate.value;
           
           if (doctorId && dateStr) {
-            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+            await updateTimeDropdownWithDoctorRange(doctorId, dateStr);
           }
         });
       }
       
-      // Event listener untuk doktor - check masa default untuk tarikh yang telah dipilih
+      // Event listener untuk doktor - update masa dropdown untuk tarikh yang telah dipilih
       if (doctorSelect) {
         doctorSelect.addEventListener('change', async () => {
           const doctorId = doctorSelect.value;
           const dateStr = requestedDate.value;
           
           if (doctorId && dateStr) {
-            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+            await updateTimeDropdownWithDoctorRange(doctorId, dateStr);
           }
         });
       }
@@ -3720,26 +3786,26 @@
         buildStaffWhatsappLinkMobile(insertResult);
       });
       
-      // Event listener untuk tarikh mobile - check masa default doktor
+      // Event listener untuk tarikh mobile - update masa dropdown berdasarkan doktor
       if (requestedDateMobile) {
         requestedDateMobile.addEventListener('change', async () => {
           const doctorId = doctorSelectMobile.value;
           const dateStr = requestedDateMobile.value;
           
           if (doctorId && dateStr) {
-            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+            await updateTimeDropdownWithDoctorRange(doctorId, dateStr);
           }
         });
       }
       
-      // Event listener untuk doktor mobile - check masa default untuk tarikh yang telah dipilih
+      // Event listener untuk doktor mobile - update masa dropdown untuk tarikh yang telah dipilih
       if (doctorSelectMobile) {
         doctorSelectMobile.addEventListener('change', async () => {
           const doctorId = doctorSelectMobile.value;
           const dateStr = requestedDateMobile.value;
           
           if (doctorId && dateStr) {
-            await checkAndSetDefaultTimeForDate(doctorId, dateStr);
+            await updateTimeDropdownWithDoctorRange(doctorId, dateStr);
           }
         });
       }
