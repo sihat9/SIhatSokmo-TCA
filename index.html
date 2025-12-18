@@ -5099,6 +5099,8 @@ async function refreshTodayActions() {
 // APPROVE BUTTON HANDLER
 approveBtn.addEventListener("click", async () => {
   const now = new Date().toISOString();
+  console.log("Approving appointment at:", now); // Debug
+  
   const { error } = await db
     .from("appointments")
     .update({ 
@@ -5106,7 +5108,7 @@ approveBtn.addEventListener("click", async () => {
       doctor_selected_date: a.requested_date,
       appointment_time: a.appointment_time || "09:00",
       appointment_duration: a.appointment_duration || 60,
-      approved_at: now // Simpan tarikh approval
+      approved_at: now // SIMPAN TARIKH APPROVAL
     })
     .eq("id", a.id);
     
@@ -5120,13 +5122,17 @@ approveBtn.addEventListener("click", async () => {
 
 // APPROVE WHATSAPP BUTTON HANDLER
 approveWhatsappBtn.addEventListener("click", async () => {
+  const now = new Date().toISOString();
+  console.log("Approving appointment at:", now); // Debug
+  
   const { error } = await db
     .from("appointments")
     .update({ 
       status: "approved", 
-      doctor_selected_date: a.requested_date, // Simpan tarikh yang dipilih
+      doctor_selected_date: a.requested_date,
       appointment_time: a.appointment_time || "09:00",
-      appointment_duration: a.appointment_duration || 60
+      appointment_duration: a.appointment_duration || 60,
+      approved_at: now // SIMPAN TARIKH APPROVAL
     })
     .eq("id", a.id);
     
