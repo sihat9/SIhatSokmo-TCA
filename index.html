@@ -3828,13 +3828,13 @@
     }
 
     // ==============================
-    // STAFF: LIST + TINDAKAN HARI INI
+    // STAFF: LIST + TINDAKAN HARI INI - DIPERBAIKI UNTUK APPOINTED HARI INI
     // ==============================
     async function refreshStaffAppointmentsList() {
       if (!currentProfile || currentProfile.role !== "staff") return;
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, complaint, created_at")
+        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, complaint, created_at")
         .order("created_at", { ascending: false })
         .limit(30);
 
@@ -3863,7 +3863,7 @@
       
       const { data, error } = await db
         .from("appointments")
-        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, patient_phone, created_at")
+        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at")
         .order("created_at", { ascending: false })
         .limit(50);
 
@@ -3874,6 +3874,7 @@
       const pendingList = data.filter(a => a.status === "pending");
       const rejectedList = data.filter(a => a.status === "rejected");
       
+      // PERBAIKAN: Dapatkan temujanji approved yang tarikhnya hari ini
       const approvedToday = data.filter(a => {
         if (a.status !== "approved") return false;
         const appointmentDate = a.doctor_selected_date || a.requested_date;
@@ -4020,11 +4021,20 @@
           serviceAppointments.slice(0, 3).forEach(a => {
             const line = document.createElement("div");
             line.className = "text-sm text-slate-700 ml-4";
-            const dates = [
-              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
-              a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
-            ].filter(Boolean).join(' atau ');
-            line.textContent = `• ${a.patient_name} - cadangan: ${dates}`;
+            
+            // TAMPILKAN TARIKH DAN MASA CADANGAN DARI DOKTOR
+            const datesWithTimes = [];
+            if (a.doctor_alt_date1) {
+              const timeInfo1 = a.doctor_alt_time1 ? ` (${formatTime(a.doctor_alt_time1)})` : '';
+              datesWithTimes.push(`${formatDate(a.doctor_alt_date1)}${timeInfo1}`);
+            }
+            if (a.doctor_alt_date2) {
+              const timeInfo2 = a.doctor_alt_time2 ? ` (${formatTime(a.doctor_alt_time2)})` : '';
+              datesWithTimes.push(`${formatDate(a.doctor_alt_date2)}${timeInfo2}`);
+            }
+            
+            const datesText = datesWithTimes.join(' atau ');
+            line.textContent = `• ${a.patient_name} - cadangan doktor: ${datesText}`;
             block.appendChild(line);
           });
           
@@ -4037,7 +4047,7 @@
           
           const instruction = document.createElement("div");
           instruction.className = "mt-3 text-sm text-slate-500 ml-4";
-          instruction.textContent = "Sila hubungi pesakit untuk memilih salah satu tarikh cadangan doktor.";
+          instruction.textContent = "Sila hubungi pesakit untuk memilih salah satu tarikh & masa cadangan doktor.";
           block.appendChild(instruction);
           
           todayActionsListEl.appendChild(block);
@@ -4254,30 +4264,45 @@
           }
 
           if (a.status === "rejected") {
-            const dates = [
-              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
-              a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
-            ].filter(Boolean);
+            // TAMPILKAN TARIKH DAN MASA CADANGAN DARI DOKTOR
+            const dates = [];
+            if (a.doctor_alt_date1) {
+              const timeInfo1 = a.doctor_alt_time1 ? ` (${formatTime(a.doctor_alt_time1)})` : '';
+              dates.push({
+                date: a.doctor_alt_date1,
+                time: a.doctor_alt_time1,
+                display: `${formatDate(a.doctor_alt_date1)}${timeInfo1}`
+              });
+            }
+            if (a.doctor_alt_date2) {
+              const timeInfo2 = a.doctor_alt_time2 ? ` (${formatTime(a.doctor_alt_time2)})` : '';
+              dates.push({
+                date: a.doctor_alt_date2,
+                time: a.doctor_alt_time2,
+                display: `${formatDate(a.doctor_alt_date2)}${timeInfo2}`
+              });
+            }
 
             actionContainer.innerHTML = `
-              <div class="text-xs text-rose-600 mb-2 font-medium">Cadangan tarikh doktor:</div>
+              <div class="text-xs text-rose-600 mb-2 font-medium">Cadangan tarikh & masa doktor:</div>
               <div class="space-y-2">
-                ${dates.map(date => `
-                  <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2" data-date="${date}">
+                ${dates.map(item => `
+                  <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2" data-date="${item.date}" data-time="${item.time || ''}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    Pilih ${date} & WhatsApp Doktor
+                    Pilih ${item.display}
                   </button>
                 `).join('')}
               </div>
-              <p class="text-xs text-slate-500 mt-2 text-center">Pilih tarikh setelah pesakit setuju</p>
+              <p class="text-xs text-slate-500 mt-2 text-center">Pilih tarikh & masa setelah pesakit setuju</p>
             `;
 
             actionContainer.querySelectorAll("button[data-date]").forEach(btn => {
               btn.addEventListener("click", () => {
                 const selectedDate = btn.dataset.date;
-                handleStaffChooseNewDate(a, selectedDate);
+                const selectedTime = btn.dataset.time;
+                handleStaffChooseNewDate(a, selectedDate, selectedTime);
               });
             });
           }
@@ -4435,21 +4460,35 @@
           }
 
           if (a.status === "rejected") {
-            const dates = [
-              a.doctor_alt_date1 ? formatDate(a.doctor_alt_date1) : null,
-              a.doctor_alt_date2 ? formatDate(a.doctor_alt_date2) : null
-            ].filter(Boolean);
+            // TAMPILKAN TARIKH DAN MASA CADANGAN DARI DOKTOR (MOBILE)
+            const dates = [];
+            if (a.doctor_alt_date1) {
+              const timeInfo1 = a.doctor_alt_time1 ? ` (${formatTime(a.doctor_alt_time1)})` : '';
+              dates.push({
+                date: a.doctor_alt_date1,
+                time: a.doctor_alt_time1,
+                display: `${formatDate(a.doctor_alt_date1)}${timeInfo1}`
+              });
+            }
+            if (a.doctor_alt_date2) {
+              const timeInfo2 = a.doctor_alt_time2 ? ` (${formatTime(a.doctor_alt_time2)})` : '';
+              dates.push({
+                date: a.doctor_alt_date2,
+                time: a.doctor_alt_time2,
+                display: `${formatDate(a.doctor_alt_date2)}${timeInfo2}`
+              });
+            }
 
             if (dates.length > 0) {
               actionContainer.innerHTML = `
                 <div class="text-xs text-rose-600 mb-2 font-medium">Cadangan doktor:</div>
                 <div class="space-y-1">
-                  ${dates.map(date => `
-                    <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1" data-date="${date}">
+                  ${dates.map(item => `
+                    <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-1" data-date="${item.date}" data-time="${item.time || ''}">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      Pilih ${date}
+                      Pilih ${item.display}
                     </button>
                   `).join('')}
                 </div>
@@ -4459,7 +4498,8 @@
               actionContainer.querySelectorAll("button[data-date]").forEach(btn => {
                 btn.addEventListener("click", () => {
                   const selectedDate = btn.dataset.date;
-                  handleStaffChooseNewDate(a, selectedDate);
+                  const selectedTime = btn.dataset.time;
+                  handleStaffChooseNewDate(a, selectedDate, selectedTime);
                 });
               });
             }
@@ -4537,33 +4577,38 @@
       window.open(waUrl, "_blank");
     }
 
-    async function handleStaffChooseNewDate(appointment, chosenDate) {
+    async function handleStaffChooseNewDate(appointment, chosenDate, chosenTime) {
+      // Update appointment dengan tarikh dan masa baharu
       const { error } = await db
         .from("appointments")
         .update({
           status: "pending",
           requested_date: chosenDate,
+          appointment_time: chosenTime || "09:00", // Gunakan masa dari cadangan doktor
           doctor_selected_date: null
         })
         .eq("id", appointment.id);
 
       if (error) {
         console.error("Error update reschedule", error);
-        alert("Gagal kemaskini tarikh baharu.");
+        alert("Gagal kemaskini tarikh & masa baharu.");
         return;
       }
 
       const serviceName = servicesCache.find(s => s.id === appointment.service_id)?.name || "Servis Klinik";
       const doctorPhone = await fetchDoctorWhatsapp(appointment.doctor_id);
+      
+      const timeInfo = chosenTime ? `\nMasa: ${formatTime(chosenTime)}` : '';
 
       const msg = [
         "Assalamualaikum / Salam sejahtera Dr,",
         "",
-        "Pesakit telah bersetuju dengan tarikh baharu:",
+        "Pesakit telah bersetuju dengan tarikh & masa baharu:",
         `Servis: ${serviceName}`,
         `Nama pesakit: ${appointment.patient_name}`,
         `Complaint: ${appointment.complaint || "Tiada complaint dinyatakan"}`,
         `Tarikh baharu dipilih pesakit: ${formatDate(chosenDate)}`,
+        `${timeInfo}`,
         "",
         "Sila semak & sahkan semula dalam sistem.",
         `Link sistem: ${APP_URL}`
@@ -4658,6 +4703,8 @@
           doctor_selected_date,
           doctor_alt_date1,
           doctor_alt_date2,
+          doctor_alt_time1,
+          doctor_alt_time2,
           created_at,
           service_id,
           doctor_id,
@@ -4796,7 +4843,9 @@
         'Tempoh': item.appointment_duration ? item.appointment_duration + ' minit' : '-',
         'Tarikh Diluluskan': formatDate(item.doctor_selected_date),
         'Cadangan Tarikh 1': formatDate(item.doctor_alt_date1),
+        'Cadangan Masa 1': item.doctor_alt_time1 ? formatTime(item.doctor_alt_time1) : '-',
         'Cadangan Tarikh 2': formatDate(item.doctor_alt_date2),
+        'Cadangan Masa 2': item.doctor_alt_time2 ? formatTime(item.doctor_alt_time2) : '-',
         'Complaint': item.complaint || '-',
         'Tarikh Didaftar': formatDateTime(item.created_at)
       }));
@@ -4826,7 +4875,7 @@
     }
 
     // ==============================
-    // DOCTOR PANEL HANDLERS - DENGAN VALIDASI TARIKH DAN MASA WAJIB
+    // DOCTOR PANEL HANDLERS - DIPERBAIKI UNTUK VALIDASI TARIKH DAN MASA WAJIB
     // ==============================
     async function fetchClinicWhatsapp() {
       const { data, error } = await db
@@ -4966,24 +5015,24 @@
           const rejectPanel = document.createElement("div");
           rejectPanel.className = "mt-3 space-y-3 hidden";
 
-          // KEMASKINI: Tarikh dan masa wajib
+          // KEMASKINI: Tarikh dan masa wajib - KOSONGKAN NILAI DEFAULT
           const altDatesContainer = document.createElement("div");
           altDatesContainer.className = "space-y-3";
           altDatesContainer.innerHTML = `
             <div class="space-y-2">
               <label class="block text-sm text-slate-700">Tarikh cadangan 1 (wajib) <span class="text-rose-500">*</span></label>
-              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" required />
+              <input type="date" class="alt-date-1 w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" required />
               <div class="mt-1">
                 <label class="block text-xs text-slate-600">Masa (wajib) <span class="text-rose-500">*</span></label>
-                <input type="time" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm" value="09:00" required />
+                <input type="time" class="alt-time-1 w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm" required />
               </div>
             </div>
             <div id="secondDateContainer" class="space-y-2 hidden">
               <label class="block text-sm text-slate-700">Tarikh cadangan 2 (optional)</label>
-              <input type="date" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
+              <input type="date" class="alt-date-2 w-full rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-sm" />
               <div class="mt-1">
                 <label class="block text-xs text-slate-600">Masa (optional)</label>
-                <input type="time" class="w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm" value="14:00" />
+                <input type="time" class="alt-time-2 w-full rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm" />
               </div>
             </div>
           `;
@@ -5001,8 +5050,8 @@
               secondDateContainer.classList.add('hidden');
               toggleSecondDateBtn.textContent = "+ Tambah Tarikh Cadangan Kedua";
               // Clear values when hiding
-              secondDateContainer.querySelector('input[type="date"]').value = '';
-              secondDateContainer.querySelector('input[type="time"]').value = '14:00';
+              secondDateContainer.querySelector('.alt-date-2').value = '';
+              secondDateContainer.querySelector('.alt-time-2').value = '';
             }
           });
 
@@ -5087,7 +5136,7 @@
             rejectPanel.classList.toggle("hidden");
           });
 
-          // REJECT CONFIRM BUTTON HANDLER DENGAN VALIDASI
+          // REJECT CONFIRM BUTTON HANDLER DENGAN VALIDASI - DIPERBAIKI
           rejectConfirmBtn.addEventListener("click", async () => {
             const dateInputs = altDatesContainer.querySelectorAll("input[type='date']");
             const timeInputs = altDatesContainer.querySelectorAll("input[type='time']");
@@ -5151,7 +5200,7 @@
             alert("Temujanji telah ditolak dengan cadangan tarikh alternatif.");
           });
 
-          // REJECT WHATSAPP BUTTON HANDLER DENGAN VALIDASI
+          // REJECT WHATSAPP BUTTON HANDLER DENGAN VALIDASI - DIPERBAIKI
           rejectWhatsappBtn.addEventListener("click", async () => {
             const dateInputs = altDatesContainer.querySelectorAll("input[type='date']");
             const timeInputs = altDatesContainer.querySelectorAll("input[type='time']");
@@ -5244,34 +5293,43 @@
           if (a.doctor_alt_date1) {
             altDates.push({
               date: a.doctor_alt_date1,
-              time: a.doctor_alt_time1 || "Tiada masa ditetapkan"
+              time: a.doctor_alt_time1
             });
           }
           if (a.doctor_alt_date2) {
             altDates.push({
               date: a.doctor_alt_date2,
-              time: a.doctor_alt_time2 || "Tiada masa ditetapkan"
+              time: a.doctor_alt_time2
             });
           }
           
           if (altDates.length > 0) {
             const datesDiv = document.createElement("div");
             datesDiv.className = "mt-3 space-y-2";
-            datesDiv.innerHTML = `
+            
+            let datesHTML = `
               <div class="text-sm font-medium text-slate-700">Cadangan tarikh & masa anda:</div>
               <div class="space-y-1">
-                ${altDates.map(item => `
-                  <div class="text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
-                    ${formatDate(item.date)} - ${item.time.includes(':') ? formatTime(item.time) : item.time}
-                  </div>
-                `).join('')}
-              </div>
             `;
+            
+            altDates.forEach((item, index) => {
+              if (item.date) {
+                const timeDisplay = item.time ? formatTime(item.time) : "Tiada masa ditetapkan";
+                datesHTML += `
+                  <div class="text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
+                    ${index + 1}) ${formatDate(item.date)} - ${timeDisplay}
+                  </div>
+                `;
+              }
+            });
+            
+            datesHTML += `</div>`;
+            datesDiv.innerHTML = datesHTML;
             card.appendChild(datesDiv);
             
             const note = document.createElement("div");
             note.className = "mt-2 text-sm text-slate-500";
-            note.textContent = "Menunggu staff klinik hubungi pesakit untuk pilih tarikh baharu.";
+            note.textContent = "Menunggu staff klinik hubungi pesakit untuk pilih tarikh & masa baharu.";
             card.appendChild(note);
           }
         } else if (activeDoctorTab === "approved") {
@@ -5537,4 +5595,4 @@
     });
   </script>
 </body>
-                      </html>
+</html>
