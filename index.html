@@ -5096,15 +5096,17 @@ async function refreshTodayActions() {
 
           card.appendChild(actionRow);
 
-         // APPROVE BUTTON HANDLER
+// APPROVE BUTTON HANDLER
 approveBtn.addEventListener("click", async () => {
+  const now = new Date().toISOString();
   const { error } = await db
     .from("appointments")
     .update({ 
       status: "approved",
-      doctor_selected_date: a.requested_date, // Simpan tarikh yang dipilih
+      doctor_selected_date: a.requested_date,
       appointment_time: a.appointment_time || "09:00",
-      appointment_duration: a.appointment_duration || 60
+      appointment_duration: a.appointment_duration || 60,
+      approved_at: now // Simpan tarikh approval
     })
     .eq("id", a.id);
     
