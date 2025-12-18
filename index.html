@@ -3832,11 +3832,11 @@
     // ==============================
     async function refreshStaffAppointmentsList() {
       if (!currentProfile || currentProfile.role !== "staff") return;
-      const { data, error } = await db
-        .from("appointments")
-        .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, complaint, created_at")
-        .order("created_at", { ascending: false })
-        .limit(30);
+    const { data, error } = await db
+  .from("appointments")
+  .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at, approved_at") // TAMBAH approved_at
+  .order("created_at", { ascending: false })
+  .limit(50);
 
       if (error) {
         console.error("Error load staff appointments", error);
