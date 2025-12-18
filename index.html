@@ -3861,45 +3861,66 @@
    // ==============================
 // STAFF: LIST + TINDAKAN HARI INI - DIPERBAIKI UNTUK APPOINTED HARI INI
 // ==============================
-// ==============================
-// STAFF: LIST + TINDAKAN HARI INI - DIPERBAIKI UNTUK APPOINTED HARI INI
-// ==============================
 async function refreshTodayActions() {
   if (!currentProfile || currentProfile.role !== "staff") return;
   
+  // TAMBAH approved_at DALAM QUERY
   const { data, error } = await db
     .from("appointments")
-    .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at, updated_at") // TAMBAH updated_at
+    .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at, approved_at")
     .order("created_at", { ascending: false })
     .limit(50);
 
-  if (error) return;
+  if (error) {
+    console.error("Error loading appointments:", error);
+    return;
+  }
 
+  // Dapatkan tarikh HARI INI dalam format YYYY-MM-DD (timezone Malaysia)
   const today = new Date();
-  const todayISO = today.toISOString().slice(0, 10);
-  console.log("Today's date:", todayISO);
+  // Adjust untuk timezone Malaysia (UTC+8)
+  const todayMalaysia = new Date(today.getTime() + (8 * 60 * 60 * 1000));
+  const todayISO = todayMalaysia.toISOString().split('T')[0];
+  
+  console.log("=== DEBUG TODAY ACTIONS ===");
+  console.log("Today (ISO):", todayISO);
+  console.log("Total appointments:", data.length);
 
   const pendingList = data.filter(a => a.status === "pending");
   const rejectedList = data.filter(a => a.status === "rejected");
   
-  // PERBAIKAN: Dapatkan temujanji yang DILULUSKAN HARI INI (berdasarkan updated_at)
+  // LOGIK YANG TEPAT: Cari appointment yang diluluskan HARI INI
   const approvedToday = data.filter(a => {
     if (a.status !== "approved") return false;
     
-    // Check jika appointment ini diluluskan hari ini
-    // Gunakan updated_at untuk menentukan bila status berubah
-    if (!a.updated_at) return false;
+    // Jika tiada approved_at, skip
+    if (!a.approved_at) {
+      console.log(`Appointment ${a.id}: No approved_at date`);
+      return false;
+    }
     
-    const updatedDate = new Date(a.updated_at);
-    const updatedDateISO = updatedDate.toISOString().split('T')[0];
+    // Convert approved_at ke tarikh Malaysia
+    const approvedDate = new Date(a.approved_at);
+    const approvedDateMalaysia = new Date(approvedDate.getTime() + (8 * 60 * 60 * 1000));
+    const approvedDateISO = approvedDateMalaysia.toISOString().split('T')[0];
     
-    console.log(`Appointment ${a.id}: status=${a.status}, updated_at=${a.updated_at}, updated_date_iso=${updatedDateISO}`); // Debug
+    console.log(`Appointment ${a.id}: 
+      - status: ${a.status}
+      - approved_at: ${a.approved_at}
+      - approved_date_iso: ${approvedDateISO}
+      - today_iso: ${todayISO}
+      - match: ${approvedDateISO === todayISO}`);
     
-    return updatedDateISO === todayISO;
+    return approvedDateISO === todayISO;
   });
 
-  console.log(`Pending: ${pendingList.length}, Rejected: ${rejectedList.length}, Approved Today: ${approvedToday.length}`);
+  console.log(`Results: 
+    - Pending: ${pendingList.length}
+    - Rejected: ${rejectedList.length}
+    - Approved Today: ${approvedToday.length}`);
+  console.log("=== END DEBUG ===");
 
+  // Update UI
   todayPendingCountEl.textContent = pendingList.length;
   todayRejectedCountEl.textContent = rejectedList.length;
   todayApprovedCountEl.textContent = approvedToday.length;
