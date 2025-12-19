@@ -102,7 +102,7 @@
       box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.4), 0 10px 10px -5px rgba(5, 150, 105, 0.1);
     }
     
-    /* STYLE UNTUK KALENDAR DOKTOR TERSEDIA DI KANAN TENGAH */
+    /* STYLE UNTUK KALENDAR DOKTOR TERSEDIA DI KANAN TENGAH - DIPERBAIKI */
     #availabilityTableContainer {
       position: fixed;
       z-index: 1000;
@@ -113,11 +113,19 @@
       max-height: 500px;
       width: 450px;
       overflow-y: auto;
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-50%) scale(0.95);
+      transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
       top: 50%;
       left: auto;
       right: 20px;
-      transform: translateY(-50%);
+    }
+    
+    #availabilityTableContainer.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%) scale(1);
     }
     
     .availability-table-header {
@@ -224,6 +232,7 @@
       font-size: 16px;
       font-weight: bold;
       box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+      z-index: 1001;
     }
     
     /* STYLE UNTUK FULLSCREEN CALENDAR (DOKTOR) */
@@ -485,7 +494,7 @@
       padding-left: 30px !important;
     }
     
-    /* STYLE UNTUK ICON KALENDAR TOGGLE */
+    /* STYLE UNTUK ICON KALENDAR TOGGLE - DIPERBAIKI */
     .calendar-toggle-btn {
       position: absolute;
       right: 10px;
@@ -512,6 +521,22 @@
     
     .doctor-select-container {
       position: relative;
+    }
+    
+    /* Style untuk overlay background */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    
+    .modal-overlay.show {
+      display: block;
     }
   </style>
 </head>
@@ -805,29 +830,12 @@
                               class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
-                      <!-- BUTANG TOGGLE KALENDAR BARU -->
+                      <!-- BUTANG TOGGLE KALENDAR BARU - DIPERBAIKI -->
                       <button type="button" id="calendarToggleBtn" class="calendar-toggle-btn" title="Toggle Jadual Doktor">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </button>
-                      <!-- TABLE TERAPUNG AKAN MUNCUL DI KANAN TENGAH -->
-                      <div id="availabilityTableContainer">
-                        <button class="close-availability-btn" id="closeAvailabilityTable">×</button>
-                        <div class="availability-table-header">
-                          <div>
-                            <span class="font-bold text-slate-800 text-lg">📅 Tarikh Available</span>
-                            <span class="text-sm text-slate-600 ml-2">Doktor: <span id="tableDoctorName" class="font-semibold"> - </span></span>
-                          </div>
-                          <div class="flex gap-2">
-                            <button type="button" class="availability-tab-btn active" data-view="list">📋 Senarai</button>
-                            <button type="button" class="availability-tab-btn" data-view="calendar">📅 Kalendar</button>
-                          </div>
-                        </div>
-                        <div id="availabilityTableView" class="p-0">
-                          <!-- Content akan diisi oleh JavaScript -->
-                        </div>
-                      </div>
                     </div>
                   </div>
 
@@ -1381,6 +1389,27 @@
     </div>
   </div>
 
+  <!-- TABLE TERAPUNG UNTUK DOKTOR AVAILABLE (DIPERBAIKI) -->
+  <div id="availabilityTableContainer">
+    <button class="close-availability-btn" id="closeAvailabilityTable">×</button>
+    <div class="availability-table-header">
+      <div>
+        <span class="font-bold text-slate-800 text-lg">📅 Tarikh Available</span>
+        <span class="text-sm text-slate-600 ml-2">Doktor: <span id="tableDoctorName" class="font-semibold"> - </span></span>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" class="availability-tab-btn active" data-view="list">📋 Senarai</button>
+        <button type="button" class="availability-tab-btn" data-view="calendar">📅 Kalendar</button>
+      </div>
+    </div>
+    <div id="availabilityTableView" class="p-0">
+      <!-- Content akan diisi oleh JavaScript -->
+    </div>
+  </div>
+
+  <!-- OVERLAY UNTUK TABLE TERAPUNG -->
+  <div id="availabilityTableOverlay" class="modal-overlay"></div>
+
   <!-- FULLSCREEN CALENDAR MODAL -->
   <div id="availabilityCalendarModal">
     <div class="calendar-header">
@@ -1697,6 +1726,7 @@
     const availabilityTableView = document.getElementById("availabilityTableView");
     const tableDoctorName = document.getElementById("tableDoctorName");
     const closeAvailabilityTable = document.getElementById("closeAvailabilityTable");
+    const availabilityTableOverlay = document.getElementById("availabilityTableOverlay");
 
     // Time selection modal elements
     const timeSelectionModal = document.getElementById("timeSelectionModal");
@@ -1992,7 +2022,7 @@
     }
 
     // ==============================
-    // FUNGSI BARU: TOGGLE JADUAL TERAPUNG
+    // FUNGSI BARU: TOGGLE JADUAL TERAPUNG - DIPERBAIKI
     // ==============================
     function toggleAvailabilityTable() {
       if (isAvailabilityTableOpen) {
@@ -2893,11 +2923,11 @@
       tableDoctorName.textContent = doctorName;
       isAvailabilityTableOpen = true;
       
-      // Tampilkan di kanan tengah dengan animasi
-      availabilityTableContainer.style.display = 'block';
-      setTimeout(() => {
-        availabilityTableContainer.style.opacity = '1';
-      }, 10);
+      // Tampilkan overlay
+      availabilityTableOverlay.classList.add('show');
+      
+      // Tampilkan table dengan animasi
+      availabilityTableContainer.classList.add('show');
       
       // Update ikon toggle button
       if (calendarToggleBtn) {
@@ -2907,6 +2937,8 @@
           </svg>
         `;
         calendarToggleBtn.title = "Tutup Jadual Doktor";
+        calendarToggleBtn.classList.add('bg-rose-500');
+        calendarToggleBtn.classList.remove('bg-emerald-500');
       }
       
       loadDoctorAvailabilityForStaff(doctorId);
@@ -2914,10 +2946,12 @@
 
     function hideAvailabilityTable() {
       isAvailabilityTableOpen = false;
-      availabilityTableContainer.style.opacity = '0';
-      setTimeout(() => {
-        availabilityTableContainer.style.display = 'none';
-      }, 200);
+      
+      // Sembunyikan overlay
+      availabilityTableOverlay.classList.remove('show');
+      
+      // Sembunyikan table dengan animasi
+      availabilityTableContainer.classList.remove('show');
       
       // Update ikon toggle button
       if (calendarToggleBtn) {
@@ -2927,6 +2961,8 @@
           </svg>
         `;
         calendarToggleBtn.title = "Buka Jadual Doktor";
+        calendarToggleBtn.classList.remove('bg-rose-500');
+        calendarToggleBtn.classList.add('bg-emerald-500');
       }
     }
 
@@ -5663,7 +5699,7 @@ approveWhatsappBtn.addEventListener("click", async () => {
     }
 
     // ==============================
-    // EVENT LISTENERS UNTUK FEATURE BARU
+    // EVENT LISTENERS UNTUK FEATURE BARU - DIPERBAIKI
     // ==============================
     
     // Availability calendar untuk doktor
@@ -5749,25 +5785,24 @@ approveWhatsappBtn.addEventListener("click", async () => {
       });
     });
     
-    // Close availability table
+    // Close availability table dengan butang X
     if (closeAvailabilityTable) {
       closeAvailabilityTable.addEventListener('click', hideAvailabilityTable);
     }
     
-    // Toggle availability table dengan ikon kalendar
+    // Toggle availability table dengan ikon kalendar - DIPERBAIKI
     if (calendarToggleBtn) {
       calendarToggleBtn.addEventListener('click', toggleAvailabilityTable);
     }
     
-    // Close availability table ketika klik di luar (kecuali klik pada ikon kalendar)
-    document.addEventListener('click', (e) => {
-      if (availabilityTableContainer && 
-          !availabilityTableContainer.contains(e.target) && 
-          e.target !== calendarToggleBtn && 
-          !calendarToggleBtn.contains(e.target) &&
-          e.target !== doctorSelect && 
-          !doctorSelect.contains(e.target) &&
-          e.target !== closeAvailabilityTable) {
+    // Close availability table ketika klik di luar (overlay) - DIPERBAIKI
+    if (availabilityTableOverlay) {
+      availabilityTableOverlay.addEventListener('click', hideAvailabilityTable);
+    }
+
+    // Close availability table ketika Escape key ditekan
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isAvailabilityTableOpen) {
         hideAvailabilityTable();
       }
     });
@@ -5779,9 +5814,6 @@ approveWhatsappBtn.addEventListener("click", async () => {
       }
       if (fixedAppointmentModal.style.display === 'flex' && e.target === fixedAppointmentModal) {
         closeFixedAppointmentModal();
-      }
-      if (availabilityTableContainer.style.display === 'block' && e.target === availabilityTableContainer) {
-        hideAvailabilityTable();
       }
     });
 
@@ -5827,15 +5859,19 @@ approveWhatsappBtn.addEventListener("click", async () => {
           '<p class="text-base text-slate-500">Tiada data lagi. Selepas staff mula daftar temujanji, ringkasan akan muncul di sini.</p>';
       }
       
-      // Set initial style untuk availability table
-      if (availabilityTableContainer) {
-        availabilityTableContainer.style.opacity = '0';
-        availabilityTableContainer.style.transition = 'opacity 0.2s ease';
-      }
-      
-      // Set initial state untuk toggle button
-      if (calendarToggleBtn) {
-        calendarToggleBtn.title = "Buka Jadual Doktor";
+      // Event listener untuk dropdown doktor - auto buka availability table
+      if (doctorSelect) {
+        doctorSelect.addEventListener('change', function() {
+          if (this.value && !isAvailabilityTableOpen) {
+            // Jika doktor dipilih dan table belum terbuka, auto buka table
+            const doctorId = this.value;
+            const doctorName = doctorsCache.find(d => d.id === doctorId)?.full_name || '';
+            showAvailabilityTable(doctorId, doctorName);
+          } else if (!this.value) {
+            // Jika doktor dikosongkan, tutup table
+            hideAvailabilityTable();
+          }
+        });
       }
     });
   </script>
