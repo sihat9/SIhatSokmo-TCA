@@ -485,25 +485,32 @@
       padding-left: 30px !important;
     }
     
-    /* Style untuk ikon kalendar pada dropdown doktor */
+    /* STYLE UNTUK ICON KALENDAR TOGGLE */
     .calendar-toggle-btn {
       position: absolute;
-      right: 12px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
-      background: transparent;
+      background: #10b981;
+      color: white;
       border: none;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      color: #64748b;
-      transition: color 0.2s ease;
       z-index: 20;
+      transition: all 0.2s ease;
     }
     
     .calendar-toggle-btn:hover {
-      color: #10b981;
+      background: #059669;
+      transform: translateY(-50%) scale(1.05);
     }
     
-    .doctor-select-wrapper {
+    .doctor-select-container {
       position: relative;
     }
   </style>
@@ -792,13 +799,14 @@
                         <option value="">Pilih servis...</option>
                       </select>
                     </div>
-                    <div class="doctor-select-wrapper">
+                    <div class="doctor-select-container relative">
                       <label class="block text-sm md:text-base mb-2 text-slate-700">Doktor</label>
                       <select id="doctorSelect"
                               class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
                         <option value="">Pilih doktor...</option>
                       </select>
-                      <button type="button" id="calendarToggleBtn" class="calendar-toggle-btn">
+                      <!-- BUTANG TOGGLE KALENDAR BARU -->
+                      <button type="button" id="calendarToggleBtn" class="calendar-toggle-btn" title="Toggle Jadual Doktor">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -979,7 +987,7 @@
                           <option value="">Pilih servis...</option>
                         </select>
                       </div>
-                      <div class="doctor-select-wrapper">
+                      <div class="doctor-select-container relative">
                         <label class="block text-sm mb-2 text-slate-700">Doktor</label>
                         <select id="doctorSelectMobile"
                                 class="w-full rounded-lg bg-white border border-slate-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-sm">
@@ -1552,6 +1560,9 @@
     let currentAvailabilityView = 'list';
     let currentSelectedDoctorId = null;
     let currentSelectedDateForTime = null;
+    
+    // State baru untuk toggle jadual
+    let isAvailabilityTableOpen = false;
 
     // State untuk kalendar doktor
     let currentCalendarMonth = new Date().getMonth();
@@ -1561,9 +1572,6 @@
     let selectedDays = new Set();
     let fixedAppointmentsCache = [];
     let doctorFixedTimes = new Map(); // Untuk menyimpan masa tetap doktor
-    
-    // State untuk toggle jadual terapung
-    let isAvailabilityTableVisible = false;
 
     // Elements
     const tabLogin = document.getElementById("tab-login");
@@ -1612,7 +1620,7 @@
     const staffFixedAppointmentBtn = document.getElementById("staffFixedAppointmentBtn");
     const staffFixedAppointmentBtnMobile = document.getElementById("staffFixedAppointmentBtnMobile");
     
-    // Ikon kalendar untuk toggle jadual terapung
+    // BUTANG TOGGLE KALENDAR BARU
     const calendarToggleBtn = document.getElementById("calendarToggleBtn");
 
     // Staff form elements (Mobile)
@@ -1716,48 +1724,19 @@
     const fixedAppointmentDoctorSelect = document.getElementById("fixedAppointmentDoctorSelect");
 
     // ==============================
-    // FUNGSI UTILITI BARU: TIMEZONE MALAYSIA (UTC+8)
+    // FUNGSI BARU: FORMAT TARIKH DENGAN TIMEZONE MALAYSIA
     // ==============================
-    function getMalaysiaDate(dateStr) {
-      if (!dateStr) return null;
-      
-      // Parse date string (YYYY-MM-DD format)
-      const date = new Date(dateStr);
-      
-      // Adjust for Malaysia timezone (UTC+8)
-      const malaysiaOffset = 8 * 60; // 8 hours in minutes
-      const localOffset = date.getTimezoneOffset();
-      const offsetDiff = malaysiaOffset + localOffset;
-      
-      // Create new date with Malaysia timezone adjustment
-      const malaysiaDate = new Date(date.getTime() + offsetDiff * 60000);
-      
-      // Format back to YYYY-MM-DD
-      const year = malaysiaDate.getFullYear();
-      const month = String(malaysiaDate.getMonth() + 1).padStart(2, '0');
-      const day = String(malaysiaDate.getDate()).padStart(2, '0');
-      
-      return `${year}-${month}-${day}`;
+    function getDateInMalaysiaTimezone(date) {
+      // Dapatkan tarikh dalam timezone Malaysia (UTC+8)
+      const malaysiaDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
+      return malaysiaDate.toISOString().split('T')[0];
     }
 
-    function getCurrentMalaysiaDate() {
-      const now = new Date();
-      const malaysiaOffset = 8 * 60; // UTC+8 in minutes
-      const localOffset = now.getTimezoneOffset();
-      const offsetDiff = malaysiaOffset + localOffset;
-      
-      const malaysiaDate = new Date(now.getTime() + offsetDiff * 60000);
-      const year = malaysiaDate.getFullYear();
-      const month = String(malaysiaDate.getMonth() + 1).padStart(2, '0');
-      const day = String(malaysiaDate.getDate()).padStart(2, '0');
-      
-      return `${year}-${month}-${day}`;
-    }
-
-    function normalizeDateForStorage(dateStr) {
-      // Fungsi untuk normalisasi tarikh ke format Malaysia (UTC+8)
-      // Pastikan tarikh disimpan sama seperti yang dipilih oleh pengguna
-      return getMalaysiaDate(dateStr) || dateStr;
+    function parseDateStringToMalaysiaDate(dateStr) {
+      // Parse tarikh string dan pastikan dalam format Malaysia
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      return getDateInMalaysiaTimezone(date);
     }
 
     // ==============================
@@ -1779,28 +1758,28 @@
       chineseNewYear2.setDate(chineseNewYear2.getDate() + 1);
       
       holidays.push(
-        { date: getMalaysiaDate(chineseNewYear1.toISOString().split('T')[0]), name: 'Tahun Baru Cina' },
-        { date: getMalaysiaDate(chineseNewYear2.toISOString().split('T')[0]), name: 'Tahun Baru Cina (Hari 2)' }
+        { date: chineseNewYear1.toISOString().split('T')[0], name: 'Tahun Baru Cina' },
+        { date: chineseNewYear2.toISOString().split('T')[0], name: 'Tahun Baru Cina (Hari 2)' }
       );
       
       // Hari Raya Aidilfitri
       const aidilfitri1 = getIslamicHolidayDate(year, 'aidilfitri', 1);
       const aidilfitri2 = getIslamicHolidayDate(year, 'aidilfitri', 2);
       
-      if (aidilfitri1) holidays.push({ date: getMalaysiaDate(aidilfitri1), name: 'Hari Raya Aidilfitri' });
-      if (aidilfitri2) holidays.push({ date: getMalaysiaDate(aidilfitri2), name: 'Hari Raya Aidilfitri (Hari 2)' });
+      if (aidilfitri1) holidays.push({ date: aidilfitri1, name: 'Hari Raya Aidilfitri' });
+      if (aidilfitri2) holidays.push({ date: aidilfitri2, name: 'Hari Raya Aidilfitri (Hari 2)' });
       
       // Hari Wesak
       const wesakDate = getWesakDate(year);
-      if (wesakDate) holidays.push({ date: getMalaysiaDate(wesakDate), name: 'Hari Wesak' });
+      if (wesakDate) holidays.push({ date: wesakDate, name: 'Hari Wesak' });
       
       // Hari Raya Haji
       const hajiDate = getIslamicHolidayDate(year, 'haji', 1);
-      if (hajiDate) holidays.push({ date: getMalaysiaDate(hajiDate), name: 'Hari Raya Haji' });
+      if (hajiDate) holidays.push({ date: hajiDate, name: 'Hari Raya Haji' });
       
       // Deepavali
       const deepavaliDate = getDeepavaliDate(year);
-      if (deepavaliDate) holidays.push({ date: getMalaysiaDate(deepavaliDate), name: 'Deepavali' });
+      if (deepavaliDate) holidays.push({ date: deepavaliDate, name: 'Deepavali' });
       
       // Cuti Negeri Terengganu
       const terengganuHolidays = getTerengganuHolidays(year);
@@ -1833,8 +1812,8 @@
     
     function getTerengganuHolidays(year) {
       return [
-        { date: getMalaysiaDate(year + "-03-04"), name: 'Hari Ulang Tahun Keputeraan Sultan Terengganu' },
-        { date: getMalaysiaDate(year + "-07-20"), name: 'Hari Keputeraan Sultan Terengganu' },
+        { date: year + "-03-04", name: 'Hari Ulang Tahun Keputeraan Sultan Terengganu' },
+        { date: year + "-07-20", name: 'Hari Keputeraan Sultan Terengganu' },
       ];
     }
 
@@ -1877,11 +1856,15 @@
     function formatDate(dateStr) {
       if (!dateStr) return "-";
       try {
-        // Gunakan fungsi normalize untuk memastikan konsistensi
-        const normalizedDate = normalizeDateForStorage(dateStr);
-        const d = new Date(normalizedDate);
+        // Gunakan timezone Malaysia untuk format tarikh
+        const d = new Date(dateStr + 'T00:00:00+08:00'); // Timezone Malaysia UTC+8
         if (isNaN(d.getTime())) return dateStr;
-        return d.toISOString().slice(0, 10);
+        return d.toLocaleDateString('ms-MY', {
+          timeZone: 'Asia/Kuala_Lumpur',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
       } catch {
         return dateStr;
       }
@@ -1893,6 +1876,7 @@
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString('ms-MY', {
+          timeZone: 'Asia/Kuala_Lumpur',
           year: 'numeric',
           month: '2-digit',
           day: '2-digit',
@@ -2008,6 +1992,23 @@
     }
 
     // ==============================
+    // FUNGSI BARU: TOGGLE JADUAL TERAPUNG
+    // ==============================
+    function toggleAvailabilityTable() {
+      if (isAvailabilityTableOpen) {
+        hideAvailabilityTable();
+      } else {
+        if (doctorSelect.value) {
+          const doctorId = doctorSelect.value;
+          const doctorName = doctorsCache.find(d => d.id === doctorId)?.full_name || '';
+          showAvailabilityTable(doctorId, doctorName);
+        } else {
+          alert('Sila pilih doktor terlebih dahulu.');
+        }
+      }
+    }
+
+    // ==============================
     // FUNGSI BARU: LOAD MASA TETAP DOKTOR
     // ==============================
     async function loadDoctorFixedTime(doctorId) {
@@ -2050,15 +2051,12 @@
     async function updateTimeDropdownWithDoctorRange(doctorId, dateStr) {
       if (!doctorId || !dateStr) return;
       
-      // Normalize date untuk consistency
-      const normalizedDate = normalizeDateForStorage(dateStr);
-      
       // First check if there's availability data for this specific date
       const { data: availabilityData, error: availabilityError } = await db
         .from('doctor_availability')
         .select('start_time, end_time')
         .eq('doctor_id', doctorId)
-        .eq('date', normalizedDate)
+        .eq('date', dateStr)
         .single();
       
       if (!availabilityError && availabilityData && availabilityData.start_time && availabilityData.end_time) {
@@ -2099,7 +2097,7 @@
         };
       } else {
         // Tiada availability data untuk tarikh spesifik, check fixed time
-        const dateObj = new Date(normalizedDate);
+        const dateObj = new Date(dateStr + 'T00:00:00+08:00'); // Timezone Malaysia
         const dayOfWeek = dateObj.getDay(); // 0-6
         
         // Load fixed time untuk doktor ini
@@ -2209,7 +2207,7 @@
     }
 
     // ==============================
-    // FEATURE AVAILABILITY DOKTOR DENGAN MASA (DIPERBAIKI DENGAN TIMEZONE FIX)
+    // FEATURE AVAILABILITY DOKTOR DENGAN MASA (DIPERBAIKI)
     // ==============================
     function openAvailabilityCalendar() {
       if (!currentProfile || currentProfile.role !== 'doctor') return;
@@ -2239,7 +2237,7 @@
         .from('doctor_availability')
         .select('date, start_time, end_time, duration')
         .eq('doctor_id', currentProfile.id)
-        .gte('date', getCurrentMalaysiaDate());
+        .gte('date', new Date().toISOString().split('T')[0]);
       
       if (error) {
         console.error('Error loading availability', error);
@@ -2248,11 +2246,9 @@
       
       if (data) {
         data.forEach(item => {
-          // Normalize date untuk consistency
-          const normalizedDate = normalizeDateForStorage(item.date);
-          selectedDates.add(normalizedDate);
+          selectedDates.add(item.date);
           if (item.start_time && item.end_time) {
-            dateTimeMap.set(normalizedDate, {
+            dateTimeMap.set(item.date, {
               start_time: item.start_time,
               end_time: item.end_time,
               duration: item.duration || 60
@@ -2270,11 +2266,10 @@
     function openTimeSelectionModal(dateStr) {
       if (!dateStr) return;
       
-      // Normalize date untuk consistency
-      const normalizedDate = normalizeDateForStorage(dateStr);
-      currentSelectedDateForTime = normalizedDate;
-      const dateObj = new Date(normalizedDate);
+      currentSelectedDateForTime = dateStr;
+      const dateObj = new Date(dateStr + 'T00:00:00+08:00'); // Timezone Malaysia
       const dateFormatted = dateObj.toLocaleDateString('ms-MY', {
+        timeZone: 'Asia/Kuala_Lumpur',
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -2300,7 +2295,7 @@
         timeSlotEl.dataset.time = slot;
         
         // Check if this time is within existing time range for this date
-        const existingTime = dateTimeMap.get(normalizedDate);
+        const existingTime = dateTimeMap.get(dateStr);
         if (existingTime && existingTime.start_time === slot) {
           timeSlotEl.classList.add('selected');
         }
@@ -2322,7 +2317,7 @@
       });
       
       // Set custom time inputs if already have data
-      const existingTime = dateTimeMap.get(normalizedDate);
+      const existingTime = dateTimeMap.get(dateStr);
       if (existingTime) {
         customStartTime.value = existingTime.start_time;
         customEndTime.value = existingTime.end_time;
@@ -2365,7 +2360,7 @@
       
       const duration = endTotal - startTotal;
       
-      // Save to map dengan date yang sudah dinormalisasi
+      // Save to map
       dateTimeMap.set(currentSelectedDateForTime, {
         start_time: startTime,
         end_time: endTime,
@@ -2404,7 +2399,6 @@
           <div class="text-sm text-slate-500">Klik pada tarikh untuk pilih/buang</div>
           <div class="text-xs text-slate-500 mt-1">Klik 2 kali untuk tetapkan masa (bebas pilih waktu)</div>
           <div class="text-xs text-rose-500 mt-1">🟥 = Cuti Umum</div>
-          <div class="text-xs text-emerald-500 mt-1">Tarikh dipilih akan disimpan sebagai tarikh Malaysia (UTC+8)</div>
         </div>
         <button id="nextMonth" class="p-2 rounded-lg hover:bg-slate-100">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2428,8 +2422,10 @@
       
       const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
       const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
-      const today = new Date();
-      const todayMalaysia = getCurrentMalaysiaDate();
+      
+      // Dapatkan tarikh hari ini dalam timezone Malaysia
+      const now = new Date();
+      const todayMalaysia = getDateInMalaysiaTimezone(now);
       
       for (let i = 0; i < firstDay.getDay(); i++) {
         const emptyCell = document.createElement('div');
@@ -2440,22 +2436,22 @@
       
       for (let day = 1; day <= lastDay.getDate(); day++) {
         const date = new Date(currentCalendarYear, currentCalendarMonth, day);
-        const dateStr = date.toISOString().split('T')[0];
-        const normalizedDate = normalizeDateForStorage(dateStr);
-        const dateObj = new Date(normalizedDate);
+        // Gunakan timezone Malaysia untuk tarikh
+        const dateStr = getDateInMalaysiaTimezone(date);
+        const dateObj = new Date(dateStr + 'T00:00:00+08:00');
         
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day';
         dayElement.textContent = day;
         
-        // Check if today - menggunakan Malaysia date
-        if (normalizedDate === todayMalaysia) {
+        // Check if today - bandingkan dengan tarikh Malaysia
+        if (dateStr === todayMalaysia) {
           dayElement.classList.add('border-2', 'border-emerald-500', 'font-bold');
           dayElement.title = 'Hari ini';
         }
         
         // Check if holiday
-        const holiday = holidays.find(h => h.date === normalizedDate);
+        const holiday = holidays.find(h => h.date === dateStr);
         if (holiday) {
           dayElement.classList.add('holiday');
           dayElement.dataset.holiday = holiday.name;
@@ -2465,7 +2461,7 @@
           holidayIndicator.className = 'holiday-indicator';
           dayElement.appendChild(holidayIndicator);
           
-          if (selectedDates.has(normalizedDate)) {
+          if (selectedDates.has(dateStr)) {
             dayElement.classList.add('selected');
             dayElement.title = holiday.name + ' - Cuti (sudah dipilih)';
           }
@@ -2473,19 +2469,15 @@
           dayElement.title = 'Klik untuk pilih tarikh available. Klik 2 kali untuk tetapkan masa (bebas pilih waktu).';
         }
         
-        // Check if past date (gunakan Malaysia date untuk perbandingan)
-        const comparisonDate = new Date(normalizedDate);
-        const todayComparison = new Date(todayMalaysia);
-        comparisonDate.setHours(0,0,0,0);
-        todayComparison.setHours(0,0,0,0);
-        
-        if (comparisonDate < todayComparison && normalizedDate !== todayMalaysia) {
+        // Check if past date - bandingkan dengan tarikh Malaysia
+        const todayObj = new Date(todayMalaysia + 'T00:00:00+08:00');
+        if (dateObj < todayObj && dateStr !== todayMalaysia) {
           dayElement.classList.add('disabled');
           dayElement.title = 'Tarikh telah berlalu';
         }
         
         // Check if selected
-        if (selectedDates.has(normalizedDate)) {
+        if (selectedDates.has(dateStr)) {
           dayElement.classList.add('selected');
           if (holiday) {
             dayElement.title = holiday.name + ' - Cuti (sudah dipilih)';
@@ -2494,7 +2486,7 @@
           }
           
           // Add time badge if time is set
-          const timeData = dateTimeMap.get(normalizedDate);
+          const timeData = dateTimeMap.get(dateStr);
           if (timeData) {
             const timeBadge = document.createElement('div');
             timeBadge.className = 'time-badge';
@@ -2504,33 +2496,28 @@
           }
         } else if (holiday) {
           dayElement.title = holiday.name + ' - Cuti (boleh dipilih)';
-        } else if (normalizedDate === todayMalaysia) {
+        } else if (dateStr === todayMalaysia) {
           dayElement.title = 'Hari ini (boleh dipilih)';
         }
         
         // Add click events
-        const comparisonDate2 = new Date(normalizedDate);
-        const todayComparison2 = new Date(todayMalaysia);
-        comparisonDate2.setHours(0,0,0,0);
-        todayComparison2.setHours(0,0,0,0);
-        
-        if (comparisonDate2 >= todayComparison2) {
+        if (dateObj >= todayObj || dateStr === todayMalaysia) {
           // Single click to select/unselect
           dayElement.addEventListener('click', (e) => {
             if (e.detail === 1) {
-              toggleDateSelection(normalizedDate, dayElement);
+              toggleDateSelection(dateStr, dayElement);
             }
           });
           
           // Double click to set time (DOKTOR BEBAS PILIH WAKTU)
           dayElement.addEventListener('dblclick', () => {
-            if (!selectedDates.has(normalizedDate)) {
+            if (!selectedDates.has(dateStr)) {
               // First select the date
-              selectedDates.add(normalizedDate);
+              selectedDates.add(dateStr);
               dayElement.classList.add('selected');
               saveAvailability.classList.remove('hidden');
             }
-            openTimeSelectionModal(normalizedDate);
+            openTimeSelectionModal(dateStr);
           });
         } else {
           dayElement.style.cursor = 'not-allowed';
@@ -2607,9 +2594,8 @@
     }
 
     function getDayOfWeekNumber(dateStr) {
-      const [y, m, d] = dateStr.split("-").map(Number);
-      const localDate = new Date(y, m - 1, d);
-      return localDate.getDay();
+      const date = new Date(dateStr + 'T00:00:00+08:00'); // Timezone Malaysia
+      return date.getDay();
     }
 
     async function saveAvailabilityDates() {
@@ -2624,12 +2610,12 @@
 
         if (delErr) throw delErr;
 
-        // Prepare data with times - PASTIKAN tarikh dinormalisasi
+        // Prepare data with times - GUNA TARIKH YANG DIPILIH (tanpa conversion timezone)
         const availabilityData = Array.from(selectedDates).map((date) => {
           const timeData = dateTimeMap.get(date);
           return {
             doctor_id: currentProfile.id,
-            date: date, // Gunakan tarikh yang sudah dinormalisasi
+            date: date, // Simpan tarikh seperti yang dipilih (YYYY-MM-DD)
             day_of_week: getDayOfWeekNumber(date),
             start_time: timeData ? timeData.start_time : null,
             end_time: timeData ? timeData.end_time : null,
@@ -2644,7 +2630,7 @@
 
         if (insErr) throw insErr;
 
-        alert("Tarikh available berjaya disimpan! (Disimpan sebagai tarikh Malaysia UTC+8)");
+        alert("Tarikh available berjaya disimpan!");
         closeAvailabilityCalendar();
       } catch (error) {
         console.error("Error saving availability", error);
@@ -2898,27 +2884,14 @@
     }
 
     // ==============================
-    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS - PERBAIKI DENGAN TOGGLE BUTTON
+    // FEATURE TABLE TERAPUNG STAFF YANG LEBIH KEMAS - DIPERBAIKI DENGAN TOGGLE
     // ==============================
-    function toggleAvailabilityTable() {
-      if (!currentSelectedDoctorId || !doctorsCache.length) {
-        alert('Sila pilih doktor terlebih dahulu.');
-        return;
-      }
-      
-      if (isAvailabilityTableVisible) {
-        hideAvailabilityTable();
-      } else {
-        showAvailabilityTable(currentSelectedDoctorId);
-      }
-    }
-
-    function showAvailabilityTable(doctorId, doctorName = null) {
+    function showAvailabilityTable(doctorId, doctorName) {
       if (!doctorId) return;
       
       currentSelectedDoctorId = doctorId;
-      const doctorObj = doctorsCache.find(d => d.id === doctorId);
-      tableDoctorName.textContent = doctorObj?.full_name || doctorName || 'Doktor';
+      tableDoctorName.textContent = doctorName;
+      isAvailabilityTableOpen = true;
       
       // Tampilkan di kanan tengah dengan animasi
       availabilityTableContainer.style.display = 'block';
@@ -2926,37 +2899,34 @@
         availabilityTableContainer.style.opacity = '1';
       }, 10);
       
-      isAvailabilityTableVisible = true;
-      
-      // Update ikon kalendar
+      // Update ikon toggle button
       if (calendarToggleBtn) {
         calendarToggleBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         `;
-        calendarToggleBtn.title = "Tutup jadual tarikh available";
+        calendarToggleBtn.title = "Tutup Jadual Doktor";
       }
       
       loadDoctorAvailabilityForStaff(doctorId);
     }
 
     function hideAvailabilityTable() {
+      isAvailabilityTableOpen = false;
       availabilityTableContainer.style.opacity = '0';
       setTimeout(() => {
         availabilityTableContainer.style.display = 'none';
       }, 200);
       
-      isAvailabilityTableVisible = false;
-      
-      // Update ikon kalendar
+      // Update ikon toggle button
       if (calendarToggleBtn) {
         calendarToggleBtn.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         `;
-        calendarToggleBtn.title = "Buka jadual tarikh available";
+        calendarToggleBtn.title = "Buka Jadual Doktor";
       }
     }
 
@@ -2967,7 +2937,7 @@
         .from('doctor_availability')
         .select('date, start_time, end_time')
         .eq('doctor_id', doctorId)
-        .gte('date', getCurrentMalaysiaDate())
+        .gte('date', new Date().toISOString().split('T')[0])
         .order('date', { ascending: true });
       
       if (error) {
@@ -3002,10 +2972,9 @@
       let html = '<div class="divide-y divide-slate-100">';
       
       availabilityData.forEach(item => {
-        // Normalize date untuk consistency
-        const normalizedDate = normalizeDateForStorage(item.date);
-        const date = new Date(normalizedDate);
+        const date = new Date(item.date + 'T00:00:00+08:00'); // Timezone Malaysia
         const dateStr = date.toLocaleDateString('ms-MY', {
+          timeZone: 'Asia/Kuala_Lumpur',
           weekday: 'long',
           year: 'numeric',
           month: 'long',
@@ -3020,11 +2989,11 @@
           <div class="availability-date-item">
             <div class="flex-1">
               <div class="font-bold text-slate-800 text-lg">${dateStr}</div>
-              <div class="text-sm text-slate-500">${formatDate(normalizedDate)}</div>
+              <div class="text-sm text-slate-500">${formatDate(item.date)}</div>
               ${timeInfo}
             </div>
             <button class="select-date-btn px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
-                    data-date="${normalizedDate}"
+                    data-date="${item.date}"
                     data-start-time="${item.start_time || ''}"
                     data-end-time="${item.end_time || ''}">
               Pilih Tarikh
@@ -3070,29 +3039,27 @@
     }
 
     function renderAvailabilityCalendar(availabilityData) {
+      // Dapatkan tarikh hari ini dalam timezone Malaysia
       const today = new Date();
-      const currentMonth = today.getMonth();
-      const currentYear = today.getFullYear();
+      const todayMalaysia = getDateInMalaysiaTimezone(today);
+      const todayObj = new Date(todayMalaysia + 'T00:00:00+08:00');
+      
+      const currentMonth = todayObj.getMonth();
+      const currentYear = todayObj.getFullYear();
       
       const monthNames = [
         'Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun',
         'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'
       ];
       
-      // Normalize dates dalam availability data
-      const normalizedAvailabilityData = availabilityData.map(item => ({
-        ...item,
-        normalizedDate: normalizeDateForStorage(item.date)
-      }));
-      
-      const availableDates = normalizedAvailabilityData
+      const availableDates = availabilityData
         .filter(item => {
-          const date = new Date(item.normalizedDate);
+          const date = new Date(item.date + 'T00:00:00+08:00');
           return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
         })
         .map(item => ({
-          day: new Date(item.normalizedDate).getDate(),
-          date: item.normalizedDate,
+          day: new Date(item.date + 'T00:00:00+08:00').getDate(),
+          date: item.date,
           time: item.start_time ? `${formatTime(item.start_time)}-${formatTime(item.end_time)}` : null,
           start_time: item.start_time,
           end_time: item.end_time
@@ -3122,9 +3089,8 @@
       
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(currentYear, currentMonth, day);
-        const dateStr = date.toISOString().split('T')[0];
-        const normalizedDate = normalizeDateForStorage(dateStr);
-        const isToday = normalizedDate === getCurrentMalaysiaDate();
+        const dateStr = getDateInMalaysiaTimezone(date);
+        const isToday = dateStr === todayMalaysia;
         const availableDate = availableDates.find(d => d.day === day);
         const isAvailable = !!availableDate;
         
@@ -3144,8 +3110,9 @@
       if (availableDates.length > 0) {
         html += '<div class="space-y-3">';
         availableDates.forEach(item => {
-          const date = new Date(item.date);
+          const date = new Date(item.date + 'T00:00:00+08:00');
           const dateStr = date.toLocaleDateString('ms-MY', {
+            timeZone: 'Asia/Kuala_Lumpur',
             weekday: 'long',
             day: 'numeric',
             month: 'short'
@@ -3276,7 +3243,7 @@
             table: 'doctor_availability'
           },
           async (payload) => {
-            if (currentSelectedDoctorId) {
+            if (currentSelectedDoctorId && isAvailabilityTableOpen) {
               await loadDoctorAvailabilityForStaff(currentSelectedDoctorId);
             }
           }
@@ -3428,15 +3395,9 @@
           const doctorName = doctorsCache.find(d => d.id === doctorId)?.full_name || '';
           
           if (doctorId) {
-            currentSelectedDoctorId = doctorId;
-            
-            // Automatically show availability table when doctor is selected
-            if (!isAvailabilityTableVisible) {
+            // Jika jadual sedang terbuka, update jadual
+            if (isAvailabilityTableOpen) {
               showAvailabilityTable(doctorId, doctorName);
-            } else {
-              // Update existing table
-              tableDoctorName.textContent = doctorName;
-              loadDoctorAvailabilityForStaff(doctorId);
             }
             
             // Update time dropdown jika tarikh telah dipilih
@@ -3444,7 +3405,7 @@
               updateTimeDropdownWithDoctorRange(doctorId, requestedDate.value);
             }
           } else {
-            currentSelectedDoctorId = null;
+            // Jika doktor dipilih kosong, tutup jadual
             hideAvailabilityTable();
           }
         });
@@ -3771,9 +3732,6 @@
         // Format nombor telefon - tambah '6' di hadapan
         let phoneNumber = patientPhone.value.trim();
         phoneNumber = formatPhoneNumber(phoneNumber);
-        
-        // Normalize date untuk consistency
-        const requestedDateValue = normalizeDateForStorage(requestedDate.value);
 
         const payload = {
           service_id: serviceId,
@@ -3782,7 +3740,7 @@
           patient_ic: patientIC.value.trim(),
           patient_phone: phoneNumber, // Format dengan '6'
           complaint: complaint.value.trim() || null,
-          requested_date: requestedDateValue, // Gunakan tarikh yang dinormalisasi
+          requested_date: requestedDate.value,
           appointment_time: appointmentTimeValue,
           appointment_duration: appointmentDurationValue,
           status: "pending"
@@ -3889,9 +3847,6 @@
         // Format nombor telefon - tambah '6' di hadapan
         let phoneNumber = patientPhoneMobile.value.trim();
         phoneNumber = formatPhoneNumber(phoneNumber);
-        
-        // Normalize date untuk consistency
-        const requestedDateValue = normalizeDateForStorage(requestedDateMobile.value);
 
         const payload = {
           service_id: serviceId,
@@ -3900,7 +3855,7 @@
           patient_ic: patientICMobile.value.trim(),
           patient_phone: phoneNumber, // Format dengan '6'
           complaint: complaintMobile.value.trim() || null,
-          requested_date: requestedDateValue, // Gunakan tarikh yang dinormalisasi
+          requested_date: requestedDateMobile.value,
           appointment_time: appointmentTimeValue,
           appointment_duration: appointmentDurationValue,
           status: "pending"
@@ -4107,11 +4062,12 @@ async function refreshTodayActions() {
     return;
   }
 
-  // Dapatkan tarikh HARI INI dalam format Malaysia (UTC+8)
-  const todayMalaysia = getCurrentMalaysiaDate();
+  // Dapatkan tarikh HARI INI dalam format YYYY-MM-DD (timezone Malaysia)
+  const today = new Date();
+  const todayMalaysia = getDateInMalaysiaTimezone(today);
   
   console.log("=== DEBUG TODAY ACTIONS ===");
-  console.log("Today (Malaysia):", todayMalaysia);
+  console.log("Today (ISO Malaysia):", todayMalaysia);
   console.log("Total appointments:", data.length);
 
   const pendingList = data.filter(a => a.status === "pending");
@@ -4129,7 +4085,7 @@ async function refreshTodayActions() {
     
     // Convert approved_at ke tarikh Malaysia
     const approvedDate = new Date(a.approved_at);
-    const approvedDateMalaysia = normalizeDateForStorage(approvedDate.toISOString().split('T')[0]);
+    const approvedDateMalaysia = getDateInMalaysiaTimezone(approvedDate);
     
     console.log(`Appointment ${a.id}: 
       - status: ${a.status}
@@ -4846,15 +4802,12 @@ async function refreshTodayActions() {
     }
 
     async function handleStaffChooseNewDate(appointment, chosenDate, chosenTime) {
-      // Normalize date untuk consistency
-      const normalizedDate = normalizeDateForStorage(chosenDate);
-      
       // Update appointment dengan tarikh dan masa baharu
       const { error } = await db
         .from("appointments")
         .update({
           status: "pending",
-          requested_date: normalizedDate,
+          requested_date: chosenDate,
           appointment_time: chosenTime || "09:00", // Gunakan masa dari cadangan doktor
           doctor_selected_date: null
         })
@@ -4878,7 +4831,7 @@ async function refreshTodayActions() {
         `Servis: ${serviceName}`,
         `Nama pesakit: ${appointment.patient_name}`,
         `Complaint: ${appointment.complaint || "Tiada complaint dinyatakan"}`,
-        `Tarikh baharu dipilih pesakit: ${formatDate(normalizedDate)}`,
+        `Tarikh baharu dipilih pesakit: ${formatDate(chosenDate)}`,
         `${timeInfo}`,
         "",
         "Sila semak & sahkan semula dalam sistem.",
@@ -5434,13 +5387,10 @@ approveWhatsappBtn.addEventListener("click", async () => {
               return;
             }
             
-            // Normalize date untuk consistency
-            const normalizedFirstDate = normalizeDateForStorage(firstDate);
-            
             // Simpan tarikh dan masa cadangan
             const altDatesWithTimes = [];
             altDatesWithTimes.push({
-              date: normalizedFirstDate,
+              date: firstDate,
               time: firstTime
             });
             
@@ -5456,9 +5406,8 @@ approveWhatsappBtn.addEventListener("click", async () => {
             
             // Jika ada kedua-dua tarikh dan masa kedua
             if (secondDate && secondTime) {
-              const normalizedSecondDate = normalizeDateForStorage(secondDate);
               altDatesWithTimes.push({
-                date: normalizedSecondDate,
+                date: secondDate,
                 time: secondTime
               });
             }
@@ -5502,13 +5451,10 @@ approveWhatsappBtn.addEventListener("click", async () => {
               return;
             }
             
-            // Normalize date untuk consistency
-            const normalizedFirstDate = normalizeDateForStorage(firstDate);
-            
             // Simpan tarikh dan masa cadangan
             const altDatesWithTimes = [];
             altDatesWithTimes.push({
-              date: normalizedFirstDate,
+              date: firstDate,
               time: firstTime
             });
             
@@ -5524,9 +5470,8 @@ approveWhatsappBtn.addEventListener("click", async () => {
             
             // Jika ada kedua-dua tarikh dan masa kedua
             if (secondDate && secondTime) {
-              const normalizedSecondDate = normalizeDateForStorage(secondDate);
               altDatesWithTimes.push({
-                date: normalizedSecondDate,
+                date: secondDate,
                 time: secondTime
               });
             }
@@ -5804,25 +5749,25 @@ approveWhatsappBtn.addEventListener("click", async () => {
       });
     });
     
-    // Toggle button untuk jadual terapung
-    if (calendarToggleBtn) {
-      calendarToggleBtn.addEventListener('click', toggleAvailabilityTable);
-    }
-    
     // Close availability table
     if (closeAvailabilityTable) {
       closeAvailabilityTable.addEventListener('click', hideAvailabilityTable);
     }
     
+    // Toggle availability table dengan ikon kalendar
+    if (calendarToggleBtn) {
+      calendarToggleBtn.addEventListener('click', toggleAvailabilityTable);
+    }
+    
     // Close availability table ketika klik di luar (kecuali klik pada ikon kalendar)
     document.addEventListener('click', (e) => {
       if (availabilityTableContainer && 
-          isAvailabilityTableVisible && 
           !availabilityTableContainer.contains(e.target) && 
           e.target !== calendarToggleBtn && 
           !calendarToggleBtn.contains(e.target) &&
-          e.target !== closeAvailabilityTable &&
-          e.target !== doctorSelect) {
+          e.target !== doctorSelect && 
+          !doctorSelect.contains(e.target) &&
+          e.target !== closeAvailabilityTable) {
         hideAvailabilityTable();
       }
     });
@@ -5834,6 +5779,9 @@ approveWhatsappBtn.addEventListener("click", async () => {
       }
       if (fixedAppointmentModal.style.display === 'flex' && e.target === fixedAppointmentModal) {
         closeFixedAppointmentModal();
+      }
+      if (availabilityTableContainer.style.display === 'block' && e.target === availabilityTableContainer) {
+        hideAvailabilityTable();
       }
     });
 
@@ -5883,6 +5831,11 @@ approveWhatsappBtn.addEventListener("click", async () => {
       if (availabilityTableContainer) {
         availabilityTableContainer.style.opacity = '0';
         availabilityTableContainer.style.transition = 'opacity 0.2s ease';
+      }
+      
+      // Set initial state untuk toggle button
+      if (calendarToggleBtn) {
+        calendarToggleBtn.title = "Buka Jadual Doktor";
       }
     });
   </script>
