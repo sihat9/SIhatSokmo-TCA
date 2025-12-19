@@ -538,6 +538,26 @@
     .modal-overlay.show {
       display: block;
     }
+    
+    /* STYLE KHAS UNTUK COMPLAINT SEPERTI DALAM GAMBAR */
+    .complaint-box {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+    
+    .complaint-label {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body class="text-slate-900">
@@ -4056,7 +4076,7 @@
       if (!currentProfile || currentProfile.role !== "staff") return;
     const { data, error } = await db
   .from("appointments")
-  .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at, approved_at") // TAMBAH approved_at
+  .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, complaint, created_at, approved_at") // TAMBAH complaint dan approved_at
   .order("created_at", { ascending: false })
   .limit(50);
 
@@ -4086,10 +4106,10 @@
 async function refreshTodayActions() {
   if (!currentProfile || currentProfile.role !== "staff") return;
   
-  // TAMBAH approved_at DALAM QUERY
+  // TAMBAH complaint DALAM QUERY
   const { data, error } = await db
     .from("appointments")
-    .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, created_at, approved_at")
+    .select("id, patient_name, patient_ic, requested_date, appointment_time, appointment_duration, status, service_id, doctor_id, doctor_alt_date1, doctor_alt_date2, doctor_selected_date, doctor_alt_time1, doctor_alt_time2, patient_phone, complaint, created_at, approved_at")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -4102,10 +4122,6 @@ async function refreshTodayActions() {
   const today = new Date();
   const todayMalaysia = getDateInMalaysiaTimezone(today);
   
-  console.log("=== DEBUG TODAY ACTIONS ===");
-  console.log("Today (ISO Malaysia):", todayMalaysia);
-  console.log("Total appointments:", data.length);
-
   const pendingList = data.filter(a => a.status === "pending");
   const rejectedList = data.filter(a => a.status === "rejected");
   
@@ -4115,7 +4131,6 @@ async function refreshTodayActions() {
     
     // Jika tiada approved_at, skip
     if (!a.approved_at) {
-      console.log(`Appointment ${a.id}: No approved_at date`);
       return false;
     }
     
@@ -4123,21 +4138,8 @@ async function refreshTodayActions() {
     const approvedDate = new Date(a.approved_at);
     const approvedDateMalaysia = getDateInMalaysiaTimezone(approvedDate);
     
-    console.log(`Appointment ${a.id}: 
-      - status: ${a.status}
-      - approved_at: ${a.approved_at}
-      - approved_date_malaysia: ${approvedDateMalaysia}
-      - today_malaysia: ${todayMalaysia}
-      - match: ${approvedDateMalaysia === todayMalaysia}`);
-    
     return approvedDateMalaysia === todayMalaysia;
   });
-
-  console.log(`Results: 
-    - Pending: ${pendingList.length}
-    - Rejected: ${rejectedList.length}
-    - Approved Today: ${approvedToday.length}`);
-  console.log("=== END DEBUG ===");
 
   // Update UI
   todayPendingCountEl.textContent = pendingList.length;
@@ -4153,8 +4155,6 @@ async function refreshTodayActions() {
   }
 
   if (approvedToday.length) {
-    console.log("Approved today appointments found:", approvedToday.length);
-    
     const approvedByService = {};
     approvedToday.forEach(a => {
       const serviceId = a.service_id;
@@ -4191,6 +4191,17 @@ async function refreshTodayActions() {
         line.className = "text-sm text-slate-700 ml-4";
         line.textContent = `• ${a.patient_name} - ${doctorName} - ${formatDate(appointmentDate)}${timeInfo}`;
         block.appendChild(line);
+        
+        // TAMBAH: Paparkan complaint jika ada
+        if (a.complaint && a.complaint.trim() !== '') {
+          const complaintDiv = document.createElement("div");
+          complaintDiv.className = "complaint-box ml-6 mt-1";
+          complaintDiv.innerHTML = `
+            <div class="complaint-label">Complaint:</div>
+            <div>${a.complaint}</div>
+          `;
+          block.appendChild(complaintDiv);
+        }
       });
       
       const instruction = document.createElement("div");
@@ -4235,6 +4246,17 @@ async function refreshTodayActions() {
         line.className = "text-sm text-slate-700 ml-4";
         line.textContent = `• ${a.patient_name} - diminta untuk ${formatDate(a.requested_date)}${timeInfo}`;
         block.appendChild(line);
+        
+        // TAMBAH: Paparkan complaint jika ada
+        if (a.complaint && a.complaint.trim() !== '') {
+          const complaintDiv = document.createElement("div");
+          complaintDiv.className = "complaint-box ml-6 mt-1";
+          complaintDiv.innerHTML = `
+            <div class="complaint-label">Complaint:</div>
+            <div>${a.complaint}</div>
+          `;
+          block.appendChild(complaintDiv);
+        }
       });
       
       if (serviceAppointments.length > 3) {
@@ -4297,6 +4319,17 @@ async function refreshTodayActions() {
         const datesText = datesWithTimes.join(' atau ');
         line.textContent = `• ${a.patient_name} - cadangan doktor: ${datesText}`;
         block.appendChild(line);
+        
+        // TAMBAH: Paparkan complaint jika ada
+        if (a.complaint && a.complaint.trim() !== '') {
+          const complaintDiv = document.createElement("div");
+          complaintDiv.className = "complaint-box ml-6 mt-1";
+          complaintDiv.innerHTML = `
+            <div class="complaint-label">Complaint:</div>
+            <div>${a.complaint}</div>
+          `;
+          block.appendChild(complaintDiv);
+        }
       });
       
       if (serviceAppointments.length > 3) {
@@ -4453,7 +4486,7 @@ async function refreshTodayActions() {
               <div class="flex-1">
                 <h3 class="font-bold text-slate-900 text-base truncate">${a.patient_name}</h3>
                 <p class="text-sm text-slate-500 mt-1">${doctorName}</p>
-                ${a.complaint ? `<p class="text-sm text-slate-600 mt-2">Complaint: ${a.complaint}</p>` : ''}
+                ${a.complaint ? `<div class="complaint-box mt-2"><div class="complaint-label">Complaint:</div><div>${a.complaint}</div></div>` : ''}
               </div>
               <div class="flex flex-col items-end gap-2">
                 <span class="status-badge ${statusColor}">${statusText}</span>
@@ -4655,7 +4688,7 @@ async function refreshTodayActions() {
               <div class="flex-1">
                 <h3 class="font-bold text-slate-900 text-sm truncate">${a.patient_name}</h3>
                 <p class="text-xs text-slate-500 mt-1">${doctorName}</p>
-                ${a.complaint ? `<p class="text-xs text-slate-600 mt-1 truncate">${a.complaint}</p>` : ''}
+                ${a.complaint ? `<div class="complaint-box mt-1"><div class="complaint-label">Complaint:</div><div class="text-xs">${a.complaint}</div></div>` : ''}
               </div>
               <div class="flex flex-col items-end gap-1">
                 <span class="status-badge ${statusColor} text-xs">${statusText}</span>
@@ -5228,6 +5261,14 @@ async function refreshTodayActions() {
           </div>
         `;
 
+        // KEMASKINI: TAMBAH COMPLAINT BOX SEPERTI DALAM GAMBAR
+        const complaintBox = a.complaint && a.complaint.trim() !== '' ? `
+          <div class="complaint-box mt-2">
+            <div class="complaint-label">Complaint:</div>
+            <div>${a.complaint}</div>
+          </div>
+        ` : '';
+
         card.innerHTML = `
           <div class="flex items-start justify-between gap-3">
             <div class="flex-1">
@@ -5236,7 +5277,7 @@ async function refreshTodayActions() {
               <div class="text-sm text-slate-400">
                 IC: ${a.patient_ic} • Tel: ${a.patient_phone}
               </div>
-              ${a.complaint ? `<div class="text-sm text-slate-600 mt-2">Complaint: ${a.complaint}</div>` : ''}
+              ${complaintBox}
             </div>
             <div class="text-right text-sm text-slate-500">
               <div>Tarikh diminta: ${formatDate(a.requested_date)}</div>
@@ -5339,7 +5380,6 @@ async function refreshTodayActions() {
 // APPROVE BUTTON HANDLER
 approveBtn.addEventListener("click", async () => {
   const now = new Date().toISOString();
-  console.log("Approving appointment at:", now); // Debug
   
   const { error } = await db
     .from("appointments")
@@ -5363,7 +5403,6 @@ approveBtn.addEventListener("click", async () => {
 // APPROVE WHATSAPP BUTTON HANDLER
 approveWhatsappBtn.addEventListener("click", async () => {
   const now = new Date().toISOString();
-  console.log("Approving appointment at:", now); // Debug
   
   const { error } = await db
     .from("appointments")
