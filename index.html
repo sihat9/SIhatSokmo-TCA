@@ -851,58 +851,106 @@
       .time-modal-content {
         width: 95%;
         max-width: none;
-        padding: 20px;
+        padding: 0;
         border-radius: 16px;
         margin: 1rem;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* Modal header - sticky */
+      .time-modal-content>div:first-child {
+        padding: 16px 20px 12px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        background: white;
+        border-radius: 16px 16px 0 0;
+        flex-shrink: 0;
       }
 
       /* Modal title */
       .time-modal-content h3 {
         font-size: 1.125rem !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.25rem !important;
+        padding-right: 2rem;
       }
 
       /* Modal description */
       .time-modal-content p {
-        font-size: 0.875rem !important;
-        margin-bottom: 0.75rem !important;
+        font-size: 0.8125rem !important;
+        margin-bottom: 0 !important;
+        color: #64748b;
+      }
+
+      /* Scrollable content area */
+      .time-modal-content>div:not(:first-child):not(:last-child) {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+        -webkit-overflow-scrolling: touch;
       }
 
       /* Time slots - 2 columns pada mobile */
       .time-slot-container {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 8px;
-        margin-top: 16px;
+        margin-top: 12px;
       }
 
-      /* Time slot buttons - bigger for touch */
+      /* Time slot buttons - compact but touchable */
       .time-slot {
-        padding: 14px 10px !important;
-        min-height: 46px !important;
-        font-size: 0.9375rem !important;
+        padding: 12px 8px !important;
+        min-height: 44px !important;
+        font-size: 0.875rem !important;
         font-weight: 600 !important;
         display: flex;
         align-items: center;
         justify-content: center;
       }
 
+      /* Time input group section */
+      .time-modal-content>div:not(:first-child):not(:last-child)>div:last-child {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #f1f5f9;
+      }
+
       /* Time input group - stack vertically */
       .time-input-group {
         flex-direction: column !important;
-        gap: 12px !important;
-        margin-top: 16px !important;
+        gap: 10px !important;
+        margin-top: 12px !important;
+      }
+
+      .time-input-group>div {
+        width: 100%;
       }
 
       .time-input-group label {
-        font-size: 0.875rem !important;
-        margin-bottom: 4px;
+        font-size: 0.8125rem !important;
+        margin-bottom: 6px;
+        display: block;
+        font-weight: 500;
+        color: #475569;
       }
 
       .time-input {
         width: 100% !important;
-        padding: 14px !important;
+        padding: 12px !important;
         font-size: 1rem !important;
-        min-height: 46px !important;
+        min-height: 44px !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+      }
+
+      /* Footer with save button - sticky at bottom */
+      .time-modal-content>div:last-child {
+        padding: 12px 20px 16px 20px;
+        border-top: 1px solid #e5e7eb;
+        background: white;
+        border-radius: 0 0 16px 16px;
+        flex-shrink: 0;
       }
 
       /* Save button - full width */
@@ -910,19 +958,36 @@
         width: 100% !important;
         min-height: 48px !important;
         font-size: 1rem !important;
-        font-weight: 600 !important;
-        margin-top: 1rem !important;
+        font-weight: 700 !important;
+        margin-top: 0 !important;
+        border-radius: 10px !important;
       }
 
       /* Close button */
-      .time-modal-content .absolute.top-4.right-4 {
-        top: 12px !important;
-        right: 12px !important;
+      .time-modal-content .absolute {
+        position: absolute !important;
+        top: 16px !important;
+        right: 16px !important;
+        z-index: 10;
       }
 
-      .time-modal-content .absolute.top-4.right-4 svg {
+      .time-modal-content .absolute svg {
         width: 1.5rem !important;
         height: 1.5rem !important;
+      }
+
+      /* Scrollbar styling untuk webkit browsers */
+      .time-modal-content>div:not(:first-child):not(:last-child)::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .time-modal-content>div:not(:first-child):not(:last-child)::-webkit-scrollbar-track {
+        background: #f8fafc;
+      }
+
+      .time-modal-content>div:not(:first-child):not(:last-child)::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
       }
     }
 
@@ -2040,46 +2105,46 @@
   <!-- MODAL UNTUK MASUKKAN MASA TEMUJANJI -->
   <div id="timeSelectionModal" class="time-modal">
     <div class="time-modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-slate-900">Pilih Masa Temujanji</h3>
-        <button id="closeTimeModal" class="text-slate-400 hover:text-slate-600">
+      <!-- Header (Sticky) -->
+      <div>
+        <button id="closeTimeModal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+        <h3 class="text-lg font-bold text-slate-900">Pilih Masa Temujanji</h3>
+        <p id="timeModalDate" class="text-sm text-slate-600"></p>
       </div>
 
-      <div id="timeModalDate" class="text-sm text-slate-600 mb-2"></div>
+      <!-- Content (Scrollable) -->
+      <div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Pilih slot masa yang available:</label>
+          <div id="timeSlotsContainer" class="time-slot-container">
+            <!-- Slot masa akan diisi oleh JavaScript -->
+          </div>
+        </div>
 
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-slate-700 mb-2">Pilih slot masa yang available:</label>
-        <div id="timeSlotsContainer" class="time-slot-container">
-          <!-- Slot masa akan diisi oleh JavaScript -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">Atau masukkan masa custom:</label>
+          <div class="time-input-group">
+            <div>
+              <label class="block text-xs text-slate-600 mb-1">Masa Mula</label>
+              <input type="time" id="customStartTime" class="time-input">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-600 mb-1">Masa Tamat</label>
+              <input type="time" id="customEndTime" class="time-input">
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-slate-700 mb-2">Atau masukkan masa custom:</label>
-        <div class="time-input-group">
-          <div>
-            <input type="time" id="customStartTime" class="time-input">
-            <div class="text-xs text-slate-500 mt-1">Mula</div>
-          </div>
-          <div class="text-slate-400">hingga</div>
-          <div>
-            <input type="time" id="customEndTime" class="time-input">
-            <div class="text-xs text-slate-500 mt-1">Tamat</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-3">
-        <button id="cancelTimeSelection"
-          class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50">
-          Batal
-        </button>
-        <button id="saveTimeSelection" class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">
-          Simpan Masa
+      <!-- Footer (Sticky) -->
+      <div>
+        <button type="button" id="saveTimeBtn"
+          class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all">
+          💾 Simpan Masa
         </button>
       </div>
     </div>
