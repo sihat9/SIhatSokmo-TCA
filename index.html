@@ -1868,6 +1868,16 @@
                     class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
                   Rejected
                 </label>
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportAttended" type="checkbox" checked
+                    class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
+                  Hadir (Attended)
+                </label>
+                <label class="inline-flex items-center gap-2 text-sm md:text-base text-slate-600">
+                  <input id="exportNoShow" type="checkbox" checked
+                    class="rounded border-slate-300 bg-white text-emerald-600 focus:ring-emerald-500 w-5 h-5">
+                  Tidak Hadir (No Show)
+                </label>
               </div>
             </div>
 
@@ -1878,7 +1888,11 @@
               </button>
               <button id="exportExcelBtn"
                 class="inline-flex items-center justify-center gap-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
-                Export ke Excel
+                📊 Export ke Excel
+              </button>
+              <button id="exportPdfBtn"
+                class="inline-flex items-center justify-center gap-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-base md:text-lg font-semibold text-white px-6 py-3 shadow-lg hover:shadow-xl">
+                📄 Export ke PDF
               </button>
             </div>
 
@@ -1910,7 +1924,7 @@
                   <span>📅</span>
                   Masukkan Tarikh Available
                 </button>
-                <button id="fixedAppointmentBtn"
+                <button id=\"fixedAppointmentBtn\"
                   class="inline-flex items-center gap-2 text-sm md:text-base px-4 py-2 rounded-full border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition">
                   <span>⏰</span>
                   Setting Temujanji Tetap
@@ -1918,7 +1932,7 @@
                 <div
                   class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
                   <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600" data-tab="pending">
-                    Status (Pending Approval)
+                    Pending
                   </button>
                   <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
                     data-tab="approved">
@@ -1928,10 +1942,18 @@
                     data-tab="rejected">
                     Rejected
                   </button>
+                  <button class="doctor-tab-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                    data-tab="attended">
+                    Selesai
+                  </button>
                 </div>
                 <button id="refreshDoctorAppointments"
                   class="text-sm md:text-base px-4 py-2 rounded-full border border-slate-300 hover:border-emerald-400 hover:text-emerald-600 bg-white shadow-sm">
                   Refresh
+                </button>
+                <button id="downloadDoctorPdfBtn"
+                  class="hidden text-sm md:text-base px-4 py-2 rounded-full border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:border-rose-300 transition shadow-sm">
+                  📄 Download PDF
                 </button>
               </div>
             </div>
@@ -2357,8 +2379,11 @@
     const exportPending = document.getElementById("exportPending");
     const exportApproved = document.getElementById("exportApproved");
     const exportRejected = document.getElementById("exportRejected");
+    const exportAttended = document.getElementById("exportAttended");  // NEW
+    const exportNoShow = document.getElementById("exportNoShow");      // NEW
     const exportPreviewBtn = document.getElementById("exportPreviewBtn");
     const exportExcelBtn = document.getElementById("exportExcelBtn");
+    const exportPdfBtn = document.getElementById("exportPdfBtn");      // NEW
     const exportPreview = document.getElementById("exportPreview");
     const exportStats = document.getElementById("exportStats");
     const exportPreviewTable = document.getElementById("exportPreviewTable");
@@ -2369,6 +2394,7 @@
     const fixedAppointmentBtn = document.getElementById("fixedAppointmentBtn");
     const doctorAppointmentsList = document.getElementById("doctorAppointmentsList");
     const refreshDoctorAppointments = document.getElementById("refreshDoctorAppointments");
+    const downloadDoctorPdfBtn = document.getElementById("downloadDoctorPdfBtn");  // NEW
     const doctorTabButtons = document.querySelectorAll(".doctor-tab-btn");
     const doctorTabDescription = document.getElementById("doctorTabDescription");
 
@@ -5769,6 +5795,8 @@
       if (exportPending.checked) statusFilters.push("pending");
       if (exportApproved.checked) statusFilters.push("approved");
       if (exportRejected.checked) statusFilters.push("rejected");
+      if (exportAttended.checked) statusFilters.push("completed");  // Changed from 'attended' to 'completed'
+      if (exportNoShow.checked) statusFilters.push("noshow");
 
       if (statusFilters.length > 0) {
         query = query.in("status", statusFilters);
@@ -5841,7 +5869,9 @@
         const statusColors = {
           pending: 'text-amber-600',
           approved: 'text-emerald-600',
-          rejected: 'text-rose-600'
+          rejected: 'text-rose-600',
+          completed: 'text-blue-600',  // Changed from 'attended' to 'completed'
+          noshow: 'text-slate-600'
         };
 
         tableHTML += `
@@ -5914,12 +5944,180 @@
       XLSX.writeFile(wb, fileName);
     }
 
+    async function exportToPdf() {
+      const data = await fetchExportData();
+
+      if (data.length === 0) {
+        alert('Tiada data untuk di-export.');
+        return;
+      }
+
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank');
+
+      const doctorName = exportDoctor.value === 'all' ? 'Semua Doktor' :
+        doctorsCache.find(d => d.id === exportDoctor.value)?.full_name || 'Doktor';
+      const monthName = exportMonth.value === 'all' ? 'Semua Bulan' :
+        document.querySelector(`#exportMonth option[value="${exportMonth.value}"]`).textContent;
+      const yearName = exportYear.value === 'all' ? 'Semua Tahun' : exportYear.value;
+
+      const statusLabels = {
+        pending: 'Pending',
+        approved: 'Diluluskan',
+        rejected: 'Ditolak',
+        completed: 'Hadir',  // Changed from 'attended' to 'completed'
+        noshow: 'Tidak Hadir'
+      };
+
+      let tableRows = '';
+      data.forEach((item, index) => {
+        const serviceName = item.services?.name || '-';
+        const doctorFullName = item.profiles?.full_name || '-';
+        const statusLabel = statusLabels[item.status] || item.status;
+        const finalDate = item.doctor_selected_date || item.requested_date;
+
+        tableRows += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${item.patient_name || '-'}</td>
+            <td>${item.patient_ic || '-'}</td>
+            <td>${item.patient_phone || '-'}</td>
+            <td>${serviceName}</td>
+            <td>${doctorFullName}</td>
+            <td>${statusLabel}</td>
+            <td>${formatDate(item.requested_date)}</td>
+            <td>${item.appointment_time ? formatTime(item.appointment_time) : '-'}</td>
+            <td>${item.appointment_duration || '-'} min</td>
+            <td>${formatDate(finalDate)}</td>
+            <td style="white-space: pre-wrap; max-width: 200px;">${item.complaint || '-'}</td>
+          </tr>
+        `;
+      });
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Laporan Temujanji - ${doctorName}</title>
+          <style>
+            @page { size: A4 landscape; margin: 15mm; }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 10px;
+              line-height: 1.4;
+              color: #333;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #10b981;
+              padding-bottom: 10px;
+            }
+            .header h1 {
+              margin: 0 0 5px 0;
+              font-size: 18px;
+              color: #10b981;
+            }
+            .header p {
+              margin: 3px 0;
+              font-size: 11px;
+              color: #666;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 6px 8px;
+              text-align: left;
+            }
+            th {
+              background-color: #10b981;
+              color: white;
+              font-weight: bold;
+              font-size: 9px;
+            }
+            td {
+              font-size: 9px;
+            }
+            tr:nth-child(even) {
+              background-color: #f9f9f9;
+            }
+            .footer {
+              margin-top: 20px;
+              text-align: right;
+              font-size: 9px;
+              color: #666;
+            }
+            @media print {
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>LAPORAN REKOD TEMUJANJI</h1>
+            <p><strong>Klinik SihatSokmo</strong></p>
+            <p>Doktor: <strong>${doctorName}</strong> | Tempoh: <strong>${monthName} ${yearName}</strong></p>
+            <p>Jumlah Rekod: <strong>${data.length}</strong> | Tarikh Cetak: <strong>${new Date().toLocaleDateString('ms-MY')}</strong></p>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Bil</th>
+                <th>Nama Pesakit</th>
+                <th>IC</th>
+                <th>Telefon</th>
+                <th>Servis</th>
+                <th>Doktor</th>
+                <th>Status</th>
+                <th>Tarikh Diminta</th>
+                <th>Masa</th>
+                <th>Tempoh</th>
+                <th>Tarikh Diluluskan</th>
+                <th>Complaint</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+
+          <div class="footer">
+            <p>Dokumen ini dijana secara automatik dari Sistem Appointment Klinik SihatSokmo</p>
+            <p><em>Dokumen sah tanpa tandatangan | For Official Use Only</em></p>
+          </div>
+
+          <div class="no-print" style="text-align: center; margin-top: 20px;">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+              🖨️ Print / Save as PDF
+            </button>
+            <button onclick="window.close()" style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 10px;">
+              ❌ Tutup
+            </button>
+          </div>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
+
     if (exportPreviewBtn) {
       exportPreviewBtn.addEventListener("click", previewExportData);
     }
 
     if (exportExcelBtn) {
       exportExcelBtn.addEventListener("click", exportToExcel);
+    }
+
+    if (exportPdfBtn) {
+      exportPdfBtn.addEventListener("click", exportToPdf);
     }
 
     // ==============================
@@ -5950,16 +6148,29 @@
           Senarai temujanji yang menunggu tindakan doktor. Tekan <span class="font-bold text-emerald-600">Approve</span> atau
           <span class="font-bold text-rose-600">Reject</span>. Jika pilih Reject, anda perlu masukkan MINIMUM SATU tarikh & masa cadangan (wajib). Boleh tambah tarikh kedua jika perlu.
         `;
+        // Hide download PDF button
+        if (downloadDoctorPdfBtn) downloadDoctorPdfBtn.classList.add('hidden');
       } else if (activeDoctorTab === "approved") {
         query = query.eq("status", "approved");
         doctorTabDescription.innerHTML = `
           Senarai temujanji yang telah diluluskan. Doktor boleh melihat rekod pesakit yang akan datang.
         `;
+        // Hide download PDF button
+        if (downloadDoctorPdfBtn) downloadDoctorPdfBtn.classList.add('hidden');
       } else if (activeDoctorTab === "rejected") {
         query = query.eq("status", "rejected");
         doctorTabDescription.innerHTML = `
           Senarai temujanji yang telah ditolak dengan cadangan tarikh alternatif. Status ini menunggu tindakan staff klinik.
         `;
+        // Hide download PDF button
+        if (downloadDoctorPdfBtn) downloadDoctorPdfBtn.classList.add('hidden');
+      } else if (activeDoctorTab === "attended") {
+        query = query.eq("status", "completed");  // Changed from 'attended' to 'completed'
+        doctorTabDescription.innerHTML = `
+          Senarai pesakit yang telah hadir dan selesai consultation. <span class="font-bold text-blue-600">✓ Rekod lengkap untuk tujuan claim dan dokumentasi.</span>
+        `;
+        // Show download PDF button
+        if (downloadDoctorPdfBtn) downloadDoctorPdfBtn.classList.remove('hidden');
       }
 
       query = query.order("created_at", { ascending: false }).limit(50);
