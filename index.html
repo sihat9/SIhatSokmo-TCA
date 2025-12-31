@@ -1044,6 +1044,64 @@
         min-height: 40px !important;
       }
     }
+
+    /* ============================================ */
+    /* COMPLAINT BOX - RESPONSIVE STYLING */
+    /* ============================================ */
+
+    /* Complaint text dalam appointment cards */
+    .appointment-card .complaint-text,
+    .appointment-card [class*="complaint"],
+    .appointment-card p:has-text("Complaint"),
+    .appointment-card div:has(> span:contains("Complaint")) {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: pre-wrap;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    /* Mobile - Extra compact */
+    @media (max-width: 768px) {
+
+      .appointment-card .complaint-text,
+      .appointment-card [class*="complaint"] {
+        font-size: 0.875rem !important;
+        line-height: 1.4;
+        max-height: 4.2em;
+        /* 3 lines */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+
+      /* Expand pada hover/focus untuk mobile */
+      .appointment-card:active .complaint-text,
+      .appointment-card.expanded .complaint-text {
+        max-height: none;
+        -webkit-line-clamp: unset;
+      }
+    }
+
+    /* Tablet */
+    @media (max-width: 1024px) and (min-width: 769px) {
+
+      .appointment-card .complaint-text,
+      .appointment-card [class*="complaint"] {
+        font-size: 0.9375rem !important;
+        line-height: 1.5;
+        max-height: 6em;
+        /* 4 lines */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+      }
+    }
   </style>
 </head>
 
@@ -1609,17 +1667,23 @@
                   <div class="flex items-center gap-3">
                     <div
                       class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm md:text-base shadow-sm">
-                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600 relative"
                         data-status="pending">
                         Pending
+                        <span
+                          class="staff-badge staff-badge-pending absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 hidden">0</span>
                       </button>
-                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600 relative"
                         data-status="approved">
                         Approved
+                        <span
+                          class="staff-badge staff-badge-approved absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 hidden">0</span>
                       </button>
-                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600"
+                      <button class="staff-filter-btn px-4 py-2 rounded-full font-semibold text-slate-600 relative"
                         data-status="rejected">
                         Rejected
+                        <span
+                          class="staff-badge staff-badge-rejected absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 hidden">0</span>
                       </button>
                     </div>
                     <button id="refreshStaffAppointments"
@@ -1774,17 +1838,26 @@
                   <div class="flex flex-col gap-3">
                     <div
                       class="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 text-sm shadow-sm w-full justify-center">
-                      <button class="staff-filter-btn-mobile px-4 py-2 rounded-full font-semibold text-slate-600"
+                      <button
+                        class="staff-filter-btn-mobile px-4 py-2 rounded-full font-semibold text-slate-600 relative"
                         data-status="pending">
                         Pending
+                        <span
+                          class="staff-badge staff-badge-pending absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 hidden">0</span>
                       </button>
-                      <button class="staff-filter-btn-mobile px-4 py-2 rounded-full font-semibold text-slate-600"
+                      <button
+                        class="staff-filter-btn-mobile px-4 py-2 rounded-full font-semibold text-slate-600 relative"
                         data-status="approved">
                         Approved
+                        <span
+                          class="staff-badge staff-badge-approved absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 hidden">0</span>
                       </button>
-                      <button class="staff-filter-btn-mobile px-4 py-2 rounded-full font-semibold text-slate-600"
+                      <button
+                        class="staff-filter-btn-mobile px-4 py-2 rounded-full font-semibold text-slate-600 relative"
                         data-status="rejected">
                         Rejected
+                        <span
+                          class="staff-badge staff-badge-rejected absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 hidden">0</span>
                       </button>
                     </div>
                     <button id="refreshStaffAppointmentsMobile"
@@ -4820,7 +4893,49 @@
       renderStaffFilterTabs();
       renderStaffAppointmentsList();
       renderStaffAppointmentsListMobile();
+      updateStaffBadgeCounts(); // Update badge counts
       await refreshTodayActions();
+    }
+
+    // Function untuk update badge notification counts
+    async function updateStaffBadgeCounts() {
+      try {
+        // Get counts for each status
+        const { data: pendingData, count: pendingCount } = await db
+          .from("appointments")
+          .select("id", { count: 'exact', head: true })
+          .in("status", ["pending", "reschedule_pending"]);
+
+        const { data: approvedData, count: approvedCount } = await db
+          .from("appointments")
+          .select("id", { count: 'exact', head: true })
+          .eq("status", "approved");
+
+        const { data: rejectedData, count: rejectedCount } = await db
+          .from("appointments")
+          .select("id", { count: 'exact', head: true })
+          .eq("status", "rejected");
+
+        // Update all badges (desktop and mobile)
+        const updateBadge = (selector, count) => {
+          const badges = document.querySelectorAll(selector);
+          badges.forEach(badge => {
+            if (count > 0) {
+              badge.textContent = count > 99 ? '99+' : count;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          });
+        };
+
+        updateBadge('.staff-badge-pending', pendingCount);
+        updateBadge('.staff-badge-approved', approvedCount);
+        updateBadge('.staff-badge-rejected', rejectedCount);
+
+      } catch (error) {
+        console.error('Error updating badge counts:', error);
+      }
     }
 
     // ==============================
@@ -6118,6 +6233,176 @@
 
     if (exportPdfBtn) {
       exportPdfBtn.addEventListener("click", exportToPdf);
+    }
+
+    // Download PDF untuk doktor (attended records only)
+    if (downloadDoctorPdfBtn) {
+      downloadDoctorPdfBtn.addEventListener("click", async () => {
+        if (!currentProfile || currentProfile.role !== "doctor") return;
+
+        // Fetch attended appointments untuk doktor ini sahaja
+        const { data, error } = await db
+          .from("appointments")
+          .select(`
+            id,
+            patient_name,
+            patient_ic,
+            patient_phone,
+            complaint,
+            requested_date,
+            appointment_time,
+            appointment_duration,
+            status,
+            doctor_selected_date,
+            created_at,
+            service_id,
+            services(name)
+          `)
+          .eq("doctor_id", currentProfile.id)
+          .eq("status", "completed")
+          .order("created_at", { ascending: false });
+
+        if (error || !data || data.length === 0) {
+          alert('Tiada rekod pesakit attended untuk di-download.');
+          return;
+        }
+
+        // Generate PDF
+        const printWindow = window.open('', '_blank');
+        const doctorName = currentProfile.full_name || 'Doktor';
+
+        let tableRows = '';
+        data.forEach((item, index) => {
+          const serviceName = item.services?.name || '-';
+          const finalDate = item.doctor_selected_date || item.requested_date;
+
+          tableRows += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${item.patient_name || '-'}</td>
+              <td>${item.patient_ic || '-'}</td>
+              <td>${item.patient_phone || '-'}</td>
+              <td>${serviceName}</td>
+              <td>${formatDate(item.requested_date)}</td>
+              <td>${item.appointment_time ? formatTime(item.appointment_time) : '-'}</td>
+              <td>${item.appointment_duration || '-'} min</td>
+              <td>${formatDate(finalDate)}</td>
+              <td style="white-space: pre-wrap; max-width: 250px;">${item.complaint || '-'}</td>
+            </tr>
+          `;
+        });
+
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Rekod Pesakit Attended - Dr. ${doctorName}</title>
+            <style>
+              @page { size: A4 landscape; margin: 15mm; }
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                line-height: 1.4;
+                color: #333;
+              }
+              .header {
+                text-align: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #10b981;
+                padding-bottom: 10px;
+              }
+              .header h1 {
+                margin: 0 0 5px 0;
+                font-size: 18px;
+                color: #10b981;
+              }
+              .header p {
+                margin: 3px 0;
+                font-size: 11px;
+                color: #666;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 6px 8px;
+                text-align: left;
+              }
+              th {
+                background-color: #10b981;
+                color: white;
+                font-weight: bold;
+                font-size: 9px;
+              }
+              td {
+                font-size: 9px;
+              }
+              tr:nth-child(even) {
+                background-color: #f9f9f9;
+              }
+              .footer {
+                margin-top: 20px;
+                text-align: right;
+                font-size: 9px;
+                color: #666;
+              }
+              @media print {
+                .no-print { display: none; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>REKOD PESAKIT ATTENDED</h1>
+              <p><strong>Klinik SihatSokmo</strong></p>
+              <p>Doktor: <strong>Dr. ${doctorName}</strong></p>
+              <p>Jumlah Rekod: <strong>${data.length}</strong> | Tarikh Cetak: <strong>${new Date().toLocaleDateString('ms-MY')}</strong></p>
+            </div>
+            
+            <table>
+              <thead>
+                <tr>
+                  <th>Bil</th>
+                  <th>Nama Pesakit</th>
+                  <th>IC</th>
+                  <th>Telefon</th>
+                  <th>Servis</th>
+                  <th>Tarikh Diminta</th>
+                  <th>Masa</th>
+                  <th>Tempoh</th>
+                  <th>Tarikh Attended</th>
+                  <th>Complaint</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+
+            <div class="footer">
+              <p>Dokumen ini dijana secara automatik dari Sistem Appointment Klinik SihatSokmo</p>
+              <p><em>Rekod peribadi Dr. ${doctorName} | For Personal Record & Claims</em></p>
+            </div>
+
+            <div class="no-print" style="text-align: center; margin-top: 20px;">
+              <button onclick="window.print()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                🖨️ Print / Save as PDF
+              </button>
+              <button onclick="window.close()" style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 10px;">
+                ❌ Tutup
+              </button>
+            </div>
+          </body>
+          </html>
+        `;
+
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+      });
     }
 
     // ==============================
