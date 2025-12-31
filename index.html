@@ -1116,6 +1116,177 @@
         -webkit-box-orient: vertical;
       }
     }
+
+    /* ============================================ */
+    /* DOCTOR PANEL - MOBILE/TABLET OPTIMIZATION */
+    /* ============================================ */
+
+    /* Mobile - Optimize untuk telefon (doktor mostly use mobile) */
+    @media (max-width: 768px) {
+
+      /* Panel container */
+      #tab-doctor .bg-slate-50 {
+        padding: 1rem !important;
+      }
+
+      /* Panel title */
+      #tab-doctor h2 {
+        font-size: 1.375rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      /* Tab description */
+      #doctorTabDescription {
+        font-size: 0.9375rem !important;
+        line-height: 1.5 !important;
+        margin-bottom: 1rem !important;
+      }
+
+      /* Appointment cards dalam doctor panel */
+      #doctorAppointmentsList .appointment-card,
+      #doctorAppointmentsList>div {
+        padding: 1rem !important;
+        margin-bottom: 1rem !important;
+        border-radius: 12px !important;
+      }
+
+      /* Patient name lebih besar */
+      #doctorAppointmentsList .appointment-card .font-semibold,
+      #doctorAppointmentsList .appointment-card h3,
+      #doctorAppointmentsList .appointment-card>div:first-child {
+        font-size: 1.125rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      /* Info fields lebih besar dan spacious */
+      #doctorAppointmentsList .appointment-card p,
+      #doctorAppointmentsList .appointment-card span:not(.badge) {
+        font-size: 0.9375rem !important;
+        line-height: 1.6 !important;
+        margin-bottom: 0.5rem !important;
+      }
+
+      /* Labels */
+      #doctorAppointmentsList .appointment-card .text-xs {
+        font-size: 0.875rem !important;
+      }
+
+      /* Status badges lebih besar */
+      #doctorAppointmentsList .appointment-card [class*="bg-amber"],
+      #doctorAppointmentsList .appointment-card [class*="bg-emerald"],
+      #doctorAppointmentsList .appointment-card [class*="bg-rose"],
+      #doctorAppointmentsList .appointment-card [class*="bg-blue"] {
+        font-size: 0.875rem !important;
+        padding: 0.375rem 0.75rem !important;
+        border-radius: 6px !important;
+      }
+
+      /* Action buttons FULL WIDTH pada mobile */
+      #doctorAppointmentsList .appointment-card button {
+        width: 100% !important;
+        min-height: 48px !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        padding: 0.75rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+        border-radius: 8px !important;
+      }
+
+      /* Grid buttons jadi single column */
+      #doctorAppointmentsList .grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+      }
+
+      /* Complaint box */
+      #doctorAppointmentsList .complaint-text,
+      #doctorAppointmentsList .appointment-card p:last-child {
+        font-size: 0.9375rem !important;
+        line-height: 1.5 !important;
+        max-height: 4.5em !important;
+        /* 3 lines untuk doctor */
+        -webkit-line-clamp: 3 !important;
+        line-clamp: 3 !important;
+      }
+
+      /* WhatsApp button lebih prominent */
+      #doctorAppointmentsList button[class*="green"],
+      #doctorAppointmentsList button[class*="whatsapp"] {
+        background: #25D366 !important;
+        font-size: 1.0625rem !important;
+      }
+    }
+
+    /* Tablet - Optimize untuk tablet */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      #tab-doctor .bg-slate-50 {
+        padding: 1.5rem !important;
+      }
+
+      #tab-doctor h2 {
+        font-size: 1.5rem !important;
+      }
+
+      #doctorTabDescription {
+        font-size: 1rem !important;
+      }
+
+      #doctorAppointmentsList .appointment-card {
+        padding: 1.25rem !important;
+        margin-bottom: 1.25rem !important;
+      }
+
+      #doctorAppointmentsList .appointment-card .font-semibold,
+      #doctorAppointmentsList .appointment-card h3 {
+        font-size: 1.25rem !important;
+      }
+
+      #doctorAppointmentsList .appointment-card p,
+      #doctorAppointmentsList .appointment-card span:not(.badge) {
+        font-size: 1rem !important;
+      }
+
+      #doctorAppointmentsList .appointment-card button {
+        min-height: 46px !important;
+        font-size: 1rem !important;
+        padding: 0.75rem 1.25rem !important;
+      }
+
+      /* Grid 2 columns pada tablet */
+      #doctorAppointmentsList .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+      }
+
+      #doctorAppointmentsList .complaint-text {
+        font-size: 1rem !important;
+        max-height: 4.8em !important;
+        -webkit-line-clamp: 3 !important;
+        line-clamp: 3 !important;
+      }
+    }
+
+    /* Landscape phone - Special handling */
+    @media (max-width: 896px) and (max-height: 414px) and (orientation: landscape) {
+      #tab-doctor .bg-slate-50 {
+        padding: 0.75rem !important;
+      }
+
+      #doctorAppointmentsList .appointment-card {
+        padding: 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      #doctorAppointmentsList .appointment-card button {
+        min-height: 42px !important;
+        font-size: 0.9375rem !important;
+        padding: 0.5rem 1rem !important;
+      }
+
+      #doctorAppointmentsList .grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
   </style>
 </head>
 
@@ -1132,7 +1303,7 @@
             <span>Live Appointment</span>
           </div>
           <h1 class="text-2xl md:text-4xl font-bold text-slate-900 tracking-tight mt-1">
-            Sistem Appointment Klinik Sihatsokmo
+            Sistem Appointment Klinik SihatSokmo
           </h1>
           <p class="text-sm md:text-base text-slate-500">
             Sistem Temujanji Untuk Staff Klinik &amp; Doktor Pakar.
@@ -2011,7 +2182,7 @@
                   <span>📅</span>
                   Masukkan Tarikh Available
                 </button>
-                <button id=\"fixedAppointmentBtn\"
+                <button id="fixedAppointmentBtn"
                   class="inline-flex items-center gap-2 text-sm md:text-base px-4 py-2 rounded-full border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition">
                   <span>⏰</span>
                   Setting Temujanji Tetap
@@ -6462,14 +6633,14 @@
             <div class="header">
               <h1>📋 REKOD PESAKIT ATTENDED</h1>
               <p><strong>Klinik SihatSokmo</strong></p>
-              <p>Dr. ${doctorName} | Total: <strong>${data.length} pesakit</strong> | ${new Date().toLocaleDateString('ms-MY')}</p>
+              <p>${doctorName} | Total: <strong>${data.length} pesakit</strong> | ${new Date().toLocaleDateString('ms-MY')}</p>
             </div>
             
             ${cardsHTML}
 
             <div class="footer">
               <p>Dokumen dijana dari Sistem Appointment Klinik SihatSokmo</p>
-              <p><em>Rekod Peribadi Dr. ${doctorName} | For Personal Record & Claims</em></p>
+              <p><em>Rekod Peribadi ${doctorName} | For Personal Record & Claims</em></p>
             </div>
 
             <div class="no-print" style="text-align: center; margin-top: 20px; padding: 15px;">
