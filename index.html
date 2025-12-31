@@ -1326,15 +1326,10 @@
 
       #doctorAppointmentsList .complaint-box>div:last-child {
         font-size: 0.875rem !important;
-        line-height: 1.4 !important;
-        max-height: 3.6em;
-        /* 2.5 lines max */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        -webkit-box-orient: vertical;
+        line-height: 1.5 !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        /* Show full text - doktor perlu baca semua */
       }
 
       /* Restructure card layout untuk lebih horizontal */
@@ -1358,9 +1353,8 @@
     @media (max-width: 1024px) and (min-width: 769px) {
       #doctorAppointmentsList .complaint-box>div:last-child {
         font-size: 0.9375rem !important;
-        max-height: 4.2em;
-        -webkit-line-clamp: 3;
-        line-clamp: 3;
+        line-height: 1.5 !important;
+        /* Show full text - doktor perlu baca semua */
       }
     }
   </style>
