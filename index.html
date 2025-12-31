@@ -6870,7 +6870,6 @@
               <div class="text-sm text-slate-400">
                 IC: ${a.patient_ic} • Tel: ${a.patient_phone}
               </div>
-              ${complaintBox}
             </div>
             <div class="text-right text-sm text-slate-500">
               <div>Tarikh diminta: ${formatDate(a.requested_date)}</div>
@@ -6878,6 +6877,7 @@
               ${statusBadge}
             </div>
           </div>
+          ${complaintBox}
           ${patientDateTimeInfo}
         `;
 
