@@ -1300,6 +1300,23 @@
       border-radius: 6px;
       margin-top: 0.75rem;
       width: 100%;
+      max-width: 100%;
+    }
+
+    /* Ensure full-width complaint box on mobile */
+    @media (max-width: 768px) {
+      #doctorAppointmentsList .complaint-box {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      /* Make parent container full-width too */
+      #doctorAppointmentsList .appointment-card>div:first-child {
+        width: 100% !important;
+        max-width: 100%;
+      }
     }
 
     #doctorAppointmentsList .complaint-label {
