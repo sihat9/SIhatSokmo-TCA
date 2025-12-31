@@ -1049,56 +1049,70 @@
     /* COMPLAINT BOX - RESPONSIVE STYLING */
     /* ============================================ */
 
-    /* Complaint text dalam appointment cards */
+    /* General complaint text styling */
     .appointment-card .complaint-text,
     .appointment-card [class*="complaint"],
-    .appointment-card p:has-text("Complaint"),
-    .appointment-card div:has(> span:contains("Complaint")) {
+    .appointment-card div:contains("Complaint") {
       word-wrap: break-word;
       overflow-wrap: break-word;
       word-break: break-word;
       white-space: pre-wrap;
       max-width: 100%;
-      overflow: hidden;
     }
 
-    /* Mobile - Extra compact */
+    /* Mobile - Very compact, horizontal priority */
     @media (max-width: 768px) {
+
+      .appointment-card .complaint-text,
+      .appointment-card [class*="complaint"],
+      .appointment-card p:last-child,
+      .appointment-card div:last-child {
+        font-size: 0.8125rem !important;
+        line-height: 1.3;
+        max-height: 2.6em;
+        /* Only 2 lines */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        margin-top: 0.25rem !important;
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+      }
+
+      /* Reduce card spacing pada mobile */
+      .appointment-card {
+        padding: 0.75rem !important;
+      }
+
+      /* Make info more compact */
+      .appointment-card>div {
+        margin-bottom: 0.25rem !important;
+      }
+
+      /* Labels more compact */
+      .appointment-card span.text-xs,
+      .appointment-card p.text-xs {
+        font-size: 0.75rem !important;
+      }
+    }
+
+    /* Tablet - Slightly more space */
+    @media (max-width: 1024px) and (min-width: 769px) {
 
       .appointment-card .complaint-text,
       .appointment-card [class*="complaint"] {
         font-size: 0.875rem !important;
         line-height: 1.4;
-        max-height: 4.2em;
-        /* 3 lines */
+        max-height: 3.5em;
+        /* 2.5 lines */
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-      }
-
-      /* Expand pada hover/focus untuk mobile */
-      .appointment-card:active .complaint-text,
-      .appointment-card.expanded .complaint-text {
-        max-height: none;
-        -webkit-line-clamp: unset;
-      }
-    }
-
-    /* Tablet */
-    @media (max-width: 1024px) and (min-width: 769px) {
-
-      .appointment-card .complaint-text,
-      .appointment-card [class*="complaint"] {
-        font-size: 0.9375rem !important;
-        line-height: 1.5;
-        max-height: 6em;
-        /* 4 lines */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 4;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
       }
     }
@@ -6267,28 +6281,50 @@
           return;
         }
 
-        // Generate PDF
+        // Generate PDF dengan format compact (card-based, bukan table)
         const printWindow = window.open('', '_blank');
         const doctorName = currentProfile.full_name || 'Doktor';
 
-        let tableRows = '';
+        let cardsHTML = '';
         data.forEach((item, index) => {
           const serviceName = item.services?.name || '-';
           const finalDate = item.doctor_selected_date || item.requested_date;
 
-          tableRows += `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${item.patient_name || '-'}</td>
-              <td>${item.patient_ic || '-'}</td>
-              <td>${item.patient_phone || '-'}</td>
-              <td>${serviceName}</td>
-              <td>${formatDate(item.requested_date)}</td>
-              <td>${item.appointment_time ? formatTime(item.appointment_time) : '-'}</td>
-              <td>${item.appointment_duration || '-'} min</td>
-              <td>${formatDate(finalDate)}</td>
-              <td style="white-space: pre-wrap; max-width: 250px;">${item.complaint || '-'}</td>
-            </tr>
+          cardsHTML += `
+            <div class="patient-card">
+              <div class="card-header">
+                <span class="card-number">#${index + 1}</span>
+                <span class="card-date">${formatDate(finalDate)}</span>
+              </div>
+              <div class="card-body">
+                <div class="info-row">
+                  <span class="label">Nama:</span>
+                  <span class="value"><strong>${item.patient_name || '-'}</strong></span>
+                </div>
+                <div class="info-row">
+                  <span class="label">IC:</span>
+                  <span class="value">${item.patient_ic || '-'}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Tel:</span>
+                  <span class="value">${item.patient_phone || '-'}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Servis:</span>
+                  <span class="value">${serviceName}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Masa:</span>
+                  <span class="value">${item.appointment_time ? formatTime(item.appointment_time) : '-'} (${item.appointment_duration || '-'} min)</span>
+                </div>
+                ${item.complaint ? `
+                  <div class="complaint-box">
+                    <span class="label">Complaint:</span>
+                    <div class="complaint-text">${item.complaint}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
           `;
         });
 
@@ -6297,102 +6333,150 @@
           <html>
           <head>
             <meta charset="UTF-8">
-            <title>Rekod Pesakit Attended - Dr. ${doctorName}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Rekod Pesakit - Dr. ${doctorName}</title>
             <style>
-              @page { size: A4 landscape; margin: 15mm; }
+              @page { size: A4 portrait; margin: 15mm; }
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              
               body {
                 font-family: Arial, sans-serif;
-                font-size: 10px;
+                font-size: 11px;
                 line-height: 1.4;
                 color: #333;
+                padding: 10px;
               }
+              
               .header {
                 text-align: center;
-                margin-bottom: 20px;
-                border-bottom: 2px solid #10b981;
+                margin-bottom: 15px;
+                border-bottom: 3px solid #10b981;
                 padding-bottom: 10px;
               }
+              
               .header h1 {
-                margin: 0 0 5px 0;
-                font-size: 18px;
+                font-size: 16px;
                 color: #10b981;
+                margin-bottom: 5px;
               }
+              
               .header p {
-                margin: 3px 0;
-                font-size: 11px;
+                font-size: 10px;
                 color: #666;
+                margin: 2px 0;
               }
-              table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-              }
-              th, td {
+              
+              .patient-card {
                 border: 1px solid #ddd;
-                padding: 6px 8px;
-                text-align: left;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                page-break-inside: avoid;
+                background: white;
+                overflow: hidden;
               }
-              th {
-                background-color: #10b981;
+              
+              .card-header {
+                background: linear-gradient(135deg, #10b981, #059669);
                 color: white;
+                padding: 6px 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
                 font-weight: bold;
-                font-size: 9px;
+                font-size: 11px;
               }
-              td {
-                font-size: 9px;
+              
+              .card-body {
+                padding: 10px;
               }
-              tr:nth-child(even) {
-                background-color: #f9f9f9;
+              
+              .info-row {
+                display: flex;
+                padding: 4px 0;
+                border-bottom: 1px solid #f1f5f9;
               }
+              
+              .info-row:last-child {
+                border-bottom: none;
+              }
+              
+              .label {
+                font-weight: 600;
+                color: #64748b;
+                min-width: 70px;
+                flex-shrink: 0;
+                font-size: 10px;
+              }
+              
+              .value {
+                color: #1e293b;
+                flex: 1;
+                font-size: 10px;
+              }
+              
+              .complaint-box {
+                margin-top: 8px;
+                padding: 8px;
+                background: #fef3c7;
+                border-left: 3px solid #f59e0b;
+                border-radius: 4px;
+              }
+              
+              .complaint-box .label {
+                display: block;
+                margin-bottom: 4px;
+                color: #92400e;
+              }
+              
+              .complaint-text {
+                font-size: 10px;
+                color: #451a03;
+                line-height: 1.5;
+                word-wrap: break-word;
+              }
+              
               .footer {
-                margin-top: 20px;
-                text-align: right;
+                margin-top: 15px;
+                padding-top: 10px;
+                border-top: 1px solid #e5e7eb;
+                text-align: center;
                 font-size: 9px;
                 color: #666;
               }
+              
               @media print {
                 .no-print { display: none; }
+                body { padding: 0; }
+              }
+              
+              @media (max-width: 600px) {
+                body { font-size: 10px; }
+                .header h1 { font-size: 14px; }
+                .patient-card { margin-bottom: 8px; }
+                .label { min-width: 60px; font-size: 9px; }
+                .value { font-size: 9px; }
               }
             </style>
           </head>
           <body>
             <div class="header">
-              <h1>REKOD PESAKIT ATTENDED</h1>
+              <h1>📋 REKOD PESAKIT ATTENDED</h1>
               <p><strong>Klinik SihatSokmo</strong></p>
-              <p>Doktor: <strong>Dr. ${doctorName}</strong></p>
-              <p>Jumlah Rekod: <strong>${data.length}</strong> | Tarikh Cetak: <strong>${new Date().toLocaleDateString('ms-MY')}</strong></p>
+              <p>Dr. ${doctorName} | Total: <strong>${data.length} pesakit</strong> | ${new Date().toLocaleDateString('ms-MY')}</p>
             </div>
             
-            <table>
-              <thead>
-                <tr>
-                  <th>Bil</th>
-                  <th>Nama Pesakit</th>
-                  <th>IC</th>
-                  <th>Telefon</th>
-                  <th>Servis</th>
-                  <th>Tarikh Diminta</th>
-                  <th>Masa</th>
-                  <th>Tempoh</th>
-                  <th>Tarikh Attended</th>
-                  <th>Complaint</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tableRows}
-              </tbody>
-            </table>
+            ${cardsHTML}
 
             <div class="footer">
-              <p>Dokumen ini dijana secara automatik dari Sistem Appointment Klinik SihatSokmo</p>
-              <p><em>Rekod peribadi Dr. ${doctorName} | For Personal Record & Claims</em></p>
+              <p>Dokumen dijana dari Sistem Appointment Klinik SihatSokmo</p>
+              <p><em>Rekod Peribadi Dr. ${doctorName} | For Personal Record & Claims</em></p>
             </div>
 
-            <div class="no-print" style="text-align: center; margin-top: 20px;">
-              <button onclick="window.print()" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+            <div class="no-print" style="text-align: center; margin-top: 20px; padding: 15px;">
+              <button onclick="window.print()" style="padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; margin-right: 10px;">
                 🖨️ Print / Save as PDF
               </button>
-              <button onclick="window.close()" style="padding: 10px 20px; background: #ef4444; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; margin-left: 10px;">
+              <button onclick="window.close()" style="padding: 12px 24px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold;">
                 ❌ Tutup
               </button>
             </div>
